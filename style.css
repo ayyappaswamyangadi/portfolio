@@ -1,0 +1,293 @@
+*,
+*::after,
+*::before{
+    box-sizing: border-box;
+}
+
+:root{
+    --ff-primary: 'Spinnaker', sans-serif;
+    --ff-secondary: 'Spinnaker', monospace;
+
+    --fw-reg :300;
+    --fw-bold :900;
+
+    --clr-light:#fff;
+    --clr-dark:#000000;
+    --clr-accent:#800080;
+
+    --fs-h1:3rem;
+    --fs-h2:2.25rem;
+    --fs-h3:1.25rem;
+    --fs-body:1rem;
+    --bs:0.25em 0.25em 0.75em rgba(0,0,0,0.25),
+    0.125em 0.125em 0.25em rgba(0,0,0,0.15);
+}
+
+@media(min-width:992px){
+:root{
+    --fs-h1: 4.5rem;
+    --fs-h2: 3.75rem;
+    --fs-h3: 1.5rem;
+    --fs-body: 1.125rem;
+      }
+}
+
+body{
+    background: var(--clr-light);
+    color: var(--clr-dark);
+    font-family: var(--ff-primary);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+h1,
+h2,
+h3{
+    line-height: 1;
+    margin: 0;
+}
+
+h1{
+    font-size: var(--fs-h1);
+}
+
+h2{
+    font-size: var(--fs-h2);
+}
+
+h3{
+    font-size: var(--fs-h3);
+}
+
+#stick{
+    position: fixed;
+    width: 100%;
+    background-color: purple;
+}
+
+#navbarNav{
+justify-content:flex-end;
+}
+
+.nav-link{
+    color: #fff95d !important;
+}
+
+.coloring{
+    color: var(--clr-accent) !important;
+    background: #fff95d;
+    border-radius: 25px;
+}
+
+/* ECMA-262 */
+
+.myName{
+    padding-top: 100px;
+}
+
+.myJobProfile{
+background: var(--clr-accent);
+padding: 5px 25px;
+font-family: var(--ff-secondary);
+font-size: var(--fs-h3);
+color: #fff95d;
+}
+
+@media(min-width:432px)
+{
+    .myProfessionalPic{
+        height: 100%;
+        width: 100%;
+    }
+    
+}
+
+@media (min-width:768px) {
+    
+    .myJobProfile{
+        text-align: right;
+    }
+    .myProfessionalPic{
+        margin: 5px;
+    }
+   
+}
+
+/* .vAlign{
+    vertical-align: middle;
+} */
+
+
+.myProfessionalPic{
+    box-shadow: var(--bs);
+}
+
+
+.myImg{
+    margin: 5px;
+}
+
+img{
+    display: inline-block;
+    max-width: 100%;
+}
+
+#resume{
+    background-color: #800080;
+    box-shadow: var(--bs);
+    padding: 10px;
+    color: #fff95d;
+}
+
+.btn{
+    background: rgba(255, 249, 93, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: var(--fw-bold);
+    color: #800080;
+    height: 30px;
+    overflow: hidden;
+    float: right;
+}
+
+
+.btn:hover{
+    background-color: #fff95d;
+}
+
+@media (min-width:0px) and (max-width:431px){ 
+
+#resume{
+        overflow: auto;
+    }
+}
+
+@media (min-width:768px) and (max-width:991px){ 
+    #resume{
+    overflow: auto;
+    }
+}
+
+
+
+
+
+.download{
+    text-decoration: none;
+    color: #800080;
+}
+.download:hover{
+    text-decoration: none;
+    color: #800080;
+}
+
+.download:visited{
+    text-decoration: none;
+    color: #800080;
+}
+
+h2 strong{
+    display: block;
+}
+
+.mySkills-title,
+.aboutMe-title,
+.contactMe-title
+{
+    color: #fff95d;
+    font-weight: var(--fw-bold);
+    background-color: #800080;
+    padding: 20px;
+    text-align: center;
+}
+
+.portfolio{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    margin:10px;
+    border: #800080 solid 2px;
+    overflow: hidden;
+
+}
+
+.portfolio-img{
+    overflow: hidden;
+    transition: transform 750ms cubic-bezier(0.5, 0, 0.5, 1), opacity 250ms linear;
+    height: 500px;
+    width: 500px;
+    padding: 50px;
+    opacity: 0.7;
+    box-shadow: var(--bs);
+    margin: 5px;
+}
+
+.portfolio-img:hover,
+.portfolio:focus .portfolio-img{
+    transform: scale(0.8);
+    opacity: 1;
+    border: #fff95d solid 2px;
+    overflow: hidden;
+
+}
+
+.contactMe{
+    display: block;
+    height: 250px;
+    box-shadow: var(--bs);
+    padding: 20px;
+    text-align: center;
+}
+
+.contactMe p{
+    font-weight: var(--fw-bold);
+}
+
+.footer{
+    background: var(--clr-dark);
+    color: var(--clr-accent);
+    text-align: center;
+    padding: 2.5em 0;
+    font-size: var(--fs-h3);
+    /* height: 100px; */
+}
+
+.footer a{
+    color: inherit;
+    text-decoration: none;
+}
+
+.footer-link{
+    font-weight: var(--fw-bold);
+}
+
+.footer-link:hover,
+.social-list-link:hover
+{
+    opacity: 0.7;
+}
+
+.footer-link:hover{
+    text-decoration: underline;
+}
+
+.social-list{
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 2em 0;
+    padding: 0;
+}
+
+.social-list-item{
+    margin: 0 0.5em;
+}
+
+.followMe{
+    color: var(--clr-light);
+}
+
+
