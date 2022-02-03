@@ -13,7 +13,8 @@
 
     --clr-light:#fff;
     --clr-dark:#000000;
-    --clr-accent:#800080;
+    --clr-accent: #800080;
+    --clr-bg: #fff95d;
 
     --fs-h1:3rem;
     --fs-h2:2.25rem;
@@ -66,7 +67,7 @@ h3{
 #stick{
     position: fixed;
     width: 100%;
-    background-color: purple;
+    background-color: var(--clr-accent);
     z-index: 1;
 }
 
@@ -75,15 +76,32 @@ justify-content:flex-end;
 }
 
 .nav-link{
-    color: #fff95d !important;
+    color: var(--clr-bg) !important;
 }
 
 .coloring{
     color: var(--clr-accent) !important;
-    background: #fff95d;
+    background: var(--clr-bg);
     border-radius: 25px;
     font-weight: var(--fw-bold);
     padding: 10px;
+}
+
+#top{
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 99;
+        font-size: 18px;
+        border: none;
+        outline: none;
+        background-color: var(--clr-accent);
+        color: var(--clr-bg);
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 4px;
+        font-weight: var(--fw-bold);
 }
 
 /* ECMA-262 */
@@ -97,7 +115,7 @@ background: var(--clr-accent);
 padding: 5px 25px;
 font-family: var(--ff-secondary);
 font-size: var(--fs-h3);
-color: #fff95d;
+color: var(--clr-bg);
 }
 
 @media(min-width:432px)
@@ -140,10 +158,10 @@ img{
 }
 
 #resume{
-    background-color: #800080;
+    background-color: var(--clr-accent);
     box-shadow: var(--bs);
     padding: 10px;
-    color: #fff95d;
+    color: var(--clr-bg);
 }
 
 .btn{
@@ -151,7 +169,7 @@ img{
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: var(--fw-bold);
-    color: #800080;
+    color: var(--clr-accent);
     height: 30px;
     overflow: hidden;
     float: right;
@@ -159,7 +177,7 @@ img{
 
 
 .btn:hover{
-    background-color: #fff95d;
+    background-color: var(--clr-bg);
 }
 
 @media (min-width:0px) and (max-width:431px){ 
@@ -177,16 +195,16 @@ img{
 
 .download{
     text-decoration: none;
-    color: #800080;
+    color: var(--clr-accent);
 }
 .download:hover{
     text-decoration: none;
-    color: #800080;
+    color: var(--clr-accent);
 }
 
 .download:visited{
     text-decoration: none;
-    color: #800080;
+    color: var(--clr-accent);
 }
 
 h2 strong{
@@ -197,9 +215,9 @@ h2 strong{
 .aboutMe-title,
 .contactMe-title
 {
-    color: #fff95d;
+    color: var(--clr-bg);
     font-weight: var(--fw-bold);
-    background-color: #800080;
+    background-color: var(--clr-accent);
     padding: 20px;
     text-align: center;
 }
@@ -208,7 +226,7 @@ h2 strong{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     margin:10px;
-    border: #800080 solid 2px;
+    border: var(--clr-accent) solid 2px;
     overflow: hidden;
 
 }
@@ -228,7 +246,7 @@ h2 strong{
 .portfolio:focus .portfolio-img{
     transform: scale(0.8);
     opacity: 1;
-    border: #fff95d solid 2px;
+    border: var(--clr-bg) solid 2px;
     overflow: hidden;
 
 }
@@ -269,15 +287,10 @@ h2 strong{
     opacity: 0.7;
 }
 
-.footer-link:hover{
-    text-decoration: underline;
-}
-
 .social-list{
     list-style: none;
     display: flex;
     justify-content: center;
-    margin: 2em 0;
     padding: 0;
 }
 
