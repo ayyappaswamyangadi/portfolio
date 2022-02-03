@@ -65,8 +65,9 @@ h3{
 }
 
 #stick{
-    position: fixed;
+    position: sticky;
     width: 100%;
+    top: 0;
     background-color: var(--clr-accent);
     z-index: 1;
 }
@@ -106,9 +107,9 @@ justify-content:flex-end;
 
 /* ECMA-262 */
 
-.myName{
+/* .myName{
     padding-top: 100px;
-}
+} */
 
 .myJobProfile{
 background: var(--clr-accent);
