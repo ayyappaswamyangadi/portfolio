@@ -82,6 +82,8 @@ justify-content:flex-end;
     color: var(--clr-accent) !important;
     background: #fff95d;
     border-radius: 25px;
+    font-weight: var(--fw-bold);
+    padding: 10px;
 }
 
 /* ECMA-262 */
@@ -172,10 +174,6 @@ img{
     overflow: auto;
     }
 }
-
-
-
-
 
 .download{
     text-decoration: none;
