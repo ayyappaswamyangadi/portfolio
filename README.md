@@ -1,4 +1,4 @@
-# Frontend Developer Portfolio
+# Ayyappa Swamy's Portfolio
 
 A modern, responsive, and performant portfolio website built using **Next.js**, **TypeScript**, **Tailwind CSS**, and **styled-components**. Designed to showcase projects, technical skills, and contact information for frontend development opportunities.
 
@@ -23,3 +23,5 @@ A modern, responsive, and performant portfolio website built using **Next.js**, 
 - **Icons**: Lucide
 - **Font**: [DM Sans](https://fonts.google.com/specimen/DM+Sans)
 - **Deployment**: Vercel
+
+🔗 **Live Demo**: [Ayyappa's portfolio](https://portfolio-jet-zeta-31.vercel.app/)
