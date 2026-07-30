@@ -611,6 +611,69 @@ body {
   color: hsl(var(--primary));
 }
 
+/* ─── Network status banner ──────────────────────────────── */
+.network-status-banner {
+  position: fixed;
+  top: 4.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: 0 4px 20px var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+  border: 1px solid var(--glass-card-border);
+}
+
+.network-status-offline {
+  background: rgba(239, 68, 68, 0.12);
+  color: hsl(0 72% 42%);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+.dark .network-status-offline {
+  color: hsl(0 85% 72%);
+}
+
+.network-status-online {
+  background: rgba(34, 197, 94, 0.12);
+  color: hsl(142 60% 30%);
+  border-color: rgba(34, 197, 94, 0.35);
+}
+.dark .network-status-online {
+  color: hsl(142 70% 65%);
+}
+
+.network-status-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.network-status-retry:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.network-status-retry:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* ─── Spotlight cursor ─────────────────────────────────── */
 :root {
   --spotlight-color: rgba(37, 99, 235, 0.07);
@@ -744,4 +807,40 @@ html:not(.dark) .skill-pill {
   background: rgba(255, 255, 255, 0.88);
   border-color: rgba(0, 0, 0, 0.10);
   color: hsl(var(--foreground));
+}
+
+/* ─── Skeleton pulse (image / route loading placeholders) ─── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.skeleton-pulse {
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+  background: linear-gradient(
+    100deg,
+    hsl(var(--muted-foreground) / 0.08) 0%,
+    hsl(var(--muted-foreground) / 0.16) 50%,
+    hsl(var(--muted-foreground) / 0.08) 100%
+  );
+}
+
+/* ─── Full-page state (loading / error / not-found) ─────── */
+.page-state {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  gap: 1rem;
+}
+
+.page-state-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 3px solid hsl(var(--primary) / 0.18);
+  border-top-color: hsl(var(--primary));
 }

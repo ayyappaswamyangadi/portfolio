@@ -6,6 +6,7 @@ import { Navbar } from "@/app/components/Navbar";
 import { Footer } from "@/app/components/Footer";
 import { ScrollProgress } from "@/app/components/ScrollProgress";
 import { CursorGlow } from "@/app/components/CursorGlow";
+import { NetworkStatus } from "@/app/components/NetworkStatus";
 import type { Metadata, Viewport } from "next";
 
 const outfit = Outfit({
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <CursorGlow />
+          <NetworkStatus />
           <header className="sticky top-0 z-50">
             <Navbar />
             <ScrollProgress />

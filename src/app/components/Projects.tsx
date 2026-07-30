@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { ExternalLink, Star, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ExternalLink, Star, ChevronLeft, ChevronRight, Clock, ImageOff } from "lucide-react";
 
 // ─── Project data ─────────────────────────────────────────────────────────────
 const projects = [
@@ -132,6 +132,7 @@ function GithubIcon({ size = 14 }: { size?: number }) {
 // ─── Flip Project Card ────────────────────────────────────────────────────────
 function ProjectCard({ project }: { project: (typeof projects)[0] }) {
   const [flipped, setFlipped] = useState(false);
+  const [imgStatus, setImgStatus] = useState<"loading" | "loaded" | "error">("loading");
 
   // Hover drives the flip on desktop; on touch devices (no hover) tap toggles it instead.
   const handleTap = () => {
@@ -160,13 +161,33 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
           style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden" }}
         >
           <div className="relative flex-1 w-full overflow-hidden">
-            <Image
-              src={project.image}
-              alt={`${project.title} landing screen`}
-              fill
-              sizes="(max-width: 640px) 92vw, 340px"
-              className="object-cover object-top"
-            />
+            {imgStatus !== "error" && (
+              <Image
+                src={project.image}
+                alt={`${project.title} landing screen`}
+                fill
+                sizes="(max-width: 640px) 92vw, 340px"
+                className={`object-cover object-top transition-opacity duration-300 ${
+                  imgStatus === "loaded" ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => setImgStatus("loaded")}
+                onError={() => setImgStatus("error")}
+              />
+            )}
+
+            {/* Skeleton while the screenshot is still loading (slow network) */}
+            {imgStatus === "loading" && (
+              <div className="absolute inset-0 skeleton-pulse" aria-hidden="true" />
+            )}
+
+            {/* Fallback if the screenshot fails to load */}
+            {imgStatus === "error" && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-accent text-muted-foreground">
+                <ImageOff size={22} />
+                <span className="text-xs">Preview unavailable</span>
+              </div>
+            )}
+
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
             {project.featured && (
               <span className="absolute top-3 right-3 flex items-center gap-1 text-xs font-medium text-amber-300 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full">
