@@ -1,99 +1,113 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence, type Variants, useMotionValue, useSpring } from "framer-motion";
-import { ExternalLink, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { ExternalLink, Star, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
 // ─── Project data ─────────────────────────────────────────────────────────────
 const projects = [
   {
     id: 1,
-    title: "NovaMart — E-Commerce Platform",
+    title: "YouTube Clone",
     description:
-      "A full-featured e-commerce web app with product discovery, cart management, checkout flow, and order tracking. Supports server-side rendering for SEO and real-time inventory updates.",
-    tech: ["Next.js", "TypeScript", "Redux Toolkit", "Tailwind CSS", "Node.js", "MongoDB"],
-    category: "Full Stack",
+      "A pixel-close clone of YouTube's web UI — home feed, sidebar navigation, category chips, notifications panel, and a Shorts rail. Focused on nailing YouTube's layout, dark theme, and micro-interactions.",
+    tech: ["React", "Tailwind CSS", "React Router"],
+    category: "UI Clone",
     featured: true,
-    gradient: "from-blue-500/20 to-cyan-500/20",
-    liveUrl: "#",
-    githubUrl: "#",
-    highlights: ["SSR/SSG for SEO", "Real-time stock updates", "Stripe payment integration"],
+    image: "/projects/youtube-clone.jpg",
+    liveUrl: "https://youtube-clone-plum-nine.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/youtube-clone",
+    highlights: ["Home feed + category chips", "Notifications & Shorts rail", "Dark-theme, fully responsive"],
   },
   {
     id: 2,
-    title: "Pulse — Real-time Chat App",
+    title: "TaskFlow — Todo App",
     description:
-      "A modern chat application featuring real-time messaging, typing indicators, read receipts, room-based conversations, and media sharing. Optimised for low-latency communication.",
-    tech: ["React", "TypeScript", "Socket.io", "Express.js", "Redux", "Firebase"],
-    category: "Real-time",
-    featured: true,
-    gradient: "from-purple-500/20 to-pink-500/20",
-    liveUrl: "#",
-    githubUrl: "#",
-    highlights: ["WebSocket real-time messaging", "Typing indicators", "File sharing"],
+      "A clean task manager with priority levels, due dates, live search, status filters (All/Active/Completed) and a progress bar that tracks completion in real time.",
+    tech: ["React", "Tailwind CSS", "Local Storage"],
+    category: "Productivity",
+    featured: false,
+    image: "/projects/taskflow.jpg",
+    liveUrl: "https://todo-list-gamma-two-83.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/todo-list",
+    highlights: ["Priority & due-date tagging", "Search + status filters", "Persistent local storage"],
   },
   {
     id: 3,
-    title: "InsightBoard — Analytics Dashboard",
+    title: "Ayyappa & Nayana — Wedding Invitation",
     description:
-      "An interactive data analytics dashboard with dynamic charts, filterable data tables, date-range comparison, and exportable reports. Built for performance with large datasets.",
-    tech: ["React", "TypeScript", "Recharts", "React Query", "Tailwind CSS", "REST API"],
-    category: "Dashboard",
-    featured: false,
-    gradient: "from-green-500/20 to-emerald-500/20",
-    liveUrl: "#",
-    githubUrl: "#",
-    highlights: ["Interactive Recharts visualisations", "Date-range filters", "PDF/CSV export"],
+      "A fully animated digital wedding invitation — countdown, couple's story, multi-event timeline, photo gallery with lightbox, embedded venue maps, and a guest wishes wall people can post to live.",
+    tech: ["React", "Tailwind CSS", "Framer Motion"],
+    category: "Personal",
+    featured: true,
+    image: "/projects/wedding-invitation.jpg",
+    liveUrl: "https://wedding-invitation-five-pi.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/wedding-invitation",
+    highlights: ["Multi-event ceremony timeline", "Photo gallery + guest wishes wall", "Embedded maps & background music"],
   },
   {
     id: 4,
-    title: "Taskflow — Project Management Tool",
+    title: "URL Shortener",
     description:
-      "A Kanban-style task management app with drag-and-drop boards, team collaboration, deadline tracking, notifications, and role-based access control for teams.",
-    tech: ["React", "TypeScript", "Redux", "React DnD", "Node.js", "PostgreSQL"],
-    category: "Productivity",
-    featured: false,
-    gradient: "from-orange-500/20 to-amber-500/20",
-    liveUrl: "#",
-    githubUrl: "#",
-    highlights: ["Drag-and-drop Kanban", "RBAC permissions", "Email notifications"],
+      "A full-stack link shortener — paste a long URL and get an instant short link backed by a real API and database, with a searchable history of everything you've shortened. The React frontend and the Node/Express backend are deployed and hosted independently of each other.",
+    tech: ["React", "Node.js", "Express", "REST API"],
+    category: "Full Stack",
+    featured: true,
+    image: "/projects/url-shortener.jpg",
+    liveUrl: "https://url-shortener-pi-mauve.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/url-shortener",
+    highlights: ["Live backend link generation", "Searchable recent-URLs history", "Copy-to-clipboard sharing"],
   },
   {
     id: 5,
-    title: "SkyWatch — Weather Forecast App",
+    title: "Sarvadharma Marriage Bureau — Registration Form",
     description:
-      "A beautiful weather app with 7-day forecasts, hourly breakdowns, interactive maps, severe weather alerts, and location auto-detection. Fully responsive with PWA support.",
-    tech: ["Next.js", "TypeScript", "OpenWeatherMap API", "Tailwind CSS", "Leaflet.js"],
-    category: "PWA",
+      "A bilingual (English/Kannada) digital registration form built for a real matrimony bureau client, replacing their paper intake process. Exports each submission as an image or PDF and saves it straight to Drive.",
+    tech: ["React", "html2canvas", "jsPDF", "Google Drive API"],
+    category: "Client Work",
     featured: false,
-    gradient: "from-sky-500/20 to-indigo-500/20",
-    liveUrl: "#",
-    githubUrl: "#",
-    highlights: ["7-day forecast", "Interactive maps", "PWA offline support"],
+    image: "/projects/matrimony-form.jpg",
+    liveUrl: "https://matrimony-registration-form.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/matrimony-registration-form",
+    highlights: ["English / Kannada language toggle", "Export as image or PDF", "Google Drive auto-save"],
   },
   {
     id: 6,
-    title: "Folio — Portfolio Builder",
+    title: "Personal Shopping List",
     description:
-      "A drag-and-drop portfolio builder that lets developers create and deploy stunning portfolios in minutes. Supports custom themes, live preview, and one-click Vercel deployment.",
-    tech: ["Next.js", "TypeScript", "Prisma", "PostgreSQL", "Tailwind CSS", "Vercel API"],
-    category: "SaaS",
-    featured: true,
-    gradient: "from-rose-500/20 to-pink-500/20",
-    liveUrl: "#",
-    githubUrl: "#",
-    highlights: ["Drag-and-drop builder", "Live preview", "One-click deploy"],
+      "A no-friction grocery list app for tracking items, quantities, and prices with a running total in rupees — built for quick day-to-day use rather than heavyweight project management.",
+    tech: ["React", "React Router", "Tailwind CSS"],
+    category: "Utility",
+    featured: false,
+    image: "/projects/shopping-list.jpg",
+    liveUrl: "https://personal-product-list.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/personal-product-list",
+    highlights: ["Quantity + price tracking", "Running total in ₹", "Add / remove items instantly"],
+  },
+  {
+    id: 7,
+    title: "Facebook Clone",
+    description:
+      "A recreation of Facebook's sign-up and authentication flow, including a real OTP-based email verification step — built to practice matching a large, familiar product's UI and auth UX exactly. A Node.js backend generates, emails, and validates each OTP server-side, so the signup flow works end to end.",
+    tech: ["React", "Tailwind CSS", "Node.js", "OTP Verification"],
+    category: "Full Stack",
+    featured: false,
+    image: "/projects/facebook-clone.jpg",
+    liveUrl: "https://facebook-clone-chi-coral.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/facebook-clone",
+    highlights: ["Sign-up + login UI", "Real OTP email verification", "Faithful layout & styling"],
   },
 ];
 
-const categories = ["All", "Full Stack", "Real-time", "Dashboard", "Productivity", "PWA", "SaaS"];
+const categories = ["All", "UI Clone", "Full Stack", "Productivity", "Utility", "Personal", "Client Work"];
 const featuredProjects = projects.filter((p) => p.featured);
 const PROJECTS_PER_PAGE = 2;
 
 // ─── Motion variants ─────────────────────────────────────────────────────────
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
 };
 
 const cardGrid: Variants = {
@@ -115,132 +129,163 @@ function GithubIcon({ size = 14 }: { size?: number }) {
   );
 }
 
-// ─── Folder SVG ───────────────────────────────────────────────────────────────
-function FolderIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-}
-
-// ─── Project Card (with 3-D tilt) ────────────────────────────────────────────
+// ─── Flip Project Card ────────────────────────────────────────────────────────
 function ProjectCard({ project }: { project: (typeof projects)[0] }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const rotX = useMotionValue(0);
-  const rotY = useMotionValue(0);
-  const springX = useSpring(rotX, { stiffness: 200, damping: 22 });
-  const springY = useSpring(rotY, { stiffness: 200, damping: 22 });
+  const [flipped, setFlipped] = useState(false);
 
-  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top)  / rect.height - 0.5;
-    rotY.set(x * 10);
-    rotX.set(-y * 10);
+  // Hover drives the flip on desktop; on touch devices (no hover) tap toggles it instead.
+  const handleTap = () => {
+    if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) return;
+    setFlipped((f) => !f);
   };
-  const onMouseLeave = () => { rotX.set(0); rotY.set(0); };
 
   return (
-    <motion.div
-      ref={cardRef}
-      variants={cardItem}
-      style={{ rotateX: springX, rotateY: springY, transformStyle: "preserve-3d" }}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-      className="project-card shimmer-card group flex flex-col h-full"
+    <div
+      className="group h-[420px]"
+      style={{ perspective: "1400px" }}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onClick={handleTap}
     >
-      {/* Gradient preview banner */}
-      <div className={`relative h-20 w-full bg-gradient-to-br ${project.gradient} flex items-center justify-center overflow-hidden`}>
-        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_70%)]" />
-        <span className="text-4xl opacity-30 select-none pointer-events-none">
-          {project.category === "Full Stack" ? "⚡" :
-           project.category === "Real-time"  ? "💬" :
-           project.category === "Dashboard"  ? "📊" :
-           project.category === "Productivity" ? "📋" :
-           project.category === "PWA"         ? "🌤" : "🛠"}
-        </span>
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-      </div>
-      <div className="flex flex-col flex-1 p-6">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex items-center gap-2">
-            <span className="icon-folder text-primary flex-shrink-0">
-              <FolderIcon size={20} />
-            </span>
-            <span className="text-xs font-medium text-muted-foreground bg-accent px-2.5 py-0.5 rounded-full border border-border">
-              {project.category}
-            </span>
+      <motion.div
+        variants={cardItem}
+        className="relative w-full h-full"
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {/* ── Front: landing screenshot ── */}
+        <div
+          className="project-card shimmer-card flex flex-col"
+          style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden" }}
+        >
+          <div className="relative flex-1 w-full overflow-hidden">
+            <Image
+              src={project.image}
+              alt={`${project.title} landing screen`}
+              fill
+              sizes="(max-width: 640px) 92vw, 340px"
+              className="object-cover object-top"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
             {project.featured && (
-              <span className="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+              <span className="absolute top-3 right-3 flex items-center gap-1 text-xs font-medium text-amber-300 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full">
                 <Star size={11} className="fill-current" />
                 Featured
               </span>
             )}
+            <span className="absolute top-3 left-3 text-xs font-medium text-white/90 bg-black/50 backdrop-blur px-2.5 py-0.5 rounded-full border border-white/10">
+              {project.category}
+            </span>
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              <h3 className="font-bold text-base text-white leading-snug drop-shadow">
+                {project.title}
+              </h3>
+              <p className="text-xs text-white/70 mt-1">Hover to see details</p>
+            </div>
           </div>
-          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="GitHub"
-              className="icon-github btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
-            >
-              <GithubIcon size={14} />
-            </a>
+        </div>
+
+        {/* ── Back: details ── */}
+        <div
+          className="project-card project-card-back flex flex-col p-6"
+          onWheel={(e) => e.stopPropagation()}
+          style={{
+            position: "absolute",
+            inset: 0,
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+          }}
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <span className="text-xs font-medium text-muted-foreground bg-accent px-2.5 py-0.5 rounded-full border border-border">
+              {project.category}
+            </span>
+            <div className="flex gap-2">
+              {project.githubUrl && (
+                <a
+                  href={project.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="GitHub"
+                  onClick={(e) => e.stopPropagation()}
+                  className="icon-github btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
+                >
+                  <GithubIcon size={14} />
+                </a>
+              )}
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Live Demo"
+                onClick={(e) => e.stopPropagation()}
+                className="btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
+              >
+                <ExternalLink size={14} className="text-muted-foreground" />
+              </a>
+            </div>
+          </div>
+
+          <h3 className="font-bold text-base mb-2 leading-snug">{project.title}</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+            {project.description}
+          </p>
+
+          <ul className="space-y-1 mb-4">
+            {project.highlights.map((h) => (
+              <li key={h} className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                {h}
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {project.tech.map((t) => (
+              <span
+                key={t}
+                className="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/15 font-medium"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-3 border-t border-border">
+            <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3">
+              <Clock size={11} className="flex-shrink-0" />
+              First load may be a little slow — hosted on free-tier services.
+            </p>
             <a
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              title="Live Demo"
-              className="btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
+              onClick={(e) => e.stopPropagation()}
+              className="btn-click w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-[#1a1000]"
+              style={{
+                background: "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
+              }}
             >
-              <ExternalLink size={14} className="text-muted-foreground" />
+              <ExternalLink size={14} />
+              View Live Demo
             </a>
           </div>
         </div>
-
-        <h3 className="font-bold text-base mb-2 group-hover:text-primary transition-colors leading-snug">
-          {project.title}
-        </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-4">
-          {project.description}
-        </p>
-
-        <ul className="space-y-1 mb-4">
-          {project.highlights.map((h) => (
-            <li key={h} className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
-              {h}
-            </li>
-          ))}
-        </ul>
-
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-border">
-          {project.tech.map((t) => (
-            <span
-              key={t}
-              className="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/15 font-medium"
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
 // ─── Featured Carousel ────────────────────────────────────────────────────────
 function FeaturedCarousel() {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollRef, setScrollRef] = useState<HTMLDivElement | null>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  const updateState = useCallback(() => {
-    const el = scrollRef.current;
+  const updateState = () => {
+    const el = scrollRef;
     if (!el) return;
     setAtStart(el.scrollLeft <= 8);
     setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 8);
@@ -249,10 +294,10 @@ function FeaturedCarousel() {
       const cardW = firstCard.offsetWidth + 20;
       setActiveIdx(Math.round(el.scrollLeft / cardW));
     }
-  }, []);
+  };
 
   const scroll = (dir: number) => {
-    const el = scrollRef.current;
+    const el = scrollRef;
     if (!el) return;
     const firstCard = el.querySelector<HTMLElement>(".featured-card");
     const cardW = (firstCard?.offsetWidth ?? 340) + 20;
@@ -273,7 +318,7 @@ function FeaturedCarousel() {
       )}
 
       <div
-        ref={scrollRef}
+        ref={setScrollRef}
         onScroll={updateState}
         className="carousel-scroll py-3 px-1"
       >
@@ -304,7 +349,7 @@ function FeaturedCarousel() {
           <button
             key={p.id}
             onClick={() => {
-              const el = scrollRef.current;
+              const el = scrollRef;
               const firstCard = el?.querySelector<HTMLElement>(".featured-card");
               if (el && firstCard) {
                 el.scrollTo({ left: i * (firstCard.offsetWidth + 20), behavior: "smooth" });
@@ -369,8 +414,8 @@ export function Projects() {
             Featured Projects
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            A selection of things I&apos;ve built — from SaaS products and real-time apps to
-            dashboards and PWAs. Each project reflects production-grade thinking.
+            Real, deployed projects — from UI clones and a client&apos;s matrimony intake form to a
+            full-stack URL shortener. Hover any card to flip it and see the details.
           </p>
         </motion.div>
 

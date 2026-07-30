@@ -353,6 +353,34 @@ body {
   transform: translateY(-6px);
 }
 
+/* Flip-card back face needs to scroll — .project-card's overflow: hidden
+   above is unlayered and beats Tailwind's overflow-y-auto utility, so the
+   scroll behavior has to be declared here instead. */
+.project-card-back {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.project-card-back::-webkit-scrollbar {
+  width: 6px;
+}
+
+.project-card-back::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.project-card-back::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+}
+
+.project-card-back::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}
+
 /* ─── Input focus ring ────────────────────────────────── */
 .form-input {
   width: 100%;

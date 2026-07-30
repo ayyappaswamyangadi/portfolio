@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useActiveSession } from "../hooks/useActiveSession";
@@ -77,22 +78,25 @@ export function Navbar() {
               key={section}
               onClick={closeMenu}
               className={cn(
-                "relative capitalize px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200",
+                "relative capitalize px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors duration-200",
                 activeScreen === section
-                  ? "font-semibold text-[#1a1000]"
+                  ? "text-[#1a1000]"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
-              style={
-                activeScreen === section
-                  ? {
-                      borderRadius: "5px",
-                      border: "2px solid #EAA22F",
-                      background:
-                        "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
-                    }
-                  : undefined
-              }
             >
+              {activeScreen === section && (
+                <motion.span
+                  layoutId="nav-pill-mobile"
+                  className="absolute inset-0 -z-10"
+                  style={{
+                    borderRadius: "5px",
+                    border: "2px solid #EAA22F",
+                    background:
+                      "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
+                  }}
+                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                />
+              )}
               {section}
             </Link>
           ))}
@@ -110,22 +114,25 @@ export function Navbar() {
             href={`#${section}`}
             key={section}
             className={cn(
-              "relative capitalize px-4 py-1.5 text-sm font-semibold transition-all duration-200",
+              "relative capitalize px-4 py-1.5 text-sm font-semibold transition-colors duration-200",
               activeScreen === section
-                ? "font-semibold text-[#1a1000]"
+                ? "text-[#1a1000]"
                 : "text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg",
             )}
-            style={
-              activeScreen === section
-                ? {
-                    borderRadius: "5px",
-                    border: "2px solid #EAA22F",
-                    background:
-                      "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
-                  }
-                : undefined
-            }
           >
+            {activeScreen === section && (
+              <motion.span
+                layoutId="nav-pill-desktop"
+                className="absolute inset-0 -z-10"
+                style={{
+                  borderRadius: "5px",
+                  border: "2px solid #EAA22F",
+                  background:
+                    "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
+                }}
+                transition={{ type: "spring", stiffness: 380, damping: 32 }}
+              />
+            )}
             {section}
           </Link>
         ))}

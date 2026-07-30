@@ -388,7 +388,7 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
 
 // ─── Main Hero Section ───────────────────────────────────────────────────────
@@ -513,7 +513,7 @@ export default function Home() {
                 View Projects
               </Link>
               <a
-                href="/Ayyappa_Swamy_Resume.pdf"
+                href="/resume/Ayyappa_Swamy_Angadi_Resume.pdf"
                 download
                 className="btn-click inline-flex items-center gap-2 px-6 py-3 text-sm rounded-md border border-border bg-card/70 hover:border-primary/40 hover:bg-accent/60 transition-colors text-foreground font-semibold"
               >
@@ -631,7 +631,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, x: 40, scale: 0.96 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="flex justify-center lg:justify-end"
           >
             <div className="relative">

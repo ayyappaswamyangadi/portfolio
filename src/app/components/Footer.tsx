@@ -1,3 +1,7 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 const socials = [
   {
     label: "GitHub",
@@ -45,7 +49,13 @@ const socials = [
 export function Footer() {
   return (
     <footer className="relative border-t border-white/30 dark:border-white/10 bg-white/50 dark:bg-[#151E2B]/60 backdrop-blur-xl">
-      <div className="max-w-5xl mx-auto px-5 py-6">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        viewport={{ once: true, margin: "-40px" }}
+        className="max-w-5xl mx-auto px-5 py-6"
+      >
         {/* ── Single main row: Logo | Socials (flex) | CTA ── */}
         <div className="flex flex-wrap items-center gap-4 sm:gap-0">
           {/* Logo + name */}
@@ -102,7 +112,7 @@ export function Footer() {
             & <span className="text-primary font-medium">Tailwind CSS</span>
           </p>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 }
