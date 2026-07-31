@@ -24,4 +24,4 @@ A modern, responsive, and performant portfolio website built using **Next.js**, 
 - **Font**: [DM Sans](https://fonts.google.com/specimen/DM+Sans)
 - **Deployment**: Vercel
 
-🔗 **Live Demo**: [Ayyappa's portfolio](https://portfolio-jet-zeta-31.vercel.app/)
+🔗 **Live link**: [Ayyappa's portfolio](www.ayyappa.dev)
