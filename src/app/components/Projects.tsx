@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { ExternalLink, Star, ChevronLeft, ChevronRight, Clock, ImageOff } from "lucide-react";
@@ -133,11 +133,19 @@ function GithubIcon({ size = 14 }: { size?: number }) {
 // ─── Flip Project Card ────────────────────────────────────────────────────────
 function ProjectCard({ project }: { project: (typeof projects)[0] }) {
   const [flipped, setFlipped] = useState(false);
+  const [canHover, setCanHover] = useState(true);
   const [imgStatus, setImgStatus] = useState<"loading" | "loaded" | "error">("loading");
 
   // Hover drives the flip on desktop; on touch devices (no hover) tap toggles it instead.
+  // Binding onMouseEnter/onMouseLeave on a touch device makes iOS/Android browsers treat
+  // the first tap as a hover-trigger (not a click), so a second tap is needed to flip —
+  // only attach the mouse handlers when the device can actually hover.
+  useEffect(() => {
+    setCanHover(window.matchMedia("(hover: hover)").matches);
+  }, []);
+
   const handleTap = () => {
-    if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) return;
+    if (canHover) return;
     setFlipped((f) => !f);
   };
 
@@ -145,8 +153,8 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
     <div
       className="group h-[420px]"
       style={{ perspective: "1400px" }}
-      onMouseEnter={() => setFlipped(true)}
-      onMouseLeave={() => setFlipped(false)}
+      onMouseEnter={canHover ? () => setFlipped(true) : undefined}
+      onMouseLeave={canHover ? () => setFlipped(false) : undefined}
       onClick={handleTap}
     >
       <motion.div

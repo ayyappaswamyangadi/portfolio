@@ -40,11 +40,6 @@ const skillGroups = [
     ],
   },
   {
-    label: "Backend & APIs (Beginner)",
-    icon: <Terminal size={16} />,
-    skills: ["Node.js", "Express.js", "REST APIs"],
-  },
-  {
     label: "State Management",
     icon: <Box size={16} />,
     skills: ["Redux", "Context API", "React Hook Form"],
@@ -63,6 +58,11 @@ const skillGroups = [
       "Lazy loading",
       "Web Vitals",
     ],
+  },
+  {
+    label: "Backend & APIs (Beginner)",
+    icon: <Terminal size={16} />,
+    skills: ["Node.js", "Express.js", "REST APIs"],
   },
 ];
 
@@ -365,9 +365,6 @@ export function About() {
         >
           {/* Shared title above both columns */}
           <div className="mb-8 text-center">
-            <p className="text-primary font-semibold text-sm tracking-widest uppercase mb-2">
-              Get to know me
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold section-heading center">
               About Me
             </h2>
@@ -387,7 +384,7 @@ export function About() {
                   &ldquo;
                 </span>
 
-                <p className="mt-0 text-muted-foreground leading-relaxed">
+                <p className="mt-0 text-muted-foreground leading-relaxed max-md:text-justify">
                   I&apos;m a passionate Frontend Engineer with{" "}
                   <span className="gradient-text font-semibold">
                     5+ years of professional experience
@@ -396,7 +393,7 @@ export function About() {
                   WordPress-driven LMS platforms and static sites to real-time
                   trading dashboards and AI-powered tools.
                 </p>
-                <p className="mt-4 text-muted-foreground leading-relaxed">
+                <p className="mt-4 text-muted-foreground leading-relaxed max-md:text-justify">
                   I began my career at{" "}
                   <span className="font-semibold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
                     Chools Consultancy Services
@@ -415,7 +412,7 @@ export function About() {
                   virtual development environment, enabling full developer
                   workflows entirely from mobile via Claude and OpenCode.
                 </p>
-                <p className="mt-4 text-muted-foreground leading-relaxed">
+                <p className="mt-4 text-muted-foreground leading-relaxed max-md:text-justify">
                   I care deeply about{" "}
                   <span className="text-primary font-semibold">
                     clean, maintainable code

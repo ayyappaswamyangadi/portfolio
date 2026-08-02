@@ -10,6 +10,9 @@ import ThemeToggleButton from "./ThemeToggleButton";
 import { PWAInstallButton } from "./PWAInstallButton";
 
 const sections = ["home", "about", "projects", "contact"];
+const sectionLabels: Record<string, string> = {
+  projects: "My Work",
+};
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -97,7 +100,7 @@ export function Navbar() {
                   transition={{ type: "spring", stiffness: 380, damping: 32 }}
                 />
               )}
-              {section}
+              {sectionLabels[section] ?? section}
             </Link>
           ))}
           <div className="pt-2 pb-1 border-t border-border mt-1 flex items-center gap-2">
@@ -133,7 +136,7 @@ export function Navbar() {
                 transition={{ type: "spring", stiffness: 380, damping: 32 }}
               />
             )}
-            {section}
+            {sectionLabels[section] ?? section}
           </Link>
         ))}
 

@@ -62,13 +62,6 @@
   box-sizing: border-box;
 }
 
-/* ─── Mobile text justify ────────────────────────────── */
-@media (max-width: 767px) {
-  p, li, blockquote {
-    text-align: justify;
-  }
-}
-
 html {
   scroll-behavior: smooth;
 }
@@ -76,7 +69,6 @@ html {
 body {
   /* Light mode default: warm cream */
   background: #F3F4E5;
-  background-attachment: fixed;
   min-height: 100vh;
   color: hsl(var(--foreground));
   font-family: var(--font-outfit), system-ui, sans-serif;
@@ -84,6 +76,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: background 0.4s ease, color 0.3s ease;
   overflow-x: hidden;
+}
+
+/* background-attachment: fixed is unreliable on mobile browsers (iOS/Android
+   often fail to extend it past the first viewport), leaving a blank/black
+   gap below the fold — only pin the background on devices that support it well. */
+@media (min-width: 768px) {
+  body {
+    background-attachment: fixed;
+  }
 }
 
 /* Dark mode: navy gradient */
