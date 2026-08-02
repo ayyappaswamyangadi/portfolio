@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
+import { gaEvent } from "@/lib/gtag";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -26,6 +27,7 @@ export function PWAInstallButton() {
   const handleInstall = async () => {
     await prompt.prompt();
     const { outcome } = await prompt.userChoice;
+    gaEvent({ action: "pwa_install", category: "engagement", label: outcome });
     if (outcome === "accepted") setPrompt(null);
   };
 

@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import { gaEvent } from "@/lib/gtag";
 
 // ─── Form schema ─────────────────────────────────────────────────────────────
 const contactSchema = z.object({
@@ -111,14 +112,17 @@ export function Contact() {
       const result = await response.json();
       if (result.success) {
         setSubmitState("success");
+        gaEvent({ action: "submit", category: "contact_form", label: "success" });
         reset();
         setTimeout(() => setSubmitState("idle"), 5000);
       } else {
         setSubmitState("error");
+        gaEvent({ action: "submit", category: "contact_form", label: "error" });
         setTimeout(() => setSubmitState("idle"), 4000);
       }
     } catch {
       setSubmitState("error");
+      gaEvent({ action: "submit", category: "contact_form", label: "error" });
       setTimeout(() => setSubmitState("idle"), 4000);
     }
   };
@@ -174,6 +178,9 @@ export function Contact() {
                 {item.href ? (
                   <a
                     href={item.href}
+                    onClick={() =>
+                      gaEvent({ action: "click", category: "contact_info", label: item.label })
+                    }
                     className="text-sm font-semibold hover:text-primary transition-colors break-all"
                   >
                     {item.value}

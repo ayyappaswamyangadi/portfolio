@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { gaEvent } from "@/lib/gtag";
 
 const socials = [
   {
@@ -86,6 +87,9 @@ export function Footer() {
                 }
                 aria-label={s.label}
                 title={s.label}
+                onClick={() =>
+                  gaEvent({ action: "click", category: "social", label: `${s.label.toLowerCase()}_footer` })
+                }
                 className={`btn-click ${s.cls} w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-accent transition-all duration-200`}
               >
                 {s.icon}
@@ -96,6 +100,9 @@ export function Footer() {
           {/* CTA */}
           <a
             href="#contact"
+            onClick={() =>
+              gaEvent({ action: "click", category: "hero_cta", label: "lets_connect_footer" })
+            }
             className="btn-orange btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2"
           >
             Let&apos;s Connect

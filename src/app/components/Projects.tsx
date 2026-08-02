@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { ExternalLink, Star, ChevronLeft, ChevronRight, Clock, ImageOff } from "lucide-react";
+import { gaEvent } from "@/lib/gtag";
 
 // ─── Project data ─────────────────────────────────────────────────────────────
 const projects = [
@@ -229,7 +230,10 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   title="GitHub"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    gaEvent({ action: "click", category: "project_link", label: `github_${project.title}` });
+                  }}
                   className="icon-github btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
                 >
                   <GithubIcon size={14} />
@@ -240,7 +244,10 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Live Demo"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  gaEvent({ action: "click", category: "project_link", label: `live_demo_icon_${project.title}` });
+                }}
                 className="btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
               >
                 <ExternalLink size={14} className="text-muted-foreground" />
@@ -282,7 +289,10 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                gaEvent({ action: "click", category: "project_link", label: `view_live_demo_${project.title}` });
+              }}
               className="btn-click w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-[#1a1000]"
               style={{
                 background: "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
@@ -577,6 +587,9 @@ export function Projects() {
             href="https://github.com/ayyappaswamyangadi"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              gaEvent({ action: "click", category: "social", label: "github_profile_projects_cta" })
+            }
             className="icon-github btn-orange-outline btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
           >
             <GithubIcon size={16} />

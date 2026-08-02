@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { MapPin, Briefcase, Download } from "lucide-react";
 import Link from "next/link";
+import { gaEvent } from "@/lib/gtag";
 
 // ─── Roles for typing effect ────────────────────────────────────────────────
 const roles = [
@@ -455,6 +456,10 @@ export default function Home() {
               </p>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mt-1 leading-tight">
                 I&apos;m <span className="gradient-text">Ayyappa</span>
+                <span className="sr-only">
+                  {" "}— Frontend Developer, Web Developer &amp; React/Next.js
+                  Engineer
+                </span>
               </h1>
             </motion.div>
 
@@ -464,8 +469,15 @@ export default function Home() {
               className="text-xl sm:text-2xl font-semibold text-muted-foreground"
             >
               <span className="text-foreground">I am a </span>
-              <span className="text-primary">{typedRole}</span>
-              <span className="cursor-blink text-primary" />
+              <span className="text-primary" aria-hidden="true">
+                {typedRole}
+              </span>
+              <span className="cursor-blink text-primary" aria-hidden="true" />
+              <span className="sr-only">
+                Frontend Engineer, React &amp; Next.js Developer, TypeScript
+                Specialist, UI Performance Optimizer, Scalable Frontend
+                Architect
+              </span>
             </motion.div>
 
             {/* Short bio */}
@@ -473,11 +485,22 @@ export default function Home() {
               variants={itemVariants}
               className="text-muted-foreground leading-relaxed max-w-md"
             >
-              Crafting pixel-perfect, performant web experiences with{" "}
+              I&apos;m a{" "}
+              <span className="text-foreground font-medium">
+                Frontend Developer
+              </span>{" "}
+              and{" "}
+              <span className="text-foreground font-medium">
+                Web Developer
+              </span>{" "}
+              crafting pixel-perfect, performant web experiences with{" "}
               <span className="text-foreground font-medium">React</span>,{" "}
-              <span className="text-foreground font-medium">Next.js</span> &{" "}
+              <span className="text-foreground font-medium">Next.js</span>,{" "}
+              <span className="text-foreground font-medium">JavaScript</span>{" "}
+              &amp;{" "}
               <span className="text-foreground font-medium">TypeScript</span>.
-              5+ years turning ideas into delightful UIs.
+              5+ years turning ideas into scalable, optimised, delightful UIs
+              with strong problem-solving.
             </motion.p>
 
             {/* Meta info */}
@@ -502,12 +525,18 @@ export default function Home() {
             >
               <Link
                 href="#contact"
+                onClick={() =>
+                  gaEvent({ action: "click", category: "hero_cta", label: "lets_connect" })
+                }
                 className="btn-orange btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
               >
                 Let&apos;s Connect
               </Link>
               <Link
                 href="#projects"
+                onClick={() =>
+                  gaEvent({ action: "click", category: "hero_cta", label: "view_projects" })
+                }
                 className="btn-orange-outline btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
               >
                 View Projects
@@ -515,6 +544,9 @@ export default function Home() {
               <a
                 href="/resume/Ayyappa_Swamy_Angadi_Resume.pdf"
                 download
+                onClick={() =>
+                  gaEvent({ action: "download_cv", category: "engagement", label: "hero_download_cv" })
+                }
                 className="btn-click inline-flex items-center gap-2 px-6 py-3 text-sm rounded-md border border-border bg-card/70 hover:border-primary/40 hover:bg-accent/60 transition-colors text-foreground font-semibold"
               >
                 <Download size={14} />
@@ -577,6 +609,9 @@ export default function Home() {
                 href="https://github.com/ayyappaswamyangadi"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  gaEvent({ action: "click", category: "social", label: "github_hero" })
+                }
                 className="icon-github flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg
@@ -593,6 +628,9 @@ export default function Home() {
                 href="https://linkedin.com/in/ayyappaswamyangadi"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() =>
+                  gaEvent({ action: "click", category: "social", label: "linkedin_hero" })
+                }
                 className="icon-linkedin flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg
@@ -607,6 +645,9 @@ export default function Home() {
               </a>
               <a
                 href="mailto:ayyappaswamy50@gmail.com"
+                onClick={() =>
+                  gaEvent({ action: "click", category: "social", label: "email_hero" })
+                }
                 className="icon-mail flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg
