@@ -10,7 +10,6 @@ import {
 import {
   Code2,
   Layers,
-  TestTube2,
   Terminal,
   GitBranch,
   Box,
@@ -41,12 +40,7 @@ const skillGroups = [
     ],
   },
   {
-    label: "Testing",
-    icon: <TestTube2 size={16} />,
-    skills: ["Jest", "React Testing Library", "Cypress", "Vitest"],
-  },
-  {
-    label: "Backend & APIs",
+    label: "Backend & APIs (Beginner)",
     icon: <Terminal size={16} />,
     skills: ["Node.js", "Express.js", "REST APIs"],
   },
@@ -93,7 +87,7 @@ const experience = [
   },
   {
     company: "Revise",
-    role: "Frontend Developer / Engineer",
+    role: "Frontend Engineer",
     duration: "May 2022 – Present  ·  4+ yrs",
     location: "Mumbai, India · Remote",
     type: "Current",
@@ -176,7 +170,7 @@ function DeveloperAvatar() {
           <div className="text-center">
             <p className="font-bold text-sm text-[#e6edf3]">Ayyappa</p>
             <p className="text-[11px] font-mono text-[#7ee787] mt-0.5">
-              {"// Frontend Dev"}
+              {"// Frontend Engineer"}
             </p>
           </div>
 
@@ -385,47 +379,58 @@ export function About() {
 
             {/* Text content */}
             <div className="flex-1 min-w-0 w-full text-center md:text-left">
-              <p className="mt-0 text-muted-foreground leading-relaxed">
-                I&apos;m a passionate Frontend Engineer with{" "}
-                <span className="text-foreground font-semibold">
-                  5+ years of professional experience
-                </span>{" "}
-                building production-grade web applications — from
-                WordPress-driven LMS platforms and static sites to real-time
-                trading dashboards and AI-powered tools.
-              </p>
-              <p className="mt-4 text-muted-foreground leading-relaxed">
-                I began my career at{" "}
-                <span className="text-foreground font-medium">
-                  Chools Consultancy Services
-                </span>{" "}
-                in Bengaluru, where I built and maintained Learning Management
-                System (LMS) websites on WordPress and delivered static web
-                projects using pure HTML, CSS, and JavaScript. I then joined{" "}
-                <span className="text-foreground font-medium">Revise</span> in
-                May 2022, where I work as a Frontend Developer/Engineer —
-                building complex React applications including dashboards,
-                trading platforms, and an AI-driven tool for querying book and
-                IPC section details. I am currently leading development of a
-                mobile application that turns a user&apos;s own machine into a
-                virtual development environment, enabling full developer
-                workflows entirely from mobile via Claude and OpenCode.
-              </p>
-              <p className="mt-4 text-muted-foreground leading-relaxed">
-                I care deeply about{" "}
-                <span className="text-foreground font-medium">
-                  clean, maintainable code
+              <div className="relative pl-5 border-l-2 border-primary/30">
+                <span
+                  className="absolute -top-4 -left-2 text-6xl font-serif text-primary/15 select-none pointer-events-none"
+                  aria-hidden="true"
+                >
+                  &ldquo;
                 </span>
-                ,{" "}
-                <span className="text-foreground font-medium">
-                  intuitive user experiences
-                </span>
-                , and{" "}
-                <span className="text-foreground font-medium">performance</span>
-                . Whether architecting a feature-rich dashboard or building an
-                AI-driven interface, I bring the same commitment to quality and
-                craft to every project.
-              </p>
+
+                <p className="mt-0 text-muted-foreground leading-relaxed">
+                  I&apos;m a passionate Frontend Engineer with{" "}
+                  <span className="gradient-text font-semibold">
+                    5+ years of professional experience
+                  </span>{" "}
+                  building production-grade web applications — from
+                  WordPress-driven LMS platforms and static sites to real-time
+                  trading dashboards and AI-powered tools.
+                </p>
+                <p className="mt-4 text-muted-foreground leading-relaxed">
+                  I began my career at{" "}
+                  <span className="font-semibold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+                    Chools Consultancy Services
+                  </span>{" "}
+                  in Bengaluru, where I built and maintained Learning Management
+                  System (LMS) websites on WordPress and delivered static web
+                  projects using pure HTML, CSS, and JavaScript. I then joined{" "}
+                  <span className="font-semibold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent">
+                    Revise
+                  </span>{" "}
+                  in May 2022, where I work as a Frontend Engineer —
+                  building complex React applications including dashboards,
+                  trading platforms, and an AI-driven tool for querying book and
+                  IPC section details. I am currently leading development of a
+                  mobile application that turns a user&apos;s own machine into a
+                  virtual development environment, enabling full developer
+                  workflows entirely from mobile via Claude and OpenCode.
+                </p>
+                <p className="mt-4 text-muted-foreground leading-relaxed">
+                  I care deeply about{" "}
+                  <span className="text-primary font-semibold">
+                    clean, maintainable code
+                  </span>
+                  ,{" "}
+                  <span className="text-primary font-semibold">
+                    intuitive user experiences
+                  </span>
+                  , and{" "}
+                  <span className="text-primary font-semibold">performance</span>
+                  . Whether architecting a feature-rich dashboard or building an
+                  AI-driven interface, I bring the same commitment to quality and
+                  craft to every project.
+                </p>
+              </div>
 
               {/* Key highlights */}
               <div className="mt-6 grid grid-cols-2 gap-3 text-left">
@@ -535,7 +540,9 @@ export function About() {
                           <h4 className="font-bold text-lg leading-tight">
                             {job.role}
                           </h4>
-                          <p className="text-primary font-semibold">
+                          <p
+                            className={`font-bold bg-gradient-to-r ${job.color} bg-clip-text text-transparent`}
+                          >
                             {job.company}
                           </p>
                         </div>

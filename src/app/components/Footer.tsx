@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Download } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
 
 const socials = [
@@ -97,16 +98,29 @@ export function Footer() {
             ))}
           </div>
 
-          {/* CTA */}
-          <a
-            href="#contact"
-            onClick={() =>
-              gaEvent({ action: "click", category: "hero_cta", label: "lets_connect_footer" })
-            }
-            className="btn-orange btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2"
-          >
-            Let&apos;s Connect
-          </a>
+          {/* CTA — Let's Connect (left) + Download CV (right) */}
+          <div className="flex items-center gap-2">
+            <a
+              href="#contact"
+              onClick={() =>
+                gaEvent({ action: "click", category: "hero_cta", label: "lets_connect_footer" })
+              }
+              className="btn-orange btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2"
+            >
+              Let&apos;s Connect
+            </a>
+            <a
+              href="/resume/Ayyappa_Swamy_Angadi_Resume.pdf"
+              download
+              onClick={() =>
+                gaEvent({ action: "download_cv", category: "engagement", label: "footer_download_cv" })
+              }
+              className="btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-md border border-border bg-card/70 hover:border-primary/40 hover:bg-accent/60 transition-colors text-foreground font-semibold"
+            >
+              <Download size={14} />
+              Download CV
+            </a>
+          </div>
         </div>
 
         {/* ── Bottom bar ── */}

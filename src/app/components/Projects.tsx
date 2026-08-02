@@ -471,13 +471,13 @@ export function Projects() {
         >
           <h3 className="text-xl font-bold mb-6 text-center">All Projects</h3>
 
-          {/* Category filter */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {/* Category filter — horizontally scrollable so it never stacks on mobile */}
+          <div className="carousel-scroll !gap-2 justify-start sm:justify-center mb-8 px-4 -mx-4 sm:px-0 sm:mx-0 sm:flex-wrap">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
-                className={`btn-click px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
+                className={`btn-click flex-shrink-0 px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   activeCategory === cat
                     ? "text-[#1a1000]"
                     : "text-muted-foreground border border-border hover:border-primary/40 hover:text-foreground rounded-full"
