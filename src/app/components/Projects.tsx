@@ -3,7 +3,14 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { ExternalLink, Star, ChevronLeft, ChevronRight, Clock, ImageOff } from "lucide-react";
+import {
+  ExternalLink,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  ImageOff,
+} from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
 
 // ─── Project data ─────────────────────────────────────────────────────────────
@@ -19,7 +26,11 @@ const projects = [
     image: "/projects/youtube-clone.jpg",
     liveUrl: "https://youtube-clone-plum-nine.vercel.app/",
     githubUrl: "https://github.com/ayyappaswamyangadi/youtube-clone",
-    highlights: ["Home feed + category chips", "Notifications & Shorts rail", "Dark-theme, fully responsive"],
+    highlights: [
+      "Home feed + category chips",
+      "Notifications & Shorts rail",
+      "Dark-theme, fully responsive",
+    ],
   },
   {
     id: 2,
@@ -32,7 +43,11 @@ const projects = [
     image: "/projects/taskflow.jpg",
     liveUrl: "https://todo-list-gamma-two-83.vercel.app/",
     githubUrl: "https://github.com/ayyappaswamyangadi/todo-list",
-    highlights: ["Priority & due-date tagging", "Search + status filters", "Persistent local storage"],
+    highlights: [
+      "Priority & due-date tagging",
+      "Search + status filters",
+      "Persistent local storage",
+    ],
   },
   {
     id: 3,
@@ -45,7 +60,11 @@ const projects = [
     image: "/projects/wedding-invitation.jpg",
     liveUrl: "https://wedding-invitation-five-pi.vercel.app/",
     githubUrl: "https://github.com/ayyappaswamyangadi/wedding-invitation",
-    highlights: ["Multi-event ceremony timeline", "Photo gallery + guest wishes wall", "Embedded maps & background music"],
+    highlights: [
+      "Multi-event ceremony timeline",
+      "Photo gallery + guest wishes wall",
+      "Embedded maps & background music",
+    ],
   },
   {
     id: 4,
@@ -58,7 +77,11 @@ const projects = [
     image: "/projects/url-shortener.jpg",
     liveUrl: "https://url-shortener-pi-mauve.vercel.app/",
     githubUrl: "https://github.com/ayyappaswamyangadi/url-shortener",
-    highlights: ["Live backend link generation", "Searchable recent-URLs history", "Copy-to-clipboard sharing"],
+    highlights: [
+      "Live backend link generation",
+      "Searchable recent-URLs history",
+      "Copy-to-clipboard sharing",
+    ],
   },
   {
     id: 5,
@@ -70,8 +93,13 @@ const projects = [
     featured: false,
     image: "/projects/matrimony-form.jpg",
     liveUrl: "https://matrimony-registration-form.vercel.app/",
-    githubUrl: "https://github.com/ayyappaswamyangadi/matrimony-registration-form",
-    highlights: ["English / Kannada language toggle", "Export as image or PDF", "Google Drive auto-save"],
+    githubUrl:
+      "https://github.com/ayyappaswamyangadi/matrimony-registration-form",
+    highlights: [
+      "English / Kannada language toggle",
+      "Export as image or PDF",
+      "Google Drive auto-save",
+    ],
   },
   {
     id: 6,
@@ -84,7 +112,11 @@ const projects = [
     image: "/projects/shopping-list.jpg",
     liveUrl: "https://personal-product-list.vercel.app/",
     githubUrl: "https://github.com/ayyappaswamyangadi/personal-product-list",
-    highlights: ["Quantity + price tracking", "Running total in ₹", "Add / remove items instantly"],
+    highlights: [
+      "Quantity + price tracking",
+      "Running total in ₹",
+      "Add / remove items instantly",
+    ],
   },
   {
     id: 7,
@@ -97,18 +129,51 @@ const projects = [
     image: "/projects/facebook-clone.jpg",
     liveUrl: "https://facebook-clone-chi-coral.vercel.app/",
     githubUrl: "https://github.com/ayyappaswamyangadi/facebook-clone",
-    highlights: ["Sign-up + login UI", "Real OTP email verification", "Faithful layout & styling"],
+    highlights: [
+      "Sign-up + login UI",
+      "Real OTP email verification",
+      "Faithful layout & styling",
+    ],
+  },
+  {
+    id: 8,
+    title: "Resume Builder",
+    description:
+      "A free resume builder with 50+ professionally designed, ATS-friendly templates and a real-time live preview. Deep customization of fonts, colors, spacing, and section order, AI-assisted writing for summaries and bullet points, and pixel-perfect PDF export — with autosave to a user account so nothing is lost mid-edit.",
+    tech: ["Next.js", "React", "Tailwind CSS", "Firebase", "Zustand"],
+    category: "Productivity",
+    featured: true,
+    image: "/projects/resume-builder.png",
+    liveUrl: "https://resume-builder-nextjs-alpha.vercel.app/",
+    githubUrl: "https://github.com/ayyappaswamyangadi/resume-builder-nextjs",
+    highlights: [
+      "50+ ATS-friendly templates",
+      "Live preview + pixel-perfect PDF export",
+      "AI writing assist for bullets & summaries",
+    ],
   },
 ];
 
-const categories = ["All", "UI Clone", "Full Stack", "Productivity", "Utility", "Personal", "Client Work"];
+const categories = [
+  "All",
+  "UI Clone",
+  "Full Stack",
+  "Productivity",
+  "Utility",
+  "Personal",
+  "Client Work",
+];
 const featuredProjects = projects.filter((p) => p.featured);
 const PROJECTS_PER_PAGE = 2;
 
 // ─── Motion variants ─────────────────────────────────────────────────────────
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
 };
 
 const cardGrid: Variants = {
@@ -134,7 +199,9 @@ function GithubIcon({ size = 14 }: { size?: number }) {
 function ProjectCard({ project }: { project: (typeof projects)[0] }) {
   const [flipped, setFlipped] = useState(false);
   const [canHover, setCanHover] = useState(true);
-  const [imgStatus, setImgStatus] = useState<"loading" | "loaded" | "error">("loading");
+  const [imgStatus, setImgStatus] = useState<"loading" | "loaded" | "error">(
+    "loading",
+  );
 
   // Hover drives the flip on desktop; on touch devices (no hover) tap toggles it instead.
   // Binding onMouseEnter/onMouseLeave on a touch device makes iOS/Android browsers treat
@@ -167,7 +234,11 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
         {/* ── Front: landing screenshot ── */}
         <div
           className="project-card shimmer-card flex flex-col"
-          style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden" }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            backfaceVisibility: "hidden",
+          }}
         >
           <div className="relative flex-1 w-full overflow-hidden">
             {imgStatus !== "error" && (
@@ -186,7 +257,10 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
 
             {/* Skeleton while the screenshot is still loading (slow network) */}
             {imgStatus === "loading" && (
-              <div className="absolute inset-0 skeleton-pulse" aria-hidden="true" />
+              <div
+                className="absolute inset-0 skeleton-pulse"
+                aria-hidden="true"
+              />
             )}
 
             {/* Fallback if the screenshot fails to load */}
@@ -240,7 +314,11 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
                   title="GitHub"
                   onClick={(e) => {
                     e.stopPropagation();
-                    gaEvent({ action: "click", category: "project_link", label: `github_${project.title}` });
+                    gaEvent({
+                      action: "click",
+                      category: "project_link",
+                      label: `github_${project.title}`,
+                    });
                   }}
                   className="icon-github btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
                 >
@@ -254,7 +332,11 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
                 title="Live Demo"
                 onClick={(e) => {
                   e.stopPropagation();
-                  gaEvent({ action: "click", category: "project_link", label: `live_demo_icon_${project.title}` });
+                  gaEvent({
+                    action: "click",
+                    category: "project_link",
+                    label: `live_demo_icon_${project.title}`,
+                  });
                 }}
                 className="btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
               >
@@ -263,14 +345,19 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
             </div>
           </div>
 
-          <h3 className="font-bold text-base mb-2 leading-snug">{project.title}</h3>
+          <h3 className="font-bold text-base mb-2 leading-snug">
+            {project.title}
+          </h3>
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
             {project.description}
           </p>
 
           <ul className="space-y-1 mb-4">
             {project.highlights.map((h) => (
-              <li key={h} className="flex items-center gap-2 text-xs text-muted-foreground">
+              <li
+                key={h}
+                className="flex items-center gap-2 text-xs text-muted-foreground"
+              >
                 <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                 {h}
               </li>
@@ -299,11 +386,16 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
               rel="noopener noreferrer"
               onClick={(e) => {
                 e.stopPropagation();
-                gaEvent({ action: "click", category: "project_link", label: `view_live_demo_${project.title}` });
+                gaEvent({
+                  action: "click",
+                  category: "project_link",
+                  label: `view_live_demo_${project.title}`,
+                });
               }}
               className="btn-click w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-[#1a1000]"
               style={{
-                background: "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
+                background:
+                  "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
               }}
             >
               <ExternalLink size={14} />
@@ -389,9 +481,13 @@ function FeaturedCarousel() {
             key={p.id}
             onClick={() => {
               const el = scrollRef;
-              const firstCard = el?.querySelector<HTMLElement>(".featured-card");
+              const firstCard =
+                el?.querySelector<HTMLElement>(".featured-card");
               if (el && firstCard) {
-                el.scrollTo({ left: i * (firstCard.offsetWidth + 20), behavior: "smooth" });
+                el.scrollTo({
+                  left: i * (firstCard.offsetWidth + 20),
+                  behavior: "smooth",
+                });
               }
             }}
             className={`rounded-full transition-all duration-300 ${
@@ -434,7 +530,10 @@ export function Projects() {
   };
 
   return (
-    <section id="projects" className="relative py-24 px-4 overflow-hidden dot-grid">
+    <section
+      id="projects"
+      className="relative py-24 px-4 overflow-hidden dot-grid"
+    >
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
       <div className="max-w-5xl mx-auto">
@@ -453,8 +552,9 @@ export function Projects() {
             Featured Projects
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Real, deployed projects — from UI clones and a client&apos;s matrimony intake form to a
-            full-stack URL shortener. Hover any card to flip it and see the details.
+            Real, deployed projects — from UI clones and a client&apos;s
+            matrimony intake form to a full-stack URL shortener. Hover any card
+            to flip it and see the details.
           </p>
         </motion.div>
 
@@ -546,7 +646,8 @@ export function Projects() {
                     ? {
                         width: "2rem",
                         height: "2rem",
-                        background: "linear-gradient(180deg, #FFC25F 0%, #F99900 100%)",
+                        background:
+                          "linear-gradient(180deg, #FFC25F 0%, #F99900 100%)",
                         border: "2px solid #EAA22F",
                         color: "#1a1000",
                       }
@@ -564,7 +665,9 @@ export function Projects() {
             ))}
 
             <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+              onClick={() =>
+                setCurrentPage((p) => Math.min(totalPages - 1, p + 1))
+              }
               disabled={currentPage === totalPages - 1}
               aria-label="Next page"
               className="btn-click w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center hover:border-primary/50 hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
@@ -577,7 +680,8 @@ export function Projects() {
         {/* ── Page info ── */}
         <p className="text-center text-xs text-muted-foreground mt-3">
           Showing {currentPage * PROJECTS_PER_PAGE + 1}–
-          {Math.min((currentPage + 1) * PROJECTS_PER_PAGE, filtered.length)} of {filtered.length} projects
+          {Math.min((currentPage + 1) * PROJECTS_PER_PAGE, filtered.length)} of{" "}
+          {filtered.length} projects
         </p>
 
         {/* ── CTA ── */}
@@ -596,7 +700,11 @@ export function Projects() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() =>
-              gaEvent({ action: "click", category: "social", label: "github_profile_projects_cta" })
+              gaEvent({
+                action: "click",
+                category: "social",
+                label: "github_profile_projects_cta",
+              })
             }
             className="icon-github btn-orange-outline btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
           >
