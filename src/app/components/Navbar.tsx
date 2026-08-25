@@ -175,7 +175,7 @@ export function Navbar() {
               // dropdown also carries `.glass` (backdrop-filter) and a
               // negative-z-index child gets swept into that blur/saturate.
               <motion.div
-                className="absolute left-3 right-3 pointer-events-none"
+                className="absolute top-0 left-3 right-3 pointer-events-none"
                 style={{ borderRadius: "12px", background: "var(--btn-gradient)" }}
                 animate={{ y: mobilePill.y, height: mobilePill.height }}
                 transition={{ type: "spring", stiffness: 380, damping: 32 }}
@@ -188,7 +188,7 @@ export function Navbar() {
                 data-section={section}
                 onClick={closeMenu}
                 className={cn(
-                  "btn-click relative capitalize px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors duration-200",
+                  "btn-click relative capitalize px-4 py-2.5 rounded-xl font-semibold text-sm text-center transition-colors duration-200",
                   activeScreen === section
                     ? "text-white"
                     : "text-muted-foreground hover:bg-primary/10 hover:text-foreground",

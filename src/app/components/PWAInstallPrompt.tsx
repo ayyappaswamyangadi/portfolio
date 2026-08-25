@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, X } from "lucide-react";
+import { Download, Share, X } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
+import { useIOSInstall } from "../hooks/useIOSInstall";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -16,15 +17,20 @@ const DISMISS_DAYS = 14;
 export function PWAInstallPrompt() {
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
+  const { isIOS, isStandalone } = useIOSInstall();
 
   useEffect(() => {
-    const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
     if (isStandalone) return;
 
     const dismissedAt = Number(localStorage.getItem(DISMISS_KEY) ?? 0);
     if (dismissedAt && Date.now() - dismissedAt < DISMISS_DAYS * 24 * 60 * 60 * 1000) {
+      return;
+    }
+
+    // iOS never fires `beforeinstallprompt` — there's no programmatic
+    // install trigger there, so just show the instructional copy directly.
+    if (isIOS) {
+      setVisible(true);
       return;
     }
 
@@ -36,7 +42,7 @@ export function PWAInstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
+  }, [isIOS, isStandalone]);
 
   const dismiss = () => {
     setVisible(false);
@@ -58,7 +64,7 @@ export function PWAInstallPrompt() {
 
   return (
     <AnimatePresence>
-      {visible && prompt && (
+      {visible && (prompt || isIOS) && (
         <motion.div
           key="pwa-install"
           initial={{ y: 120, opacity: 0 }}
@@ -70,15 +76,19 @@ export function PWAInstallPrompt() {
           className="pwa-install-banner md:hidden"
         >
           <div className="pwa-install-icon">
-            <Download size={18} />
+            {isIOS ? <Share size={18} /> : <Download size={18} />}
           </div>
           <div className="pwa-install-text">
             <span className="pwa-install-title">Install this app</span>
-            <span className="pwa-install-subtitle">Add to your home screen for quick access</span>
+            <span className="pwa-install-subtitle">
+              {isIOS ? "Tap Share, then “Add to Home Screen”" : "Add to your home screen for quick access"}
+            </span>
           </div>
-          <button onClick={handleInstall} className="pwa-install-cta btn-click">
-            Install
-          </button>
+          {!isIOS && (
+            <button onClick={handleInstall} className="pwa-install-cta btn-click">
+              Install
+            </button>
+          )}
           <button
             onClick={dismiss}
             aria-label="Dismiss install prompt"

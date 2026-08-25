@@ -404,7 +404,7 @@ export default function Home() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center px-4 py-20 overflow-hidden dot-grid"
+      className="relative min-h-dvh flex items-center justify-center px-4 py-20 overflow-hidden dot-grid"
     >
       {/* ── Animated background blobs ──
           Previously hardcoded indigo/violet/cyan in both themes — an
