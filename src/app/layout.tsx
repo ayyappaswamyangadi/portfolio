@@ -7,6 +7,7 @@ import { Footer } from "@/app/components/Footer";
 import { ScrollProgress } from "@/app/components/ScrollProgress";
 import { CursorGlow } from "@/app/components/CursorGlow";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
+import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
 import { StructuredData } from "@/app/components/StructuredData";
 import type { Metadata, Viewport } from "next";
@@ -149,6 +150,7 @@ export default function RootLayout({
           </header>
           <main className="flex-1">{children}</main>
           <Footer />
+          <PWAInstallPrompt />
         </ThemeProvider>
       </body>
     </html>

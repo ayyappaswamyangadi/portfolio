@@ -735,6 +735,84 @@ body {
   cursor: default;
 }
 
+/* ─── PWA install banner (mobile) ────────────────────────── */
+.pwa-install-banner {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.65rem 0.65rem 0.75rem;
+  border-radius: 1rem;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: 0 8px 28px var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+}
+
+.pwa-install-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.7rem;
+  background: var(--btn-gradient);
+  color: #fff;
+}
+
+.pwa-install-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.pwa-install-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.pwa-install-subtitle {
+  font-size: 0.72rem;
+  color: hsl(var(--muted-foreground));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pwa-install-cta {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.pwa-install-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  color: hsl(var(--muted-foreground));
+  transition: background 0.2s, color 0.2s;
+}
+
+.pwa-install-close:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
+}
+
 /* ─── Spotlight cursor ─────────────────────────────────── */
 :root {
   --spotlight-color: rgba(37, 99, 235, 0.07);
