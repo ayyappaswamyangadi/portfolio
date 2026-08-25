@@ -59,7 +59,9 @@ const projects = [
     featured: true,
     image: "/projects/wedding-invitation.jpg",
     liveUrl: "https://wedding-invitation-five-pi.vercel.app/",
-    githubUrl: "https://github.com/ayyappaswamyangadi/wedding-invitation",
+    // No public repo link — github.com/.../wedding-invitation 404s (repo is
+    // private or renamed). Live demo still works; re-add if it goes public.
+    githubUrl: "",
     highlights: [
       "Multi-event ceremony timeline",
       "Photo gallery + guest wishes wall",
@@ -93,8 +95,9 @@ const projects = [
     featured: false,
     image: "/projects/matrimony-form.jpg",
     liveUrl: "https://matrimony-registration-form.vercel.app/",
-    githubUrl:
-      "https://github.com/ayyappaswamyangadi/matrimony-registration-form",
+    // No public repo link — github.com/.../matrimony-registration-form
+    // 404s (repo is private or renamed). Live demo still works.
+    githubUrl: "",
     highlights: [
       "English / Kannada language toggle",
       "Export as image or PDF",
@@ -139,7 +142,7 @@ const projects = [
     id: 8,
     title: "Resume Builder",
     description:
-      "A free resume builder with 50+ professionally designed, ATS-friendly templates and a real-time live preview. Deep customization of fonts, colors, spacing, and section order, AI-assisted writing for summaries and bullet points, and pixel-perfect PDF export — with autosave to a user account so nothing is lost mid-edit.",
+      "A free resume builder with 50+ professionally designed, ATS-friendly templates and a real-time live preview. Deep customization of fonts, colors, spacing, and section order, AI-assisted writing for summaries and bullet points, niceand pixel-perfect PDF export — with autosave to a user account so nothing is lost mid-edit.",
     tech: ["Next.js", "React", "Tailwind CSS", "Firebase", "Zustand"],
     category: "Productivity",
     featured: true,
@@ -217,194 +220,207 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
   };
 
   return (
-    <div
+    // Entrance fade/slide lives on this wrapper (via variants, inherited from
+    // the grid's stagger container) rather than the inner flip div — that div
+    // needs an explicit `animate` for rotateY, and an explicit `animate`
+    // object makes Framer Motion ignore inherited variants entirely, which
+    // left cards permanently stuck at the "hidden" (opacity: 0) state.
+    // `perspective` lives on a plain, un-animated div below rather than here:
+    // putting a 3D perspective context directly on the element Framer Motion
+    // is also transform-animating creates a compositing layer nested inside
+    // another compositing layer, which some Chromium GPU paths render as a
+    // blank/black box once the entrance animation settles.
+    <motion.div
+      variants={cardItem}
       className="group h-[420px]"
-      style={{ perspective: "1400px" }}
       onMouseEnter={canHover ? () => setFlipped(true) : undefined}
       onMouseLeave={canHover ? () => setFlipped(false) : undefined}
       onClick={handleTap}
     >
-      <motion.div
-        variants={cardItem}
-        className="relative w-full h-full"
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* ── Front: landing screenshot ── */}
-        <div
-          className="project-card shimmer-card flex flex-col"
-          style={{
-            position: "absolute",
-            inset: 0,
-            backfaceVisibility: "hidden",
-          }}
+      <div className="relative w-full h-full" style={{ perspective: "1400px" }}>
+        <motion.div
+          className="relative w-full h-full"
+          animate={{ rotateY: flipped ? 180 : 0 }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          style={{ transformStyle: "preserve-3d" }}
         >
-          <div className="relative flex-1 w-full overflow-hidden">
-            {imgStatus !== "error" && (
-              <Image
-                src={project.image}
-                alt={`${project.title} landing screen`}
-                fill
-                sizes="(max-width: 640px) 92vw, 340px"
-                className={`object-cover object-top transition-opacity duration-300 ${
-                  imgStatus === "loaded" ? "opacity-100" : "opacity-0"
-                }`}
-                onLoad={() => setImgStatus("loaded")}
-                onError={() => setImgStatus("error")}
-              />
-            )}
+          {/* ── Front: landing screenshot ── */}
+          <div
+            className="project-card shimmer-card flex flex-col"
+            style={{
+              position: "absolute",
+              inset: 0,
+              backfaceVisibility: "hidden",
+            }}
+          >
+            <div className="relative flex-1 w-full overflow-hidden">
+              {imgStatus !== "error" && (
+                <Image
+                  src={project.image}
+                  alt={`${project.title} landing screen`}
+                  fill
+                  loading="eager"
+                  sizes="(max-width: 640px) 92vw, 340px"
+                  className={`object-cover object-top transition-opacity duration-300 ${
+                    imgStatus === "loaded" ? "opacity-100" : "opacity-0"
+                  }`}
+                  onLoad={() => setImgStatus("loaded")}
+                  onError={() => setImgStatus("error")}
+                />
+              )}
 
-            {/* Skeleton while the screenshot is still loading (slow network) */}
-            {imgStatus === "loading" && (
-              <div
-                className="absolute inset-0 skeleton-pulse"
-                aria-hidden="true"
-              />
-            )}
+              {/* Skeleton while the screenshot is still loading (slow network) */}
+              {imgStatus === "loading" && (
+                <div
+                  className="absolute inset-0 skeleton-pulse"
+                  aria-hidden="true"
+                />
+              )}
 
-            {/* Fallback if the screenshot fails to load */}
-            {imgStatus === "error" && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-accent text-muted-foreground">
-                <ImageOff size={22} />
-                <span className="text-xs">Preview unavailable</span>
-              </div>
-            )}
+              {/* Fallback if the screenshot fails to load */}
+              {imgStatus === "error" && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-accent text-muted-foreground">
+                  <ImageOff size={22} />
+                  <span className="text-xs">Preview unavailable</span>
+                </div>
+              )}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-            {project.featured && (
-              <span className="absolute top-3 right-3 flex items-center gap-1 text-xs font-medium text-amber-300 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full">
-                <Star size={11} className="fill-current" />
-                Featured
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+              {project.featured && (
+                <span className="absolute top-3 right-3 flex items-center gap-1 text-xs font-medium text-amber-300 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full">
+                  <Star size={11} className="fill-current" />
+                  Featured
+                </span>
+              )}
+              <span className="absolute top-3 left-3 text-xs font-medium text-white/90 bg-black/50 backdrop-blur px-2.5 py-0.5 rounded-full border border-white/10">
+                {project.category}
               </span>
-            )}
-            <span className="absolute top-3 left-3 text-xs font-medium text-white/90 bg-black/50 backdrop-blur px-2.5 py-0.5 rounded-full border border-white/10">
-              {project.category}
-            </span>
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <h3 className="font-bold text-base text-white leading-snug drop-shadow">
-                {project.title}
-              </h3>
-              <p className="text-xs text-white/70 mt-1">Hover to see details</p>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <h3 className="font-bold text-base text-white leading-snug drop-shadow">
+                  {project.title}
+                </h3>
+                <p className="text-xs text-white/70 mt-1">
+                  Hover to see details
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ── Back: details ── */}
-        <div
-          className="project-card project-card-back flex flex-col p-6"
-          onWheel={(e) => e.stopPropagation()}
-          style={{
-            position: "absolute",
-            inset: 0,
-            backfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
-          }}
-        >
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <span className="text-xs font-medium text-muted-foreground bg-accent px-2.5 py-0.5 rounded-full border border-border">
-              {project.category}
-            </span>
-            <div className="flex gap-2">
-              {project.githubUrl && (
+          {/* ── Back: details ── */}
+          <div
+            className="project-card project-card-back flex flex-col p-6"
+            onWheel={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              inset: 0,
+              backfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+            }}
+          >
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <span className="text-xs font-medium text-muted-foreground bg-accent px-2.5 py-0.5 rounded-full border border-border">
+                {project.category}
+              </span>
+              <div className="flex gap-2">
+                {project.githubUrl && (
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="GitHub"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      gaEvent({
+                        action: "click",
+                        category: "project_link",
+                        label: `github_${project.title}`,
+                      });
+                    }}
+                    className="icon-github btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
+                  >
+                    <GithubIcon size={14} />
+                  </a>
+                )}
                 <a
-                  href={project.githubUrl}
+                  href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="GitHub"
+                  title="Live Demo"
                   onClick={(e) => {
                     e.stopPropagation();
                     gaEvent({
                       action: "click",
                       category: "project_link",
-                      label: `github_${project.title}`,
+                      label: `live_demo_icon_${project.title}`,
                     });
                   }}
-                  className="icon-github btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
+                  className="btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
                 >
-                  <GithubIcon size={14} />
+                  <ExternalLink size={14} className="text-muted-foreground" />
                 </a>
-              )}
+              </div>
+            </div>
+
+            <h3 className="font-bold text-base mb-2 leading-snug">
+              {project.title}
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+              {project.description}
+            </p>
+
+            <ul className="space-y-1 mb-4">
+              {project.highlights.map((h) => (
+                <li
+                  key={h}
+                  className="flex items-center gap-2 text-xs text-muted-foreground"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                  {h}
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {project.tech.map((t) => (
+                <span
+                  key={t}
+                  className="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/15 font-medium"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-auto pt-3 border-t border-border">
+              <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3">
+                <Clock size={11} className="flex-shrink-0" />
+                First load may be a little slow — hosted on free-tier services.
+              </p>
               <a
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                title="Live Demo"
                 onClick={(e) => {
                   e.stopPropagation();
                   gaEvent({
                     action: "click",
                     category: "project_link",
-                    label: `live_demo_icon_${project.title}`,
+                    label: `view_live_demo_${project.title}`,
                   });
                 }}
-                className="btn-click p-1.5 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors"
+                className="btn-click w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-white"
+                style={{
+                  background: "var(--btn-gradient)",
+                }}
               >
-                <ExternalLink size={14} className="text-muted-foreground" />
+                <ExternalLink size={14} />
+                View Live Demo
               </a>
             </div>
           </div>
-
-          <h3 className="font-bold text-base mb-2 leading-snug">
-            {project.title}
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-            {project.description}
-          </p>
-
-          <ul className="space-y-1 mb-4">
-            {project.highlights.map((h) => (
-              <li
-                key={h}
-                className="flex items-center gap-2 text-xs text-muted-foreground"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                {h}
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {project.tech.map((t) => (
-              <span
-                key={t}
-                className="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/15 font-medium"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-auto pt-3 border-t border-border">
-            <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-3">
-              <Clock size={11} className="flex-shrink-0" />
-              First load may be a little slow — hosted on free-tier services.
-            </p>
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation();
-                gaEvent({
-                  action: "click",
-                  category: "project_link",
-                  label: `view_live_demo_${project.title}`,
-                });
-              }}
-              className="btn-click w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-[#1a1000]"
-              style={{
-                background:
-                  "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
-              }}
-            >
-              <ExternalLink size={14} />
-              View Live Demo
-            </a>
-          </div>
-        </div>
-      </motion.div>
-    </div>
+        </motion.div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -497,7 +513,10 @@ function FeaturedCarousel() {
             }`}
             style={
               activeIdx === i
-                ? { background: "linear-gradient(90deg, #FFC25F, #F99900)" }
+                ? {
+                    background:
+                      "linear-gradient(90deg, var(--brand-1), var(--brand-3))",
+                  }
                 : undefined
             }
             aria-label={`Go to project ${i + 1}`}
@@ -545,9 +564,6 @@ export function Projects() {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
-          <p className="text-primary font-semibold text-sm tracking-widest uppercase mb-2">
-            My work
-          </p>
           <h2 className="text-3xl sm:text-4xl font-bold section-heading center mb-6">
             Featured Projects
           </h2>
@@ -587,16 +603,15 @@ export function Projects() {
                 onClick={() => handleCategoryChange(cat)}
                 className={`btn-click flex-shrink-0 px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   activeCategory === cat
-                    ? "text-[#1a1000]"
-                    : "text-muted-foreground border border-border hover:border-primary/40 hover:text-foreground rounded-full"
+                    ? "text-white"
+                    : "text-muted-foreground dark:text-white border border-border hover:border-primary/40 hover:text-foreground rounded-full"
                 }`}
                 style={
                   activeCategory === cat
                     ? {
                         borderRadius: "5px",
-                        border: "2px solid #EAA22F",
-                        background:
-                          "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
+                        border: "1.5px solid var(--brand-2)",
+                        background: "var(--btn-gradient)",
                       }
                     : undefined
                 }
@@ -646,10 +661,9 @@ export function Projects() {
                     ? {
                         width: "2rem",
                         height: "2rem",
-                        background:
-                          "linear-gradient(180deg, #FFC25F 0%, #F99900 100%)",
-                        border: "2px solid #EAA22F",
-                        color: "#1a1000",
+                        background: "var(--btn-gradient)",
+                        border: "1.5px solid var(--brand-2)",
+                        color: "#ffffff",
                       }
                     : {
                         width: "2rem",
@@ -706,7 +720,7 @@ export function Projects() {
                 label: "github_profile_projects_cta",
               })
             }
-            className="icon-github btn-orange-outline btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
+            className="icon-github btn-primary-outline btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
           >
             <GithubIcon size={16} />
             View GitHub Profile

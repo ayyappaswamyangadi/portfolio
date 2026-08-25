@@ -143,9 +143,6 @@ export function Contact() {
           viewport={{ once: true }}
           className="mb-10 text-center"
         >
-          <p className="text-primary font-semibold text-sm tracking-widest uppercase mb-2">
-            Get in touch
-          </p>
           <h2 className="text-3xl sm:text-4xl font-bold section-heading center mb-4">
             Let&apos;s Connect
           </h2>
@@ -207,10 +204,10 @@ export function Contact() {
             {/* Form header */}
             <div className="flex items-center gap-3 mb-7">
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-[#1a1000]"
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
                 style={{
                   background:
-                    "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53.12%, #F99900 100%)",
+                    "var(--btn-gradient)",
                 }}
               >
                 <Send size={18} />
@@ -350,7 +347,7 @@ export function Contact() {
               <button
                 type="submit"
                 disabled={submitState === "loading"}
-                className="btn-orange btn-click w-full flex items-center justify-center gap-2 px-6 py-3.5 text-sm"
+                className="btn-primary btn-click w-full flex items-center justify-center gap-2 px-6 py-3.5 text-sm"
               >
                 {submitState === "loading" ? (
                   <>

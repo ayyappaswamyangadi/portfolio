@@ -11,7 +11,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="btn-orange btn-click mt-2 inline-flex items-center gap-2 px-5 py-2.5 text-sm"
+        className="btn-primary btn-click mt-2 inline-flex items-center gap-2 px-5 py-2.5 text-sm"
       >
         <Home size={15} />
         Back to home

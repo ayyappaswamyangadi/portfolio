@@ -7,9 +7,14 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import { MapPin, Briefcase, Download } from "lucide-react";
+import { MapPin, Briefcase } from "lucide-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { gaEvent } from "@/lib/gtag";
+import { DownloadCvButton } from "./DownloadCvButton";
+
+// WebGL scene needs the browser's canvas/GL context — load client-only.
+const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
 
 // ─── Roles for typing effect ────────────────────────────────────────────────
 const roles = [
@@ -401,11 +406,46 @@ export default function Home() {
       id="home"
       className="relative min-h-screen flex items-center justify-center px-4 py-20 overflow-hidden dot-grid"
     >
-      {/* ── Animated background blobs ── */}
+      {/* ── Animated background blobs ──
+          Previously hardcoded indigo/violet/cyan in both themes — an
+          unrelated color trio that never matched dark mode's navy & gold
+          palette. These now use the theme's own --primary hue (violet in
+          light, gold in dark) at varying opacity instead. */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="animate-blob absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-blue-500/10 dark:bg-blue-500/8 blur-3xl" />
-        <div className="animate-blob-delay-2 absolute top-1/2 -right-32 w-[400px] h-[400px] rounded-full bg-purple-500/10 dark:bg-purple-500/8 blur-3xl" />
-        <div className="animate-blob-delay-4 absolute bottom-0 left-1/3 w-[350px] h-[350px] rounded-full bg-cyan-500/10 dark:bg-cyan-500/8 blur-3xl" />
+        <div
+          className="animate-blob absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full blur-3xl"
+          style={{ background: "hsl(var(--primary) / 0.12)" }}
+        />
+        <div
+          className="animate-blob-delay-2 absolute top-1/2 -right-32 w-[400px] h-[400px] rounded-full blur-3xl"
+          style={{ background: "hsl(var(--primary) / 0.08)" }}
+        />
+        <div
+          className="animate-blob-delay-4 absolute bottom-0 left-1/3 w-[350px] h-[350px] rounded-full blur-3xl"
+          style={{ background: "hsl(var(--primary) / 0.10)" }}
+        />
+      </div>
+
+      {/* ── WebGL "AI core" — distorted blob + orbit rings + sparkles ──
+          Desktop only: on mobile the layout stacks to one column, so a
+          full-bleed canvas here would render directly behind (and wash
+          out) the stacked hero text instead of sitting in its own column.
+          The wrapper itself is hard-capped to the right half of the
+          section (not just masked) so the glow can never bleed past the
+          midline into the text column — a mask alone isn't enough here
+          because CSS radial-gradient ellipse sizes are radii, not
+          diameters, so it's easy to under-shrink the visible falloff. */}
+      <div
+        className="absolute inset-y-0 right-0 w-full lg:w-1/2 pointer-events-none hidden lg:block overflow-hidden"
+        aria-hidden="true"
+        style={{
+          maskImage:
+            "radial-gradient(ellipse 70% 75% at 62% 46%, black 25%, transparent 85%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 75% at 62% 46%, black 25%, transparent 85%)",
+        }}
+      >
+        <HeroScene />
       </div>
 
       {/* ── Floating tech icon badges (desktop only) ── */}
@@ -454,7 +494,7 @@ export default function Home() {
                   👋
                 </span>
               </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mt-1 leading-tight">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mt-1 leading-[1.05]">
                 I&apos;m <span className="gradient-text">Ayyappa</span>
                 <span className="sr-only">
                   {" "}— Frontend Developer, Web Developer &amp; React/Next.js
@@ -528,21 +568,14 @@ export default function Home() {
                 onClick={() =>
                   gaEvent({ action: "click", category: "hero_cta", label: "lets_connect" })
                 }
-                className="btn-orange btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
+                className="btn-primary btn-click inline-flex items-center gap-2 px-6 py-3 text-sm"
               >
                 Let&apos;s Connect
               </Link>
-              <a
-                href="/resume/Ayyappa_Swamy_Angadi_Resume.pdf"
-                download
-                onClick={() =>
-                  gaEvent({ action: "download_cv", category: "engagement", label: "hero_download_cv" })
-                }
+              <DownloadCvButton
+                gaLabel="hero_download_cv"
                 className="btn-click inline-flex items-center gap-2 px-6 py-3 text-sm rounded-md border border-border bg-card/70 hover:border-primary/40 hover:bg-accent/60 transition-colors text-foreground font-semibold"
-              >
-                <Download size={14} />
-                Download CV
-              </a>
+              />
             </motion.div>
 
             {/* Quick stats */}
@@ -577,7 +610,10 @@ export default function Home() {
           >
             <div className="relative">
               {/* Glow under the card */}
-              <div className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-cyan-500/20 blur-2xl pointer-events-none" />
+              <div
+                className="absolute -inset-4 rounded-2xl blur-2xl pointer-events-none opacity-20"
+                style={{ background: "var(--btn-gradient)" }}
+              />
               <MacWindow />
             </div>
           </motion.div>

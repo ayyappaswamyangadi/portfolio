@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Ayyappa — Frontend Developer, Web Developer & React/Next.js Engineer";
+  "Ayyappa — Frontend Developer, React.js & Next.js Web Developer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,7 +16,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #1A375F 0%, #344864 100%)",
+          background: "linear-gradient(135deg, #0a0b16 0%, #14152b 55%, #1b1440 100%)",
           fontFamily: "sans-serif",
         }}
       >
@@ -36,8 +36,8 @@ export default async function Image() {
               borderRadius: 16,
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(180deg, #FFC25F 0%, #FF9E00 53%, #F99900 100%)",
-              color: "#1a1000",
+              background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 55%, #06b6d4 100%)",
+              color: "#ffffff",
               fontSize: 32,
               fontWeight: 700,
             }}
@@ -53,7 +53,7 @@ export default async function Image() {
             display: "flex",
             fontSize: 34,
             fontWeight: 600,
-            color: "#FFC25F",
+            color: "#a78bfa",
             marginBottom: 24,
           }}
         >

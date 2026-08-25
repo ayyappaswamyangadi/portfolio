@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Download } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
+import { DownloadCvButton } from "./DownloadCvButton";
 
 const socials = [
   {
@@ -50,7 +50,13 @@ const socials = [
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/30 dark:border-white/10 bg-white/50 dark:bg-[#151E2B]/60 backdrop-blur-xl">
+    <footer
+      className="relative border-t backdrop-blur-xl"
+      style={{
+        borderColor: "var(--glass-border)",
+        background: "var(--glass-card-bg)",
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +68,10 @@ export function Footer() {
         <div className="flex flex-wrap items-center gap-4 sm:gap-0">
           {/* Logo + name */}
           <div className="flex items-center gap-2 mr-auto">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center gap-px select-none">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center gap-px select-none"
+              style={{ background: "var(--btn-gradient)" }}
+            >
               <span className="text-white/60 font-mono font-bold text-[6px] leading-none">
                 &lt;
               </span>
@@ -105,21 +114,14 @@ export function Footer() {
               onClick={() =>
                 gaEvent({ action: "click", category: "hero_cta", label: "lets_connect_footer" })
               }
-              className="btn-orange btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2"
+              className="btn-primary btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2"
             >
               Let&apos;s Connect
             </a>
-            <a
-              href="/resume/Ayyappa_Swamy_Angadi_Resume.pdf"
-              download
-              onClick={() =>
-                gaEvent({ action: "download_cv", category: "engagement", label: "footer_download_cv" })
-              }
+            <DownloadCvButton
+              gaLabel="footer_download_cv"
               className="btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-md border border-border bg-card/70 hover:border-primary/40 hover:bg-accent/60 transition-colors text-foreground font-semibold"
-            >
-              <Download size={14} />
-              Download CV
-            </a>
+            />
           </div>
         </div>
 

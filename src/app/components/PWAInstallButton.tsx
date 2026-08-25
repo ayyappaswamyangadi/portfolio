@@ -34,7 +34,7 @@ export function PWAInstallButton() {
   return (
     <button
       onClick={handleInstall}
-      className="btn-orange btn-click ml-2 px-4 py-1.5 text-sm inline-flex items-center gap-1.5"
+      className="btn-primary btn-click ml-2 px-4 py-1.5 text-sm inline-flex items-center gap-1.5"
       aria-label="Install app"
     >
       <Download size={14} />

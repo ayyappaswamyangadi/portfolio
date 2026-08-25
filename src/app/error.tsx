@@ -26,7 +26,7 @@ export default function Error({
       </p>
       <button
         onClick={reset}
-        className="btn-orange btn-click mt-2 inline-flex items-center gap-2 px-5 py-2.5 text-sm"
+        className="btn-primary btn-click mt-2 inline-flex items-center gap-2 px-5 py-2.5 text-sm"
       >
         <RotateCw size={15} />
         Try again

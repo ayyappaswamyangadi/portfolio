@@ -19,10 +19,15 @@ const outfit = Outfit({
 });
 
 const siteUrl = "https://www.ayyappa.dev";
+// Title kept under ~65 chars (Google's typical SERP truncation width) with
+// the exact phrases recruiters/search actually use — "Frontend Developer",
+// "React.js", "Next.js", "Web Developer" — up front rather than buried.
 const siteTitle =
-  "Ayyappa | Frontend Developer, Web Developer & React/Next.js Engineer";
+  "Ayyappa | Frontend Developer, React.js & Next.js Web Developer";
+// Description kept under ~160 chars so it doesn't get cut mid-sentence in
+// search results, with the highest-value keywords front-loaded.
 const siteDescription =
-  "Ayyappa Swamy Angadi — Frontend Developer & Web Developer with 5+ years building scalable, high-performance web apps using React, Next.js, JavaScript, TypeScript, HTML, CSS & Tailwind CSS. Strong on optimisation, scalability & problem solving.";
+  "Ayyappa Swamy Angadi — Frontend Developer & Web Developer with 5+ years building fast, scalable web apps using React.js, Next.js, TypeScript & JavaScript.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -31,13 +36,35 @@ export const metadata: Metadata = {
     template: "%s | Ayyappa",
   },
   description: siteDescription,
+  // Google itself no longer uses the keywords meta tag for ranking, but a
+  // handful of other search/indexing tools and internal-search crawlers
+  // still read it — kept comprehensive and pulled directly from the resume's
+  // actual skill set rather than generic frontend buzzwords.
   keywords: [
-    "Frontend Developer", "Web Developer", "Frontend Engineer",
-    "React Developer", "Next.js Developer", "JavaScript Developer",
-    "TypeScript Developer", "HTML", "CSS", "Tailwind CSS",
-    "Web Performance Optimisation", "Scalable Web Applications",
-    "Problem Solving", "Redux", "Portfolio", "Ayyappa",
-    "Ayyappa Swamy Angadi", "Bengaluru",
+    // Roles / titles
+    "Frontend Developer", "Frontend Engineer", "Web Developer",
+    "React Developer", "React.js Developer", "Next.js Developer",
+    "JavaScript Developer", "TypeScript Developer",
+    // Core stack
+    "React.js", "Next.js", "JavaScript ES6+", "TypeScript",
+    "React Hooks", "Context API", "Functional Components",
+    // State & forms
+    "Redux", "Redux Toolkit", "React Hook Form", "Zod",
+    // UI & styling
+    "Tailwind CSS", "Material UI", "Bootstrap", "Styled-Components",
+    "Framer Motion", "Responsive Web Design", "Cross-Browser Compatibility",
+    // Data & APIs
+    "RESTful APIs", "Axios", "Fetch API",
+    // Performance
+    "Performance Optimization", "Code Splitting", "Lazy Loading", "Web Vitals",
+    // Tooling & workflow
+    "Webpack", "Vite", "Babel", "Git", "GitHub", "CI/CD", "Agile", "Scrum",
+    // Notable project domains
+    "Web3.js", "Ethers.js", "MetaMask Integration",
+    "Enterprise Dashboards", "Real-Time Trading Platforms", "AI-Powered Applications",
+    // Brand / location
+    "Scalable Web Applications", "Portfolio", "Ayyappa",
+    "Ayyappa Swamy Angadi", "Bengaluru", "Remote Frontend Engineer",
   ],
   authors: [{ name: "Ayyappa Swamy Angadi", url: siteUrl }],
   creator: "Ayyappa Swamy Angadi",
@@ -61,6 +88,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
       { url: "/apple-icon.svg", type: "image/svg+xml" },
@@ -84,12 +113,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
+    // Twitter/X does fall back to og:image when this is unset, but leaving
+    // it implicit is fragile — set it explicitly to the same generated
+    // opengraph-image so the card preview is guaranteed.
+    images: ["/opengraph-image"],
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F3F4E5" },
+    { media: "(prefers-color-scheme: light)", color: "#D8B6FF" },
     { media: "(prefers-color-scheme: dark)", color: "#1A375F" },
   ],
   width: "device-width",
@@ -107,7 +140,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col" suppressHydrationWarning>
         <StructuredData />
         <GoogleAnalytics />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <CursorGlow />
           <NetworkStatus />
           <header className="sticky top-0 z-50">

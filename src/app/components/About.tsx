@@ -139,7 +139,10 @@ function DeveloperAvatar() {
       className="relative flex-shrink-0 w-full max-w-xs sm:max-w-sm md:w-56 lg:w-64 mx-auto md:mx-0 self-center md:self-start"
     >
       {/* Glow */}
-      <div className="absolute -inset-3 rounded-2xl bg-gradient-to-br from-primary/25 via-purple-500/20 to-cyan-500/20 blur-2xl pointer-events-none" />
+      <div
+        className="absolute -inset-3 rounded-2xl blur-2xl pointer-events-none opacity-25"
+        style={{ background: "var(--btn-gradient)" }}
+      />
 
       {/* Card */}
       <div className="relative rounded-2xl border border-primary/20 glass-card overflow-hidden shadow-xl">
@@ -157,7 +160,10 @@ function DeveloperAvatar() {
         <div className="bg-gradient-to-b from-[#0d1117] to-[#161b22] p-6 flex flex-col items-center gap-4">
           {/* Initials circle */}
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-blue-500 to-purple-500 flex items-center justify-center gap-px shadow-lg shadow-primary/30 select-none">
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center gap-px shadow-lg shadow-primary/30 select-none"
+              style={{ background: "var(--btn-gradient)" }}
+            >
               <span className="text-white/55 font-mono font-bold text-[10px] leading-none">&lt;</span>
               <span className="text-white font-bold text-2xl leading-none tracking-tight">A</span>
               <span className="text-white/55 font-mono font-bold text-[10px] leading-none">/&gt;</span>
@@ -384,7 +390,7 @@ export function About() {
                   &ldquo;
                 </span>
 
-                <p className="mt-0 text-muted-foreground leading-relaxed max-md:text-justify">
+                <p className="mt-0 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
                   I&apos;m a passionate Frontend Engineer with{" "}
                   <span className="gradient-text font-semibold">
                     5+ years of professional experience
@@ -393,7 +399,7 @@ export function About() {
                   WordPress-driven LMS platforms and static sites to real-time
                   trading dashboards and AI-powered tools.
                 </p>
-                <p className="mt-4 text-muted-foreground leading-relaxed max-md:text-justify">
+                <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
                   I began my career at{" "}
                   <span className="font-semibold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
                     Chools Consultancy Services
@@ -412,7 +418,7 @@ export function About() {
                   virtual development environment, enabling full developer
                   workflows entirely from mobile via Claude and OpenCode.
                 </p>
-                <p className="mt-4 text-muted-foreground leading-relaxed max-md:text-justify">
+                <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
                   I care deeply about{" "}
                   <span className="text-primary font-semibold">
                     clean, maintainable code
@@ -589,11 +595,10 @@ export function About() {
 
                   {/* Connector between jobs — centered under the dot */}
                   {idx < experience.length - 1 && (
-                    <div
-                      className="flex items-center gap-3 py-4"
-                      style={{ paddingLeft: "14px" }}
-                    >
-                      <div className="flex flex-col items-center gap-1 w-5">
+                    <div className="flex items-center gap-6 py-4">
+                      {/* Same w-10 column as the timeline dot above, so the
+                          arrow stays centered on the connecting line. */}
+                      <div className="flex-shrink-0 w-10 flex flex-col items-center gap-1">
                         <div className="w-px h-2 bg-border" />
                         <svg
                           width="12"
