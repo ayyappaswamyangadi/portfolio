@@ -251,7 +251,13 @@ export function Contact() {
             )}
 
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleSubmit(onSubmit, (formErrors) =>
+                gaEvent({
+                  action: "submit",
+                  category: "contact_form",
+                  label: `validation_error_${Object.keys(formErrors).join("_")}`,
+                }),
+              )}
               className="space-y-5"
               noValidate
             >

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { gaEvent } from "@/lib/gtag";
 import { useActiveSession } from "../hooks/useActiveSession";
 import ThemeToggleButton from "./ThemeToggleButton";
 import { PWAInstallButton } from "./PWAInstallButton";
@@ -79,6 +80,15 @@ export function Navbar() {
 
   const closeMenu = () => setIsOpen(false);
 
+  const toggleMenu = () =>
+    setIsOpen((o) => {
+      gaEvent({ action: "click", category: "navigation", label: o ? "menu_close" : "menu_open" });
+      return !o;
+    });
+
+  const handleNavClick = (section: string, place: "desktop" | "mobile") =>
+    gaEvent({ action: "click", category: "navigation", label: `${section}_${place}` });
+
   return (
     <div className="fixed top-3 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
       <nav
@@ -130,6 +140,7 @@ export function Navbar() {
               href={`#${section}`}
               key={section}
               data-section={section}
+              onClick={() => handleNavClick(section, "desktop")}
               className={cn(
                 "btn-click relative capitalize px-3.5 py-1.5 text-sm font-medium transition-colors duration-200 rounded-full",
                 activeScreen === section ? "text-white" : inactiveLinkStyles,
@@ -146,6 +157,7 @@ export function Navbar() {
           <PWAInstallButton />
           <a
             href="#contact"
+            onClick={() => gaEvent({ action: "click", category: "hero_cta", label: "hire_me_navbar" })}
             className="btn-primary btn-click ml-1 px-4 py-1.5 text-sm inline-flex items-center rounded-full"
           >
             Hire me
@@ -155,7 +167,7 @@ export function Navbar() {
         {/* ── Hamburger (mobile) ── */}
         <button
           className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors text-foreground btn-click"
-          onClick={() => setIsOpen((o) => !o)}
+          onClick={toggleMenu}
           aria-label="Toggle menu"
           aria-expanded={isOpen}
         >
@@ -186,7 +198,10 @@ export function Navbar() {
                 href={`#${section}`}
                 key={section}
                 data-section={section}
-                onClick={closeMenu}
+                onClick={() => {
+                  handleNavClick(section, "mobile");
+                  closeMenu();
+                }}
                 className={cn(
                   "btn-click relative capitalize px-4 py-2.5 rounded-xl font-semibold text-sm text-center transition-colors duration-200",
                   activeScreen === section

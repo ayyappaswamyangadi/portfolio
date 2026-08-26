@@ -1,7 +1,18 @@
+"use client";
+
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Home } from "lucide-react";
+import { gaEvent } from "@/lib/gtag";
 
 export default function NotFound() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    gaEvent({ action: "page_not_found", category: "error", label: pathname });
+  }, [pathname]);
+
   return (
     <div className="page-state">
       <h1 className="text-6xl font-bold gradient-text">404</h1>

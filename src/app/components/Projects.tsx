@@ -216,7 +216,12 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
 
   const handleTap = () => {
     if (canHover) return;
-    setFlipped((f) => !f);
+    setFlipped((f) => {
+      if (!f) {
+        gaEvent({ action: "expand", category: "project_card", label: project.title });
+      }
+      return !f;
+    });
   };
 
   return (
@@ -449,6 +454,7 @@ function FeaturedCarousel() {
     const firstCard = el.querySelector<HTMLElement>(".featured-card");
     const cardW = (firstCard?.offsetWidth ?? 340) + 20;
     el.scrollBy({ left: dir * cardW, behavior: "smooth" });
+    gaEvent({ action: "click", category: "featured_carousel", label: dir > 0 ? "next" : "prev" });
   };
 
   return (
@@ -505,6 +511,7 @@ function FeaturedCarousel() {
                   behavior: "smooth",
                 });
               }
+              gaEvent({ action: "click", category: "featured_carousel", label: `dot_${p.title}` });
             }}
             className={`rounded-full transition-all duration-300 ${
               activeIdx === i
@@ -546,6 +553,7 @@ export function Projects() {
   const handleCategoryChange = (cat: string) => {
     setActiveCategory(cat);
     setCurrentPage(0);
+    gaEvent({ action: "filter", category: "project_category", label: cat });
   };
 
   return (
@@ -642,7 +650,10 @@ export function Projects() {
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-8">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+              onClick={() => {
+                setCurrentPage((p) => Math.max(0, p - 1));
+                gaEvent({ action: "click", category: "project_pagination", label: "prev" });
+              }}
               disabled={currentPage === 0}
               aria-label="Previous page"
               className="btn-click w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center hover:border-primary/50 hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
@@ -653,7 +664,10 @@ export function Projects() {
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                onClick={() => setCurrentPage(i)}
+                onClick={() => {
+                  setCurrentPage(i);
+                  gaEvent({ action: "click", category: "project_pagination", label: `page_${i + 1}` });
+                }}
                 aria-label={`Page ${i + 1}`}
                 className="btn-click rounded-full transition-all duration-300 font-semibold text-xs"
                 style={
@@ -679,9 +693,10 @@ export function Projects() {
             ))}
 
             <button
-              onClick={() =>
-                setCurrentPage((p) => Math.min(totalPages - 1, p + 1))
-              }
+              onClick={() => {
+                setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
+                gaEvent({ action: "click", category: "project_pagination", label: "next" });
+              }}
               disabled={currentPage === totalPages - 1}
               aria-label="Next page"
               className="btn-click w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center hover:border-primary/50 hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"

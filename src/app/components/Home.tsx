@@ -268,7 +268,10 @@ function MacWindow() {
         {(["profile", "terminal"] as TabKey[]).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => {
+              setActiveTab(tab);
+              gaEvent({ action: "click", category: "hero_mac_window", label: `${tab}_tab` });
+            }}
             className={`px-4 py-2 text-xs font-mono flex items-center gap-1.5 border-r border-white/[0.06] transition-colors ${
               activeTab === tab
                 ? "bg-[#0d1117] text-[#e6edf3] border-b-2 border-b-[#2f81f7] -mb-px"

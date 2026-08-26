@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AlertTriangle, RotateCw } from "lucide-react";
+import { gaEvent } from "@/lib/gtag";
 
 export default function Error({
   error,
@@ -12,6 +13,7 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error(error);
+    gaEvent({ action: "exception", category: "error", label: error.message });
   }, [error]);
 
   return (

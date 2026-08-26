@@ -9,6 +9,8 @@ import { CursorGlow } from "@/app/components/CursorGlow";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
 import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
+import { WebVitals } from "@/app/components/WebVitals";
+import { SectionViewTracker } from "@/app/components/SectionViewTracker";
 import { StructuredData } from "@/app/components/StructuredData";
 import type { Metadata, Viewport } from "next";
 
@@ -141,6 +143,8 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col" suppressHydrationWarning>
         <StructuredData />
         <GoogleAnalytics />
+        <WebVitals />
+        <SectionViewTracker />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <CursorGlow />
           <NetworkStatus />

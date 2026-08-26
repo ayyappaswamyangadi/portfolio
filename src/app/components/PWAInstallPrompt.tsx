@@ -31,6 +31,7 @@ export function PWAInstallPrompt() {
     // install trigger there, so just show the instructional copy directly.
     if (isIOS) {
       setVisible(true);
+      gaEvent({ action: "pwa_prompt_shown", category: "engagement", label: "ios" });
       return;
     }
 
@@ -38,6 +39,7 @@ export function PWAInstallPrompt() {
       e.preventDefault();
       setPrompt(e as BeforeInstallPromptEvent);
       setVisible(true);
+      gaEvent({ action: "pwa_prompt_shown", category: "engagement", label: "android" });
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -47,6 +49,7 @@ export function PWAInstallPrompt() {
   const dismiss = () => {
     setVisible(false);
     localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    gaEvent({ action: "pwa_prompt_dismissed", category: "engagement", label: isIOS ? "ios" : "android" });
   };
 
   const handleInstall = async () => {
