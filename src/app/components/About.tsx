@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import Image from "next/image";
 import {
   motion,
   type Variants,
@@ -152,21 +153,26 @@ function DeveloperAvatar() {
           <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
           <span className="ml-auto text-[10px] font-mono text-[#8b949e]">
-            developer.png
+            ayyappa.png
           </span>
         </div>
 
         {/* Avatar area */}
         <div className="bg-gradient-to-b from-[#0d1117] to-[#161b22] p-6 flex flex-col items-center gap-4">
-          {/* Initials circle */}
+          {/* Profile photo */}
           <div className="relative">
             <div
-              className="w-20 h-20 rounded-full flex items-center justify-center gap-px shadow-lg shadow-primary/30 select-none"
+              className="w-24 h-24 rounded-full p-[2px] shadow-lg shadow-primary/30"
               style={{ background: "var(--btn-gradient)" }}
             >
-              <span className="text-white/55 font-mono font-bold text-[10px] leading-none">&lt;</span>
-              <span className="text-white font-bold text-2xl leading-none tracking-tight">A</span>
-              <span className="text-white/55 font-mono font-bold text-[10px] leading-none">/&gt;</span>
+              <Image
+                src="/assets/images/avatar-headshot.jpg"
+                alt="Ayyappa Swamy, Frontend Engineer"
+                width={200}
+                height={200}
+                className="w-full h-full rounded-full object-cover border-2 border-[#0d1117]"
+                priority
+              />
             </div>
             {/* Online dot */}
             <span className="absolute bottom-0.5 right-0.5 w-4 h-4 rounded-full bg-green-500 border-2 border-[#0d1117] pulse-badge" />
