@@ -116,7 +116,11 @@ const experience = [
 // ─── Motion variants ─────────────────────────────────────────────────────────
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  },
 };
 
 const staggerContainer: Variants = {
@@ -416,10 +420,10 @@ export function About() {
                   <span className="font-semibold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent">
                     Revise
                   </span>{" "}
-                  in May 2022, where I work as a Frontend Engineer —
-                  building complex React applications including dashboards,
-                  trading platforms, and an AI-driven tool for querying book and
-                  IPC section details. I am currently leading development of a
+                  in May 2022, where I work as a Frontend Engineer — building
+                  complex React applications including dashboards, trading
+                  platforms, and an AI-driven tool for querying book and IPC
+                  section details. I am currently leading development of a
                   mobile application that turns a user&apos;s own machine into a
                   virtual development environment, enabling full developer
                   workflows entirely from mobile via Claude and OpenCode.
@@ -434,10 +438,12 @@ export function About() {
                     intuitive user experiences
                   </span>
                   , and{" "}
-                  <span className="text-primary font-semibold">performance</span>
+                  <span className="text-primary font-semibold">
+                    performance
+                  </span>
                   . Whether architecting a feature-rich dashboard or building an
-                  AI-driven interface, I bring the same commitment to quality and
-                  craft to every project.
+                  AI-driven interface, I bring the same commitment to quality
+                  and craft to every project.
                 </p>
               </div>
 

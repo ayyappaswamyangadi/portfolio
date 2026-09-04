@@ -57,29 +57,29 @@
 
   /* ─── Dark theme — navy & gold ─────────────────────────── */
   .dark {
-    --background: 215 43% 27%;          /* solid fallback for the #344864→#1A375F page gradient below */
+    --background: 217 50% 11%;          /* solid fallback for the #0F1B2E→#060D18 page gradient below */
     --foreground: 0 0% 100%;            /* white */
     --primary: 37 100% 69%;             /* #FFC25F — icons, links, highlight text */
     --primary-foreground: 37 65% 19%;   /* #503811 */
-    --secondary: 215 32% 30%;
+    --secondary: 215 30% 15%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 214 35% 9%;
+    --muted: 214 35% 7%;
     --muted-foreground: 214 24% 57%;    /* #768DAB — footer text */
-    --accent: 215 35% 24%;
+    --accent: 215 33% 13%;
     --accent-foreground: 0 0% 100%;
-    --border: 214 25% 20%;
-    --input: 215 30% 8%;
+    --border: 214 25% 17%;
+    --input: 215 30% 6%;
     --ring: 37 100% 69%;
-    --card: 214 35% 9%;                 /* solid fallback for the #0F1823→#0E131A card gradient below */
+    --card: 214 40% 6%;                 /* solid fallback for the #0A1420→#080D14 card gradient below */
     --card-foreground: 0 0% 100%;
 
     /* Glass surfaces — dark mode */
-    --glass-bg: rgba(26, 55, 95, 0.82);
+    --glass-bg: rgba(10, 18, 30, 0.84);
     --glass-border: rgba(255, 255, 255, 0.10);
-    --glass-card-bg: rgba(15, 24, 38, 0.55); /* non-card chrome: form inputs, scroll-top button */
+    --glass-card-bg: rgba(8, 13, 20, 0.6); /* non-card chrome: form inputs, scroll-top button */
     --glass-card-border: rgba(255, 255, 255, 0.12);
     --glass-inset: rgba(255, 255, 255, 0.05);
-    --glass-shadow: rgba(0, 0, 0, 0.45);
+    --glass-shadow: rgba(0, 0, 0, 0.55);
 
     /* Card surface gradient — the warm gold-tinted version clashed with the
        cool navy hero/page background (most visible in the hero's stat
@@ -88,7 +88,7 @@
        being much darker than the page gradient — it never had the
        "blends into the background" problem light mode had, so it doesn't
        need a brand-hue whisper the way the light card does. */
-    --card-gradient: linear-gradient(135deg, #0F1823 0%, #0E131A 100%);
+    --card-gradient: linear-gradient(135deg, #0A1420 0%, #080D14 100%);
 
     /* Brand gradient — gold */
     --brand-1: #EAA22F;
@@ -133,7 +133,7 @@ body {
 
 /* Dark mode: navy gradient */
 .dark body {
-  background: linear-gradient(180deg, #344864 0%, #1A375F 100%);
+  background: linear-gradient(180deg, #0F1B2E 0%, #060D18 100%);
 }
 
 /* ─── Grid-mesh background pattern (AI-lab) ──────────── */
@@ -557,6 +557,11 @@ body {
   -ms-overflow-style: none;
   gap: 1.25rem;
   padding-bottom: 0.25rem;
+  /* Claim only horizontal panning so a vertical swipe that starts on the
+     carousel falls through to the page instead of getting stuck here —
+     without this, mobile browsers can trap the touch and block scrolling
+     past the featured carousel down to the listed projects below. */
+  touch-action: pan-x;
 }
 .carousel-scroll::-webkit-scrollbar {
   display: none;

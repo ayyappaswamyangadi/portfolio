@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { gaEvent } from "@/lib/gtag";
 import { DownloadCvButton } from "./DownloadCvButton";
@@ -69,18 +70,16 @@ export function Footer() {
           {/* Logo + name */}
           <div className="flex items-center gap-2 mr-auto">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center gap-px select-none"
+              className="w-8 h-8 rounded-full p-[2px] select-none"
               style={{ background: "var(--btn-gradient)" }}
             >
-              <span className="text-white/60 font-mono font-bold text-[6px] leading-none">
-                &lt;
-              </span>
-              <span className="text-white font-bold text-[13px] leading-none tracking-tight">
-                A
-              </span>
-              <span className="text-white/60 font-mono font-bold text-[6px] leading-none">
-                /&gt;
-              </span>
+              <Image
+                src="/assets/images/avatar-headshot-icon.jpg"
+                alt="Ayyappa Swamy"
+                width={64}
+                height={64}
+                className="w-full h-full rounded-full object-cover"
+              />
             </div>
             <span className="font-bold text-sm">Ayyappa</span>
           </div>

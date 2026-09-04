@@ -6,6 +6,7 @@ import { Navbar } from "@/app/components/Navbar";
 import { Footer } from "@/app/components/Footer";
 import { ScrollProgress } from "@/app/components/ScrollProgress";
 import { CursorGlow } from "@/app/components/CursorGlow";
+import { FaviconThemeSync } from "@/app/components/FaviconThemeSync";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
 import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
@@ -94,7 +95,11 @@ export const metadata: Metadata = {
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
+    // iOS Safari does not render SVG apple-touch-icons — it silently falls
+    // back to a screenshot of the page — so the PNG must be listed (and
+    // listed first; Safari uses the first entry it recognizes).
     apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
       { url: "/apple-icon.svg", type: "image/svg+xml" },
     ],
     shortcut: "/icon.svg",
@@ -126,7 +131,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#D8B6FF" },
-    { media: "(prefers-color-scheme: dark)", color: "#1A375F" },
+    { media: "(prefers-color-scheme: dark)", color: "#060D18" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -146,6 +151,7 @@ export default function RootLayout({
         <WebVitals />
         <SectionViewTracker />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <FaviconThemeSync />
           <CursorGlow />
           <NetworkStatus />
           <header className="sticky top-0 z-50">

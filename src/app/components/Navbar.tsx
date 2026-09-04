@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -106,14 +107,19 @@ export function Navbar() {
           className="flex items-center gap-2 group select-none"
           aria-label="Home"
         >
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center gap-px shadow-md group-hover:shadow-primary/40 transition-shadow select-none" style={{ background: "var(--btn-gradient)" }}>
-            <span className="text-white/60 font-mono font-bold text-[6px] leading-none">&lt;</span>
-            <span className="text-white font-bold text-[13px] leading-none tracking-tight">A</span>
-            <span className="text-white/60 font-mono font-bold text-[6px] leading-none">/&gt;</span>
+          <div
+            className="w-8 h-8 rounded-full p-[2px] shadow-md group-hover:shadow-primary/40 transition-shadow select-none"
+            style={{ background: "var(--btn-gradient)" }}
+          >
+            <Image
+              src="/assets/images/avatar-headshot-icon.jpg"
+              alt="Ayyappa Swamy"
+              width={64}
+              height={64}
+              className="w-full h-full rounded-full object-cover"
+              priority
+            />
           </div>
-          <span className="hidden sm:block font-bold text-sm leading-tight">
-            Ayyappa
-          </span>
         </Link>
 
         {/* ── Desktop links ── */}
@@ -164,15 +170,18 @@ export function Navbar() {
           </a>
         </div>
 
-        {/* ── Hamburger (mobile) ── */}
-        <button
-          className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors text-foreground btn-click"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-          aria-expanded={isOpen}
-        >
-          {isOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* ── Right cluster (mobile) ── */}
+        <div className="flex md:hidden items-center gap-1">
+          <ThemeToggleButton />
+          <button
+            className="p-2 rounded-lg hover:bg-accent transition-colors text-foreground btn-click"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
 
         {/* ── Mobile dropdown ── */}
         <div
@@ -213,8 +222,17 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-2 pb-1 border-t border-border mt-1 flex items-center gap-2">
-              <ThemeToggleButton />
               <PWAInstallButton />
+              <a
+                href="#contact"
+                onClick={() => {
+                  gaEvent({ action: "click", category: "hero_cta", label: "hire_me_navbar_mobile" });
+                  closeMenu();
+                }}
+                className="btn-primary btn-click flex-1 px-4 py-2 text-sm inline-flex items-center justify-center rounded-full"
+              >
+                Hire me
+              </a>
             </div>
           </div>
         </div>
