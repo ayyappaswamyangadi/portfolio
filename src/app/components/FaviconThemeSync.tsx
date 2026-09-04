@@ -31,7 +31,7 @@ export function FaviconThemeSync() {
 
   useEffect(() => {
     const img = new window.Image();
-    img.src = "/assets/images/avatar-headshot-icon.jpg";
+    img.src = "/assets/images/avatar-headshot.jpg";
     imgRef.current = img;
   }, []);
 

@@ -74,7 +74,7 @@ export function Footer() {
               style={{ background: "var(--btn-gradient)" }}
             >
               <Image
-                src="/assets/images/avatar-headshot-icon.jpg"
+                src="/assets/images/avatar-headshot.jpg"
                 alt="Ayyappa Swamy"
                 width={64}
                 height={64}
