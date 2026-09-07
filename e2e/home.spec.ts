@@ -8,7 +8,11 @@ test.describe("Home hero", () => {
     // scope with .first() rather than asserting a single strict match.
     await expect(page.getByText("Available for work", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Bengaluru, Karnataka, India").first()).toBeVisible();
-    await expect(page.getByText("5+ Years Experience").first()).toBeVisible();
+    // Exact duration is computed from real dates at render time (see
+    // src/lib/experience.ts), so match the pattern rather than a fixed string.
+    await expect(
+      page.getByText(/\d+\s*yrs?(\s*\d+\s*months?)?\s*Experience/i).first(),
+    ).toBeVisible();
   });
 
   test("typing effect cycles through role text over time", async ({ page }) => {

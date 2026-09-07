@@ -3,6 +3,38 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { About } from "./About";
 
+// About.tsx computes experience durations from the current date rather than
+// hardcoding them, so tests mirror the same month-diff math instead of
+// asserting a string that would go stale the moment a month rolls over.
+function monthsToLabel(totalMonths: number): string {
+  const years = Math.floor(totalMonths / 12);
+  const remMonths = totalMonths % 12;
+  const yearPart = years > 0 ? `${years} yr${years !== 1 ? "s" : ""}` : "";
+  const monthPart =
+    remMonths > 0 ? `${remMonths} month${remMonths !== 1 ? "s" : ""}` : "";
+  return [yearPart, monthPart].filter(Boolean).join(" ") || "0 months";
+}
+
+function monthsBetween(
+  start: { year: number; month: number },
+  end: { year: number; month: number },
+) {
+  return (end.year - start.year) * 12 + (end.month - start.month);
+}
+
+const now = new Date();
+const NOW_YM = { year: now.getFullYear(), month: now.getMonth() + 1 };
+const REVISE_START = { year: 2022, month: 5 };
+const CHOOLS_PERIOD = {
+  start: { year: 2020, month: 10 },
+  end: { year: 2022, month: 1 },
+};
+const reviseDurationLabel = monthsToLabel(monthsBetween(REVISE_START, NOW_YM));
+const totalExperienceLabel = monthsToLabel(
+  monthsBetween(CHOOLS_PERIOD.start, CHOOLS_PERIOD.end) +
+    monthsBetween(REVISE_START, NOW_YM),
+);
+
 // Capture every IntersectionObserver instance constructed during a test —
 // framer-motion's own `whileInView` machinery also constructs real
 // IntersectionObservers (About.tsx has several whileInView wrappers), so we
@@ -90,7 +122,9 @@ describe("About", () => {
   it("renders the About-me bio paragraphs with key facts", () => {
     render(<About />);
 
-    expect(screen.getByText(/5\+ years of professional experience/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(`${totalExperienceLabel} of professional experience`),
+    ).toBeInTheDocument();
     // Both company names appear twice: once in the flowing bio paragraph,
     // once as the experience card's heading — assert at least one exists.
     expect(screen.getAllByText("Chools Consultancy Services").length).toBeGreaterThan(0);
@@ -156,7 +190,9 @@ describe("About", () => {
     expect(screen.getByText("Bengaluru, India · Onsite")).toBeInTheDocument();
 
     expect(screen.getByRole("heading", { name: /frontend engineer/i })).toBeInTheDocument();
-    expect(screen.getByText("May 2022 – Present · 4+ yrs")).toBeInTheDocument();
+    expect(
+      screen.getByText(`May 2022 – Present · ${reviseDurationLabel}`),
+    ).toBeInTheDocument();
     expect(screen.getByText("Mumbai, India · Remote")).toBeInTheDocument();
   });
 

@@ -11,6 +11,7 @@ vi.mock("@/lib/gtag", () => ({
   gaEvent: (...args: unknown[]) => gaEventMock(...args),
 }));
 
+import { getTotalExperienceLabel } from "@/lib/experience";
 import Home from "./Home";
 
 describe("Home", () => {
@@ -31,7 +32,9 @@ describe("Home", () => {
     // regex query would also match, making the query ambiguous.
     expect(screen.getByText("Available for work")).toBeInTheDocument();
     expect(screen.getByText("Bengaluru, Karnataka, India")).toBeInTheDocument();
-    expect(screen.getByText("5+ Years Experience")).toBeInTheDocument();
+    expect(
+      screen.getByText(`${getTotalExperienceLabel()} Experience`),
+    ).toBeInTheDocument();
   });
 
   it("renders the 'Let's Connect' CTA linking to #contact and fires gaEvent on click", async () => {

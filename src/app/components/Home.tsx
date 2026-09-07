@@ -11,10 +11,13 @@ import { MapPin, Briefcase } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { gaEvent } from "@/lib/gtag";
+import { getTotalExperienceLabel } from "@/lib/experience";
 import { DownloadCvButton } from "./DownloadCvButton";
 
 // WebGL scene needs the browser's canvas/GL context — load client-only.
 const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
+
+const experienceLabel = getTotalExperienceLabel();
 
 // ─── Roles for typing effect ────────────────────────────────────────────────
 const roles = [
@@ -549,15 +552,15 @@ export default function Home() {
             {/* Meta info */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-4 text-sm text-muted-foreground justify-center"
+              className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground justify-center"
             >
               <span className="icon-mappin flex items-center gap-1.5">
                 <MapPin size={14} className="text-primary" />
                 Bengaluru, Karnataka, India
               </span>
-              <span className="icon-briefcase flex items-center gap-1.5">
-                <Briefcase size={14} className="text-primary" />
-                5+ Years Experience
+              <span className="icon-briefcase flex items-center gap-2 text-lg sm:text-xl font-bold text-foreground">
+                <Briefcase size={18} className="text-primary" />
+                {experienceLabel} Experience
               </span>
             </motion.div>
 

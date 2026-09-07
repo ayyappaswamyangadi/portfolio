@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod/v4";
-import { motion, type Variants } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Mail,
   Phone,
@@ -12,6 +13,7 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
 
@@ -83,6 +85,8 @@ export function Contact() {
   const [submitState, setSubmitState] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
+  const [mounted, setMounted] = useState(false);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     register,
@@ -92,6 +96,24 @@ export function Contact() {
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
+
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
+
+  const dismissToast = () => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setSubmitState("idle");
+  };
+
+  const showToast = (state: "success" | "error", autoHideMs: number) => {
+    setSubmitState(state);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setSubmitState("idle"), autoHideMs);
+  };
 
   const onSubmit = async (data: ContactFormData) => {
     setSubmitState("loading");
@@ -111,24 +133,73 @@ export function Contact() {
       });
       const result = await response.json();
       if (result.success) {
-        setSubmitState("success");
         gaEvent({ action: "submit", category: "contact_form", label: "success" });
         reset();
-        setTimeout(() => setSubmitState("idle"), 5000);
+        showToast("success", 5000);
       } else {
-        setSubmitState("error");
         gaEvent({ action: "submit", category: "contact_form", label: "error" });
-        setTimeout(() => setSubmitState("idle"), 4000);
+        showToast("error", 4000);
       }
     } catch {
-      setSubmitState("error");
       gaEvent({ action: "submit", category: "contact_form", label: "error" });
-      setTimeout(() => setSubmitState("idle"), 4000);
+      showToast("error", 4000);
     }
   };
 
+  const toast = (
+    <AnimatePresence>
+      {(submitState === "success" || submitState === "error") && (
+        <motion.div
+          key="contact-toast"
+          initial={{ y: -60, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -60, opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          role="status"
+          aria-live="polite"
+          className="fixed top-[4.5rem] inset-x-0 z-[70] flex justify-center px-4 pointer-events-none"
+        >
+          <div
+            className={`pointer-events-auto flex items-center gap-3 max-w-md w-full sm:w-auto rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-xl ${
+              submitState === "success"
+                ? "bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400"
+                : "bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400"
+            }`}
+          >
+            {submitState === "success" ? (
+              <CheckCircle2 size={20} className="flex-shrink-0" />
+            ) : (
+              <AlertCircle size={20} className="flex-shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">
+                {submitState === "success"
+                  ? "Message sent successfully!"
+                  : "Something went wrong"}
+              </p>
+              <p className="text-xs opacity-80">
+                {submitState === "success"
+                  ? "Thanks for reaching out. I'll reply soon."
+                  : "Please try again or email me directly."}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissToast}
+              aria-label="Dismiss notification"
+              className="flex-shrink-0 rounded-full p-1 opacity-70 hover:opacity-100 transition-opacity"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
   return (
     <section id="contact" className="relative py-24 px-4 overflow-hidden">
+      {mounted && createPortal(toast, document.body)}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
       <div className="absolute top-1/4 -left-20 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
@@ -221,34 +292,6 @@ export function Contact() {
                 </p>
               </div>
             </div>
-
-            {/* Success state */}
-            {submitState === "success" && (
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 mb-6">
-                <CheckCircle2 size={20} className="flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-sm">
-                    Message sent successfully!
-                  </p>
-                  <p className="text-xs opacity-80">
-                    Thanks for reaching out. I&apos;ll reply soon.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Error state */}
-            {submitState === "error" && (
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 mb-6">
-                <AlertCircle size={20} className="flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-sm">Something went wrong</p>
-                  <p className="text-xs opacity-80">
-                    Please try again or email me directly.
-                  </p>
-                </div>
-              </div>
-            )}
 
             <form
               onSubmit={handleSubmit(onSubmit, (formErrors) =>

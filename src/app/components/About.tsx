@@ -20,6 +20,12 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import {
+  CHOOLS_PERIOD,
+  REVISE_START,
+  formatDuration,
+  getTotalExperienceLabel,
+} from "@/lib/experience";
 
 // ─── Skills data ─────────────────────────────────────────────────────────────
 const skillGroups = [
@@ -67,12 +73,14 @@ const skillGroups = [
   },
 ];
 
+const totalExperienceLabel = getTotalExperienceLabel();
+
 // ─── Experience timeline ─────────────────────────────────────────────────────
 const experience = [
   {
     company: "Chools Consultancy Services",
     role: "Software Developer",
-    duration: "Oct 2020 – Jan 2022  ·  1 yr 3 months",
+    duration: `Oct 2020 – Jan 2022  ·  ${formatDuration(CHOOLS_PERIOD.start, CHOOLS_PERIOD.end)}`,
     location: "Bengaluru, India · Onsite",
     type: "Full-time",
     period: "2020 – 2022",
@@ -89,7 +97,7 @@ const experience = [
   {
     company: "Revise",
     role: "Frontend Engineer",
-    duration: "May 2022 – Present  ·  4+ yrs",
+    duration: `May 2022 – Present  ·  ${formatDuration(REVISE_START)}`,
     location: "Mumbai, India · Remote",
     type: "Current",
     period: "2022 – Present",
@@ -403,7 +411,7 @@ export function About() {
                 <p className="mt-0 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
                   I&apos;m a passionate Frontend Engineer with{" "}
                   <span className="gradient-text font-semibold">
-                    5+ years of professional experience
+                    {totalExperienceLabel} of professional experience
                   </span>{" "}
                   building production-grade web applications — from
                   WordPress-driven LMS platforms and static sites to real-time
