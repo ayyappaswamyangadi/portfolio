@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Download } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
 import { useIOSInstall } from "../hooks/useIOSInstall";
+import { usePwaPromptDismissed } from "../hooks/usePwaPromptDismissed";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -13,13 +14,25 @@ interface BeforeInstallPromptEvent extends Event {
 
 const TIP_WIDTH = 192;
 
-export function PWAInstallButton() {
+interface PWAInstallButtonProps {
+  // The mobile nav's own Install entry is a second install affordance
+  // alongside the auto-shown bottom banner (PWAInstallPrompt) — surfacing
+  // both at once reads as redundant. Passing this keeps it hidden until
+  // that banner has actually been dismissed (or declined) at least once,
+  // at which point it's the way back in that banner's own follow-up toast
+  // points to. The desktop instance of this button has no banner to defer
+  // to, so it's left out of this gating.
+  revealAfterPromptDismiss?: boolean;
+}
+
+export function PWAInstallButton({ revealAfterPromptDismiss = false }: PWAInstallButtonProps = {}) {
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIOSTip, setShowIOSTip] = useState(false);
   const [tipPos, setTipPos] = useState<{ top: number; left: number } | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
   const { isIOS, isStandalone } = useIOSInstall();
+  const promptDismissed = usePwaPromptDismissed();
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -65,6 +78,7 @@ export function PWAInstallButton() {
   // iOS never fires `beforeinstallprompt` — there's no programmatic install
   // trigger there, so fall back to showing manual instructions on tap.
   if (!prompt && !(isIOS && !isStandalone)) return null;
+  if (revealAfterPromptDismiss && !promptDismissed) return null;
 
   const handleInstall = async () => {
     if (isIOS) {

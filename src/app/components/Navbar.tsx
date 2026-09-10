@@ -149,7 +149,7 @@ export function Navbar() {
               onClick={() => handleNavClick(section, "desktop")}
               className={cn(
                 "btn-click relative capitalize px-3.5 py-1.5 text-sm font-medium transition-colors duration-200 rounded-full",
-                activeScreen === section ? "text-white" : inactiveLinkStyles,
+                activeScreen === section ? "text-[var(--btn-text)]" : inactiveLinkStyles,
               )}
             >
               {sectionLabels[section] ?? section}
@@ -214,7 +214,7 @@ export function Navbar() {
                 className={cn(
                   "btn-click relative capitalize px-4 py-2.5 rounded-xl font-semibold text-sm text-center transition-colors duration-200",
                   activeScreen === section
-                    ? "text-white"
+                    ? "text-[var(--btn-text)]"
                     : "text-muted-foreground hover:bg-primary/10 hover:text-foreground",
                 )}
               >
@@ -222,7 +222,7 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-2 pb-1 border-t border-border mt-1 flex items-center gap-2">
-              <PWAInstallButton />
+              <PWAInstallButton revealAfterPromptDismiss />
               <a
                 href="#contact"
                 onClick={() => {

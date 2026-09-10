@@ -316,6 +316,7 @@ export function Contact() {
                   <input
                     id="name"
                     type="text"
+                    autoComplete="name"
                     placeholder="John Doe"
                     className={`form-input ${errors.name ? "border-red-400 focus:border-red-400" : ""}`}
                     {...register("name")}
@@ -336,6 +337,7 @@ export function Contact() {
                   <input
                     id="email"
                     type="email"
+                    autoComplete="email"
                     placeholder="john@example.com"
                     className={`form-input ${errors.email ? "border-red-400 focus:border-red-400" : ""}`}
                     {...register("email")}

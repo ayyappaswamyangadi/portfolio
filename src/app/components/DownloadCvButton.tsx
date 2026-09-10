@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Download, LoaderCircle } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
+import { cn } from "@/lib/utils";
 
 // A native `<a download>` gives zero feedback while the browser prepares its
 // save dialog — on a slow disk, first-load fetch, or just OS overhead, a
@@ -36,12 +37,12 @@ export function DownloadCvButton({
       download="Ayyappa_Swamy_Angadi_Resume.pdf"
       onClick={handleClick}
       aria-busy={downloading}
-      className={className}
+      className={cn(className, !downloading && "btn-cv-pulse")}
     >
       {downloading ? (
         <LoaderCircle size={iconSize} className="animate-spin" />
       ) : (
-        <Download size={iconSize} />
+        <Download size={iconSize} className="cv-download-icon" />
       )}
       {downloading ? "Downloading…" : "Download CV"}
     </a>

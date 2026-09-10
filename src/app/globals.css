@@ -615,6 +615,42 @@ body {
   }
 }
 
+/* ─── Download CV — idle "come click me" pulse ──────────
+   A slow breathing glow ring plus a small nudge on the download
+   icon, so the button reads as inviting a click even when idle.
+   Pauses on hover/focus so the existing hover styles take over
+   cleanly instead of fighting the loop. */
+@keyframes cv-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.38); }
+  50%       { box-shadow: 0 0 0 9px hsl(var(--primary) / 0); }
+}
+@keyframes cv-icon-nudge {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(3px); }
+}
+
+.btn-cv-pulse {
+  animation: cv-pulse-glow 2.2s ease-out infinite;
+}
+.btn-cv-pulse:hover,
+.btn-cv-pulse:focus-visible {
+  animation-play-state: paused;
+}
+.btn-cv-pulse .cv-download-icon {
+  animation: cv-icon-nudge 1.6s ease-in-out infinite;
+}
+.btn-cv-pulse:hover .cv-download-icon,
+.btn-cv-pulse:focus-visible .cv-download-icon {
+  animation: none;
+  transform: translateY(2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-cv-pulse,
+  .btn-cv-pulse .cv-download-icon {
+    animation: none;
+  }
+}
+
 /* ─── Aurora animated background ────────────────────────── */
 @keyframes aurora-shift {
   0%, 100% { background-position: 0% 50%; }
