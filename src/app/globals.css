@@ -571,6 +571,50 @@ body {
   scroll-snap-align: start;
 }
 
+/* ─── Tech logo marquee ──────────────────────────────────
+   Continuous auto-scrolling strip of brand logos. The track's content is
+   duplicated once by the component (so -50% is exactly one full set) —
+   that's what makes the loop seamless instead of jumping at the end. */
+.marquee-wrapper {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6%,
+    black 94%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6%,
+    black 94%,
+    transparent
+  );
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll linear infinite;
+  animation-duration: var(--marquee-duration, 32s);
+}
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
 /* ─── Aurora animated background ────────────────────────── */
 @keyframes aurora-shift {
   0%, 100% { background-position: 0% 50%; }

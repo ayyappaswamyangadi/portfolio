@@ -1,6 +1,12 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  type CSSProperties,
+} from "react";
 import Image from "next/image";
 import {
   motion,
@@ -19,7 +25,30 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
 } from "lucide-react";
+import {
+  SiJavascript,
+  SiTypescript,
+  SiHtml5,
+  SiCss,
+  SiReact,
+  SiNextdotjs,
+  SiRedux,
+  SiReactquery,
+  SiStyledcomponents,
+  SiTailwindcss,
+  SiReacthookform,
+  SiGit,
+  SiGithub,
+  SiWebpack,
+  SiVite,
+  SiVercel,
+  SiNodedotjs,
+  SiExpress,
+  SiClaudecode,
+} from "react-icons/si";
+import type { IconType } from "react-icons";
 import {
   CHOOLS_PERIOD,
   REVISE_START,
@@ -71,6 +100,40 @@ const skillGroups = [
     icon: <Terminal size={16} />,
     skills: ["Node.js", "Express.js", "REST APIs"],
   },
+  {
+    label: "AI-Augmented Development",
+    icon: <Sparkles size={16} />,
+    skills: [
+      "Claude Code",
+      "AI Pair Programming",
+      "Prompt Engineering",
+      "Agentic Dev Workflows",
+      "AI Code Review",
+    ],
+  },
+];
+
+// ─── Tech stack logos ────────────────────────────────────────────────────────
+const techLogos: { name: string; Icon: IconType; hex: string }[] = [
+  { name: "JavaScript", Icon: SiJavascript, hex: "F7DF1E" },
+  { name: "TypeScript", Icon: SiTypescript, hex: "3178C6" },
+  { name: "HTML5", Icon: SiHtml5, hex: "E34F26" },
+  { name: "CSS3", Icon: SiCss, hex: "663399" },
+  { name: "React", Icon: SiReact, hex: "61DAFB" },
+  { name: "Next.js", Icon: SiNextdotjs, hex: "000000" },
+  { name: "Redux", Icon: SiRedux, hex: "764ABC" },
+  { name: "React Query", Icon: SiReactquery, hex: "FF4154" },
+  { name: "Styled-Components", Icon: SiStyledcomponents, hex: "DB7093" },
+  { name: "Tailwind CSS", Icon: SiTailwindcss, hex: "06B6D4" },
+  { name: "React Hook Form", Icon: SiReacthookform, hex: "EC5990" },
+  { name: "Git", Icon: SiGit, hex: "F05032" },
+  { name: "GitHub", Icon: SiGithub, hex: "181717" },
+  { name: "Webpack", Icon: SiWebpack, hex: "8DD6F9" },
+  { name: "Vite", Icon: SiVite, hex: "9135FF" },
+  { name: "Vercel", Icon: SiVercel, hex: "000000" },
+  { name: "Node.js", Icon: SiNodedotjs, hex: "5FA04E" },
+  { name: "Express.js", Icon: SiExpress, hex: "0A0A0A" },
+  { name: "Claude Code", Icon: SiClaudecode, hex: "D97757" },
 ];
 
 const totalExperienceLabel = getTotalExperienceLabel();
@@ -372,6 +435,42 @@ function AnimatedStat({ label, value }: { label: string; value: string }) {
   );
 }
 
+// ─── Tech logo marquee ─────────────────────────────────────────────────────────
+// Duplicated once so the CSS marquee's -50% translate is exactly one full
+// set wide, making the loop seamless. The second copy is aria-hidden so
+// screen readers/tab order only ever see each logo once.
+const marqueeLogos = [...techLogos, ...techLogos];
+
+function TechLogoGrid() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="marquee-wrapper"
+      style={{ "--marquee-duration": "36s" } as CSSProperties}
+    >
+      <div className="marquee-track gap-3 py-2">
+        {marqueeLogos.map(({ name, Icon, hex }, i) => (
+          <motion.div
+            key={`${name}-${i}`}
+            aria-hidden={i >= techLogos.length}
+            whileHover={{ scale: 1.08, y: -3 }}
+            transition={{ type: "spring", stiffness: 350, damping: 20 }}
+            className="tech-logo-tile flex flex-col items-center gap-1.5 w-[78px] flex-shrink-0 rounded-xl border border-black/5 bg-white/95 dark:bg-white shadow-sm px-2 py-3 cursor-default"
+          >
+            <Icon size={26} color={`#${hex}`} aria-hidden="true" />
+            <span className="text-[9.5px] font-medium text-gray-600 text-center leading-tight">
+              {name}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── About Section ───────────────────────────────────────────────────────────
 export function About() {
   return (
@@ -452,6 +551,22 @@ export function About() {
                   . Whether architecting a feature-rich dashboard or building an
                   AI-driven interface, I bring the same commitment to quality
                   and craft to every project.
+                </p>
+                <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
+                  Since{" "}
+                  <span className="text-primary font-semibold">
+                    April 2026
+                  </span>
+                  , I&apos;ve also built AI pair-programming with{" "}
+                  <span className="text-primary font-semibold">
+                    Claude Code
+                  </span>{" "}
+                  into my daily workflow — using it to move faster on
+                  scaffolding, refactors, tests, and debugging, while I stay
+                  the one making every architecture, design, and
+                  code-quality call. It&apos;s a modern, agentic way of
+                  shipping software, and I&apos;m comfortable directing it on
+                  real production codebases.
                 </p>
               </div>
 
@@ -656,6 +771,15 @@ export function About() {
               value={stat.value}
             />
           ))}
+        </div>
+
+        {/* ── Tech stack logo grid ── */}
+        <div className="mt-12">
+          <h3 className="text-xl font-bold mb-6 flex items-center justify-center gap-2">
+            <Sparkles size={20} className="text-primary" />
+            Tech I Work With
+          </h3>
+          <TechLogoGrid />
         </div>
       </div>
 

@@ -8,6 +8,16 @@ import {
   useSpring,
 } from "framer-motion";
 import { MapPin, Briefcase } from "lucide-react";
+import {
+  SiReact,
+  SiTypescript,
+  SiRedux,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiGit,
+  SiClaudecode,
+} from "react-icons/si";
+import type { IconType } from "react-icons";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { gaEvent } from "@/lib/gtag";
@@ -160,6 +170,44 @@ const floatingTechs = [
     pos: "top-[68%] left-[5%]",
   },
 ];
+
+// ─── Icon-only tech strip (banner) ──────────────────────────────────────────
+// Next.js has no hex: its logo is solid black/white (a wordmark, not a
+// brand color), so it's left to inherit `text-foreground` instead — the
+// site's theme-flipping text token — so it stays visible as light-on-dark
+// card in dark mode and dark-on-light in light mode, same as every other
+// icon here which sit on the theme's own `--card`/`--border` tokens rather
+// than a fixed white chip.
+const bannerLogos: { name: string; Icon: IconType; hex?: string }[] = [
+  { name: "React", Icon: SiReact, hex: "61DAFB" },
+  { name: "TypeScript", Icon: SiTypescript, hex: "3178C6" },
+  { name: "Redux", Icon: SiRedux, hex: "764ABC" },
+  { name: "Next.js", Icon: SiNextdotjs },
+  { name: "Node.js", Icon: SiNodedotjs, hex: "5FA04E" },
+  { name: "Git", Icon: SiGit, hex: "F05032" },
+  { name: "Claude Code", Icon: SiClaudecode, hex: "D97757" },
+];
+
+function BannerTechIcons() {
+  return (
+    <div className="flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 w-full max-w-sm">
+      {bannerLogos.map(({ name, Icon, hex }) => (
+        <div
+          key={name}
+          title={name}
+          className="shimmer-card flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-border bg-card/70 backdrop-blur-sm shadow-sm flex items-center justify-center"
+        >
+          <Icon
+            size={18}
+            className={!hex ? "text-foreground" : undefined}
+            style={hex ? { color: `#${hex}` } : undefined}
+            aria-hidden="true"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ─── Mac Window Card ─────────────────────────────────────────────────────────
 type TabKey = "profile" | "terminal";
@@ -604,6 +652,11 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </motion.div>
+
+            {/* Tech icon strip (icons only, static, theme-aware) */}
+            <motion.div variants={itemVariants} className="flex justify-center w-full pt-1">
+              <BannerTechIcons />
             </motion.div>
           </motion.div>
 

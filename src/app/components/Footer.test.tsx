@@ -79,7 +79,7 @@ describe("Footer", () => {
   it("renders a Download CV link pointing at the resume PDF", () => {
     render(<Footer />);
     const cta = screen.getByRole("link", { name: /download cv/i });
-    expect(cta).toHaveAttribute("href", "/resume/Ayyappa_Swamy_Angadi_Resume.pdf");
+    expect(cta).toHaveAttribute("href", "/api/resume");
     expect(cta).toHaveAttribute("download");
   });
 

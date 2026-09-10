@@ -131,7 +131,7 @@ describe("About", () => {
     expect(screen.getAllByText("Revise").length).toBeGreaterThan(0);
   });
 
-  it("renders all 6 skill groups with their skills", () => {
+  it("renders all 7 skill groups with their skills", () => {
     render(<About />);
 
     const groups: Record<string, string[]> = {
@@ -148,6 +148,13 @@ describe("About", () => {
       "Tools & DevOps": ["Git", "GitHub Actions", "Webpack", "Vite", "Vercel"],
       Performance: ["Lighthouse audits", "Code splitting", "Lazy loading", "Web Vitals"],
       "Backend & APIs (Beginner)": ["Node.js", "Express.js", "REST APIs"],
+      "AI-Augmented Development": [
+        "Claude Code",
+        "AI Pair Programming",
+        "Prompt Engineering",
+        "Agentic Dev Workflows",
+        "AI Code Review",
+      ],
     };
 
     for (const [label, skills] of Object.entries(groups)) {
@@ -254,5 +261,41 @@ describe("About", () => {
     // A stat card that never intersected stays at 0.
     const companiesCard = screen.getByText("Companies Worked").closest(".project-card") as HTMLElement;
     expect(counterText(companiesCard)).toBe("0");
+  });
+
+  it("renders the tech stack logo marquee below the stat cards, with a labeled icon per technology", () => {
+    render(<About />);
+
+    const heading = screen.getByText("Tech I Work With");
+    expect(heading).toBeInTheDocument();
+
+    // Several of these names also appear as plain-text skill pills earlier
+    // in the page (e.g. "TypeScript", "Next.js"), so scope the search to the
+    // logo grid's own container rather than the whole document.
+    const grid = heading.closest(".mt-12") as HTMLElement;
+    expect(grid).not.toBeNull();
+
+    // The marquee track renders each logo twice (a duplicated, aria-hidden
+    // copy back-to-back with the real one) so the CSS loop is seamless.
+    for (const name of [
+      "React",
+      "Next.js",
+      "Redux",
+      "Node.js",
+      "TypeScript",
+      "Claude Code",
+    ]) {
+      expect(within(grid).getAllByText(name).length).toBe(2);
+    }
+
+    // Each logo tile renders an actual SVG icon, not just the text label.
+    const reactTile = within(grid).getAllByText("React")[0].closest("div") as HTMLElement;
+    expect(reactTile.querySelector("svg")).toBeInTheDocument();
+
+    // The duplicated half is hidden from assistive tech so it isn't
+    // announced/tabbed to twice; the real half stays visible.
+    const allTiles = grid.querySelectorAll(".tech-logo-tile");
+    const hiddenTiles = grid.querySelectorAll('.tech-logo-tile[aria-hidden="true"]');
+    expect(hiddenTiles.length).toBe(allTiles.length / 2);
   });
 });

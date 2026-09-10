@@ -56,7 +56,7 @@ describe("Home", () => {
   it("renders a Download CV link pointing at the resume PDF", () => {
     render(<Home />);
     const dl = screen.getByRole("link", { name: /download cv/i });
-    expect(dl).toHaveAttribute("href", "/resume/Ayyappa_Swamy_Angadi_Resume.pdf");
+    expect(dl).toHaveAttribute("href", "/api/resume");
   });
 
   it("renders the quick-stats grid labels", () => {
@@ -150,5 +150,26 @@ describe("Home", () => {
       });
     }
     expect(typedRole()?.textContent).not.toBe("Frontend Engineer");
+  });
+
+  it("renders a static, icon-only tech strip with exactly one title-labeled icon per technology", () => {
+    render(<Home />);
+
+    for (const name of [
+      "React",
+      "TypeScript",
+      "Redux",
+      "Next.js",
+      "Node.js",
+      "Git",
+      "Claude Code",
+    ]) {
+      const tiles = screen.getAllByTitle(name);
+      expect(tiles.length).toBe(1);
+      expect(tiles[0].querySelector("svg")).toBeInTheDocument();
+    }
+
+    // Icon-only: no visible text label sits alongside these logos.
+    expect(screen.queryByText("Node.js")).not.toBeInTheDocument();
   });
 });

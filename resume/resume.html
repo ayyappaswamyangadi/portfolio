@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Ayyappa Swamy Angadi — Resume</title>
+<style>
+  @page { size: A4; margin: 11mm 15mm; }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #1f2937;
+    font-size: 10.2pt;
+    line-height: 1.36;
+    margin: 0;
+  }
+
+  a { color: #5b21b6; text-decoration: none; }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2.5px solid #5b21b6;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 21pt;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: #1f2937;
+  }
+  .title {
+    font-size: 11.5pt;
+    font-weight: bold;
+    color: #5b21b6;
+    margin-top: 2px;
+  }
+  .contact {
+    text-align: right;
+    font-size: 9pt;
+    color: #4b5563;
+    line-height: 1.55;
+  }
+  .contact a { color: #4b5563; }
+  .contact .links a { color: #5b21b6; font-weight: bold; }
+
+  /* ── Sections ── */
+  section { margin-bottom: 8px; }
+  h2 {
+    font-size: 10.2pt;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #5b21b6;
+    border-bottom: 1px solid #ddd6fe;
+    padding-bottom: 2px;
+    margin: 0 0 5px 0;
+  }
+
+  .summary { margin: 0; }
+  .summary b { color: #1f2937; }
+
+  /* ── Skills: single-column, one category per line (ATS-safe reading order) ── */
+  .skills p { margin: 3px 0; }
+  .skills b { color: #1f2937; }
+
+  /* ── Experience ── */
+  .entry { margin-bottom: 6px; }
+  .entry:last-child { margin-bottom: 0; }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .role { font-weight: bold; font-size: 10.4pt; }
+  .dates {
+    font-size: 9pt;
+    font-weight: bold;
+    color: #5b21b6;
+    white-space: nowrap;
+  }
+  .org { font-style: italic; color: #4b5563; font-size: 9.4pt; margin-bottom: 3px; }
+
+  ul { margin: 3px 0 0 0; padding-left: 15px; }
+  li { margin-bottom: 2px; }
+  li::marker { color: #5b21b6; }
+
+  /* ── Projects ── */
+  .proj-head { font-weight: bold; }
+  .proj-tech { font-style: italic; color: #6b7280; font-weight: normal; font-size: 9.1pt; }
+  .proj-line { margin: 1.5px 0 0 0; }
+
+  .edu-degree { font-weight: bold; }
+  .edu-school { color: #4b5563; font-size: 9.5pt; }
+</style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>AYYAPPA SWAMY ANGADI</h1>
+      <div class="title">Frontend Engineer — React.js / Next.js / TypeScript</div>
+    </div>
+    <div class="contact">
+      Bengaluru, Karnataka, India<br />
+      +91 87925 94229 &nbsp;·&nbsp; ayyappaswamy50@gmail.com<br />
+      <span class="links">
+        <a href="https://www.ayyappa.dev">Portfolio</a> |
+        <a href="https://linkedin.com/in/ayyappaswamyangadi">LinkedIn</a> |
+        <a href="https://github.com/ayyappaswamyangadi">GitHub</a>
+      </span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Professional Summary</h2>
+    <p class="summary">
+      Frontend Engineer with <b>5+ years of web development experience</b>, including
+      <b>4+ years building production React.js and Next.js applications</b> — from
+      real-time trading platforms and enterprise dashboards to AI-driven tools. Since
+      <b>April 2026</b>, integrates <b>Claude Code</b> into a daily AI-augmented development
+      workflow, directing agentic pair-programming for scaffolding, refactors, and tests
+      while owning every architecture and code-quality decision. Delivers production-grade
+      features within fully remote, cross-functional Agile teams.
+    </p>
+  </section>
+
+  <section class="skills">
+    <h2>Technical Skills</h2>
+    <p><b>Frontend Development:</b> React.js, Next.js, JavaScript (ES6+), TypeScript, React Hooks, Context API, Performance Optimization (Code Splitting, Lazy Loading, Web Vitals)</p>
+    <p><b>UI &amp; Styling:</b> Tailwind CSS, Styled-Components, Material UI, Bootstrap, Framer Motion, Responsive Design</p>
+    <p><b>State &amp; Forms:</b> Redux, Redux Toolkit, React Hook Form, Zod (schema validation)</p>
+    <p><b>AI-Augmented Development:</b> Claude Code, AI Pair Programming, Prompt Engineering, Agentic Dev Workflows, AI Code Review</p>
+    <p><b>Backend &amp; APIs (working knowledge):</b> Node.js, Express.js, RESTful APIs, Axios</p>
+    <p><b>Tools &amp; Workflow:</b> Git, GitHub, CI/CD Pipelines, Webpack, Vite, ESLint, Agile / Scrum</p>
+  </section>
+
+  <section>
+    <h2>Professional Experience</h2>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="role">Frontend Developer / Engineer</span>
+        <span class="dates">May 2022 – Present</span>
+      </div>
+      <div class="org">Revise — Mumbai, India (Remote)</div>
+      <ul>
+        <li>Design and develop complex, reusable React components for enterprise-scale applications, including real-time trading platforms and analytical dashboards with advanced data visualization.</li>
+        <li>Built a Next.js AI-driven application enabling natural-language queries over books and IPC (Indian Penal Code) section content.</li>
+        <li>Lead architecture of a mobile app that turns a local machine into a virtual dev environment — enabling full developer workflows, including AI-assisted code changes and agent-driven task execution, from mobile.</li>
+        <li>Drive frontend architecture decisions and REST API integration with backend teams; improved performance via memoization and reduced bundle size. Mentor junior developers and run code reviews — shipped multiple production releases with zero critical defects.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="role">Software Developer</span>
+        <span class="dates">Oct 2020 – Jan 2022</span>
+      </div>
+      <div class="org">Chools Consultancy Services — Bengaluru, India (Onsite)</div>
+      <ul>
+        <li>Built and maintained WordPress-based LMS websites — course delivery, learner progress tracking, and administrative management.</li>
+        <li>Customized WordPress themes and plugins to client-specific e-learning requirements.</li>
+        <li>Delivered responsive, cross-browser static sites in pure HTML/CSS/JavaScript, translating client wireframes into polished, production pages.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+
+    <p class="proj-line"><span class="proj-head">Web3 Trading Dashboard</span> — <span class="proj-tech">React.js, Web3.js, Ethers.js, MetaMask, REST APIs.</span> Built a MetaMask-integrated dashboard for wallet authentication, transaction signing, and real-time trade execution, with secure network-switching and gas-fee handling.</p>
+
+    <p class="proj-line"><span class="proj-head">API Key Management Dashboard</span> — <span class="proj-tech">React.js, REST APIs, Axios.</span> Built a full-CRUD API key management tool with role-based access control, real-time usage metrics, and robust client-side validation.</p>
+
+    <p class="proj-line"><span class="proj-head">Business Portfolio &amp; Admin Dashboard</span> — <span class="proj-tech">React.js, Responsive Design.</span> Delivered a fully responsive portfolio and admin dashboard for a photography studio client, with optimized images and load performance across devices.</p>
+  </section>
+
+  <section>
+    <h2>Education</h2>
+    <div class="edu-degree">Bachelor of Engineering — Electronics and Communication Engineering</div>
+    <div class="edu-school">Visvesvaraya Technological University, 2019 · CGPA: 6.0 / 10</div>
+  </section>
+
+</body>
+</html>

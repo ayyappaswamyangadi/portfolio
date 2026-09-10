@@ -17,7 +17,7 @@ describe("DownloadCvButton", () => {
     render(<DownloadCvButton gaLabel="test_label" className="my-class" />);
 
     const link = screen.getByRole("link", { name: /download cv/i });
-    expect(link).toHaveAttribute("href", "/resume/Ayyappa_Swamy_Angadi_Resume.pdf");
+    expect(link).toHaveAttribute("href", "/api/resume");
     expect(link).toHaveAttribute("download");
     expect(link).toHaveClass("my-class");
     expect(link).toHaveAttribute("aria-busy", "false");

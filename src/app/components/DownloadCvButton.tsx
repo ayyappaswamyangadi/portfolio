@@ -32,8 +32,8 @@ export function DownloadCvButton({
 
   return (
     <a
-      href="/resume/Ayyappa_Swamy_Angadi_Resume.pdf"
-      download
+      href="/api/resume"
+      download="Ayyappa_Swamy_Angadi_Resume.pdf"
       onClick={handleClick}
       aria-busy={downloading}
       className={className}
