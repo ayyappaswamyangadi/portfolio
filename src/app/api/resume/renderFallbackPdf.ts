@@ -7,14 +7,20 @@ import {
   RESUME_EDUCATION,
 } from "@/lib/resumeContent";
 
-// Plain-pdfkit fallback for /api/resume's GET handler. Deliberately does not
-// touch @react-pdf/renderer or its yoga-layout (WASM) dependency — that's
-// the suspected cause of the renderToBuffer crashes this fallback exists to
-// survive (see route.tsx and resume/README.md). Content is pulled from the
-// same resumeContent.ts as the primary renderer, and the experience labels
-// are passed in computed fresh per request, so even a recruiter who hits
-// this fallback path still gets accurate current-month numbers rather than
-// a frozen static file.
+// Plain-pdfkit fallback for /api/resume's GET handler, used if the primary
+// @react-pdf/renderer path throws for any reason. It still depends on the
+// same underlying "pdfkit" package (see the `outputFileTracingIncludes`
+// entry in next.config.ts that both renderers need to run at all on
+// Vercel — pdfkit resolves its base-14 font files through a package.json
+// subpath-imports alias that Vercel's build-time file tracer doesn't
+// follow), so it isn't a hedge against that specific class of failure —
+// it's just a much smaller, simpler code path than @react-pdf/renderer's
+// full React-reconciler-plus-flexbox-layout engine, so there's less
+// surface area for something else to go wrong on. Content is pulled from
+// the same resumeContent.ts as the primary renderer, and the experience
+// labels are passed in computed fresh per request, so even a recruiter who
+// hits this fallback path still gets accurate current-month numbers rather
+// than a frozen static file.
 //
 // Layout is intentionally simpler than ResumeDocument.tsx (single-column
 // header instead of a two-column name/contact split, plain sequential text

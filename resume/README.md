@@ -5,34 +5,45 @@ There are now **two** resume artifacts — don't confuse them:
 1. **`/api/resume` (canonical, live)** — the site's "Download CV" button
    (`src/app/components/DownloadCvButton.tsx`) hits this Next.js Route Handler
    (`src/app/api/resume/route.tsx`), which renders a fresh PDF **on every
-   request** via `@react-pdf/renderer` (pure JS/pdfkit — no headless browser,
-   so it runs fine as a normal Vercel serverless function... usually — see
-   the fallback note below). The experience durations in the summary
-   ("5 yrs 7 months...") are computed at request time from
-   `src/lib/experience.ts` — the same functions the site's About section
-   uses — so a recruiter downloading it in December sees a different,
-   correct number than one downloading it in June. Shared text content
-   (skills, bullets, projects, education/CGPA) lives in
+   request** via `@react-pdf/renderer` (pure JS/pdfkit — no headless
+   browser, so it runs fine as a normal Vercel serverless function). The
+   experience durations in the summary ("5 yrs 7 months...") are computed
+   at request time from `src/lib/experience.ts` — the same functions the
+   site's About section uses — so a recruiter downloading it in December
+   sees a different, correct number than one downloading it in June.
+   Shared text content (skills, bullets, projects, education/CGPA) lives in
    `src/lib/resumeContent.ts`. **Edit that file and `ResumeDocument.tsx`,
    not this folder, to change what recruiters actually download.**
 
-   **Fallback:** `route.tsx`'s primary renderer has been observed to throw
-   in Vercel's serverless runtime (yoga-layout's WASM layout engine — a
-   `@react-pdf/renderer` dependency) even when an identical build runs fine
-   locally via `next start`; see
-   https://github.com/diegomura/react-pdf/issues/2589. If `renderToBuffer`
-   throws, the route logs the error and falls back to
-   `renderFallbackPdf.ts` — a second renderer built directly on plain
-   `pdfkit` (no yoga-layout, no `@react-pdf/renderer`) that reads the same
-   `resumeContent.ts` and the same live `totalExperienceLabel` /
-   `reviseDurationLabel` the primary renderer was given. So even when the
-   fallback fires, the download still reflects the current month, not a
-   frozen snapshot — it's a different rendering engine, not stale content.
-   Its layout is deliberately simpler than `ResumeDocument.tsx` (pdfkit lays
-   text out as a linear cursor rather than flexbox), so if you change the
-   visible resume content, update both `ResumeDocument.tsx` and
-   `renderFallbackPdf.ts`. Check Vercel's function logs for `[/api/resume]`
-   occasionally to see whether the fallback is firing and how often.
+   **Font files on Vercel:** both `@react-pdf/renderer` and the fallback
+   below depend on the real `pdfkit` npm package, which resolves its
+   base-14 font files (`Helvetica`, etc.) through a `package.json`
+   `"imports"` subpath alias (`#standard-fonts/*` →
+   `./js/standard-fonts/*.cjs`). Vercel's build-time file tracer doesn't
+   follow that alias, so without help those font files silently don't ship
+   with the deployed function — `renderToBuffer` throws `Cannot find
+   module '.../standard-fonts/Helvetica.cjs'` the first time a font is
+   actually used, a failure invisible locally since `next start`/dev run
+   against the full `node_modules` on disk rather than a traced subset.
+   Fixed via the `outputFileTracingIncludes` entry in `next.config.ts`,
+   which force-includes `node_modules/pdfkit/js/standard-fonts/**` for the
+   `/api/resume` function. If pdfkit's version ever changes and this
+   starts throwing again, that's the first place to check.
+
+   **Fallback:** if `renderToBuffer` throws for any other reason, the route
+   logs the error and falls back to `renderFallbackPdf.ts` — a second,
+   much simpler renderer built directly on plain `pdfkit` (skips
+   `@react-pdf/renderer`'s React-reconciler-plus-flexbox-layout engine
+   entirely) that reads the same `resumeContent.ts` and the same live
+   `totalExperienceLabel` / `reviseDurationLabel` the primary renderer was
+   given. So even when the fallback fires, the download still reflects the
+   current month, not a frozen snapshot. Its layout is deliberately simpler
+   than `ResumeDocument.tsx` (pdfkit lays text out as a linear cursor
+   rather than flexbox), so if you change the visible resume content,
+   update both `ResumeDocument.tsx` and `renderFallbackPdf.ts`. If *both*
+   renderers throw, the route returns a JSON error response instead of a
+   broken/empty PDF — check Vercel's function logs for `[/api/resume]`
+   occasionally to see whether either path is firing.
 
 2. **`resume.html` / `public/resume/Ayyappa_Swamy_Angadi_Resume.pdf`
    (design reference / manual-export copy)** — a static snapshot, not

@@ -9,6 +9,8 @@ import { renderFallbackPdf } from "./renderFallbackPdf";
 // @react-pdf/renderer uses pdfkit under the hood — pure Node.js, no headless
 // browser — so this runs fine as a normal serverless function (unlike a
 // Puppeteer/Chromium approach, which needs a special buildpack on Vercel).
+// It does need help shipping pdfkit's font files to Vercel's Lambda,
+// though — see the `outputFileTracingIncludes` entry in next.config.ts.
 export const runtime = "nodejs";
 // Force this to run fresh on every request rather than being statically
 // optimized/cached at build time — the whole point is that the experience
@@ -23,19 +25,11 @@ export async function GET() {
 
   let buffer: Buffer;
   try {
-    // @react-pdf/renderer (and ResumeDocument, which imports it) must be
-    // imported *inside* this try, not at module top-level. yoga-layout — a
-    // @react-pdf/renderer dependency — runs a top-level `await loadYoga()`
-    // that instantiates a WASM module as soon as the module is evaluated,
-    // and that instantiation has been observed to throw in Vercel's
-    // serverless runtime (see https://github.com/diegomura/react-pdf/issues/2589)
-    // even though an identical build works fine locally under `next start`.
-    // A static top-level import means that throw happens while Next.js is
-    // loading the route module itself — before this function, or its
-    // try/catch, ever runs — which crashes the whole invocation with an
-    // empty response and no way to catch it. A dynamic import here defers
-    // that module evaluation (and any throw it causes) until it's actually
-    // inside this try block.
+    // @react-pdf/renderer (and ResumeDocument, which imports it) is
+    // imported *inside* this try, not at module top-level, as defense in
+    // depth: a throw during that module's own evaluation — as opposed to a
+    // throw from calling renderToBuffer() below — would otherwise happen
+    // before this function, or its try/catch, ever runs.
     const [{ renderToBuffer }, { ResumeDocument }] = await Promise.all([
       import("@react-pdf/renderer"),
       import("./ResumeDocument"),
@@ -47,8 +41,7 @@ export async function GET() {
       />,
     );
   } catch (primaryError) {
-    // Fall back to a plain-pdfkit renderer that never imports
-    // @react-pdf/renderer/yoga-layout at all, built from the same
+    // Fall back to a plain-pdfkit renderer built from the same
     // live-computed labels, so the download still reflects the current
     // month instead of a frozen snapshot.
     console.error(
@@ -68,25 +61,10 @@ export async function GET() {
         "[/api/resume] plain-pdfkit fallback also failed:",
         fallbackError,
       );
-      // TEMPORARY diagnostic: surface both real error messages in the
-      // response body itself. Vercel's dashboard function logs aren't
-      // reachable from here, and blindly guessing at fixes without seeing
-      // the actual crash has already cost multiple failed production
-      // deploys. Remove this once the real cause is identified and fixed.
       return NextResponse.json(
         {
           error:
             "Resume generation is temporarily unavailable. Please try again shortly.",
-          debug: {
-            primary:
-              primaryError instanceof Error
-                ? { message: primaryError.message, stack: primaryError.stack }
-                : String(primaryError),
-            fallback:
-              fallbackError instanceof Error
-                ? { message: fallbackError.message, stack: fallbackError.stack }
-                : String(fallbackError),
-          },
         },
         { status: 500 },
       );
