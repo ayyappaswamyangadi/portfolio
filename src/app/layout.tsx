@@ -1,5 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
+import Script from "next/script";
 import { Outfit } from "next/font/google";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { Navbar } from "@/app/components/Navbar";
@@ -9,11 +10,29 @@ import { CursorGlow } from "@/app/components/CursorGlow";
 import { FaviconThemeSync } from "@/app/components/FaviconThemeSync";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
 import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
+import { SplashScreen } from "@/app/components/SplashScreen";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
 import { WebVitals } from "@/app/components/WebVitals";
 import { SectionViewTracker } from "@/app/components/SectionViewTracker";
 import { StructuredData } from "@/app/components/StructuredData";
 import type { Metadata, Viewport } from "next";
+
+// Runs before hydration so a standalone (home-screen-installed) launch gets
+// the `pwa-splash` class on <html> before the browser paints anything — a
+// regular browser tab visit never touches this, so it never sees a splash
+// flash. SplashScreen.tsx removes the class once it's done fading itself out.
+const detectPwaLaunchScript = `
+(function () {
+  try {
+    var isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+    if (isStandalone) {
+      document.documentElement.classList.add("pwa-splash");
+    }
+  } catch (e) {}
+})();
+`;
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -146,6 +165,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${outfit.variable}`}>
       <body className="min-h-screen flex flex-col" suppressHydrationWarning>
+        <Script
+          id="detect-pwa-launch"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: detectPwaLaunchScript }}
+        />
+        <SplashScreen />
         <StructuredData />
         <GoogleAnalytics />
         <WebVitals />

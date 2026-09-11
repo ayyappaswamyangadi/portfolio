@@ -632,14 +632,25 @@ body {
 .btn-cv-pulse {
   animation: cv-pulse-glow 2.2s ease-out infinite;
 }
-.btn-cv-pulse:hover,
-.btn-cv-pulse:focus-visible {
-  animation-play-state: paused;
-}
 .btn-cv-pulse .cv-download-icon {
   animation: cv-icon-nudge 1.6s ease-in-out infinite;
 }
-.btn-cv-pulse:hover .cv-download-icon,
+/* Scoped to real pointer devices only — touch browsers apply :hover on tap
+   and never clear it (no mouseleave), so without this guard a single tap on
+   mobile would permanently pause the loop instead of just pausing while
+   the finger/pointer is actually over the button. */
+@media (hover: hover) {
+  .btn-cv-pulse:hover {
+    animation-play-state: paused;
+  }
+  .btn-cv-pulse:hover .cv-download-icon {
+    animation: none;
+    transform: translateY(2px);
+  }
+}
+.btn-cv-pulse:focus-visible {
+  animation-play-state: paused;
+}
 .btn-cv-pulse:focus-visible .cv-download-icon {
   animation: none;
   transform: translateY(2px);
@@ -1047,6 +1058,54 @@ html:not(.dark) .skill-pill {
     hsl(var(--muted-foreground) / 0.16) 50%,
     hsl(var(--muted-foreground) / 0.08) 100%
   );
+}
+
+/* ─── PWA launch splash screen ────────────────────────────
+   Only ever shown for standalone (home-screen-installed) launches. The
+   `pwa-splash` class is added to <html> by a blocking inline script in
+   layout.tsx *before* first paint, so a regular browser tab visit never
+   gets `display: flex` here and never sees a flash of this overlay. */
+.splash-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #060D18;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+html.pwa-splash .splash-screen {
+  display: flex;
+}
+.splash-screen.splash-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-screen-logo {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+}
+.splash-screen-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.01em;
+}
+.splash-screen-role {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #EAA22F;
+  letter-spacing: 0.02em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen {
+    transition: none;
+  }
 }
 
 /* ─── Full-page state (loading / error / not-found) ─────── */
