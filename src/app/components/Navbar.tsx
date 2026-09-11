@@ -10,6 +10,7 @@ import { gaEvent } from "@/lib/gtag";
 import { useActiveSession } from "../hooks/useActiveSession";
 import ThemeToggleButton from "./ThemeToggleButton";
 import { PWAInstallButton } from "./PWAInstallButton";
+import { PwaInstalledBadge } from "./PwaInstalledBadge";
 
 const sections = ["home", "about", "projects", "contact"];
 const sectionLabels: Record<string, string> = {
@@ -160,7 +161,8 @@ export function Navbar() {
         {/* ── Right cluster (desktop) ── */}
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggleButton />
-          <PWAInstallButton />
+          <PwaInstalledBadge />
+          <PWAInstallButton revealAfterPromptDismiss />
           <a
             href="#contact"
             onClick={() => gaEvent({ action: "click", category: "hero_cta", label: "hire_me_navbar" })}
@@ -222,6 +224,7 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-2 pb-1 border-t border-border mt-1 flex items-center gap-2">
+              <PwaInstalledBadge />
               <PWAInstallButton revealAfterPromptDismiss />
               <a
                 href="#contact"

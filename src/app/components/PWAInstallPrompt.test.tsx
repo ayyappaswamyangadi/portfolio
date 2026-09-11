@@ -8,7 +8,7 @@ vi.mock("@/lib/gtag", () => ({
   gaEvent: (...args: unknown[]) => gaEventMock(...args),
 }));
 
-const useIOSInstallMock = vi.fn(() => ({ isIOS: false, isStandalone: false }));
+const useIOSInstallMock = vi.fn(() => ({ isIOS: false, isInstalled: false }));
 vi.mock("../hooks/useIOSInstall", () => ({
   useIOSInstall: () => useIOSInstallMock(),
 }));
@@ -35,12 +35,12 @@ describe("PWAInstallPrompt", () => {
   afterEach(() => {
     gaEventMock.mockClear();
     useIOSInstallMock.mockReset();
-    useIOSInstallMock.mockReturnValue({ isIOS: false, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: false, isInstalled: false });
     localStorage.clear();
   });
 
   it("renders nothing when already installed (standalone)", () => {
-    useIOSInstallMock.mockReturnValue({ isIOS: false, isStandalone: true });
+    useIOSInstallMock.mockReturnValue({ isIOS: false, isInstalled: true });
     const { container } = render(<PWAInstallPrompt />);
     expect(container).toBeEmptyDOMElement();
   });
@@ -63,7 +63,7 @@ describe("PWAInstallPrompt", () => {
   });
 
   it("shows the banner immediately on iOS with instructional copy, no Install button, and fires pwa_prompt_shown/ios", () => {
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallPrompt />);
 
     const dialog = screen.getByRole("dialog", { name: /install app/i });
@@ -78,7 +78,7 @@ describe("PWAInstallPrompt", () => {
 
   it("does not show the prompt again within 14 days of a dismissal", () => {
     localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     const { container } = render(<PWAInstallPrompt />);
     expect(container).toBeEmptyDOMElement();
     expect(gaEventMock).not.toHaveBeenCalled();
@@ -87,13 +87,13 @@ describe("PWAInstallPrompt", () => {
   it("shows the prompt again once the dismissal is older than 14 days", () => {
     const fifteenDaysAgo = Date.now() - 15 * 24 * 60 * 60 * 1000;
     localStorage.setItem(DISMISS_KEY, String(fifteenDaysAgo));
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallPrompt />);
     expect(screen.getByRole("dialog", { name: /install app/i })).toBeInTheDocument();
   });
 
   it("dismiss button hides the banner, records dismissal, and fires pwa_prompt_dismissed", async () => {
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallPrompt />);
 
     const user = userEvent.setup();
@@ -109,6 +109,27 @@ describe("PWAInstallPrompt", () => {
       label: "ios",
     });
     expect(localStorage.getItem(DISMISS_KEY)).not.toBeNull();
+  });
+
+  it("shows iOS-specific instructions copy in the follow-up note, not the Android install copy", async () => {
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
+    render(<PWAInstallPrompt />);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /dismiss install prompt/i }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(/instructions in the menu/i);
+  });
+
+  it("shows Android install copy (not iOS instructions copy) in the follow-up note", async () => {
+    render(<PWAInstallPrompt />);
+    dispatchBeforeInstallPrompt("dismissed");
+    await screen.findByRole("dialog", { name: /install app/i });
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Install" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(/install anytime from the menu/i);
   });
 
   it("clicking Install calls prompt(), hides the banner on any outcome, and fires pwa_install", async () => {

@@ -21,7 +21,7 @@ export function PWAInstallPrompt() {
   const [visible, setVisible] = useState(false);
   const [showFollowup, setShowFollowup] = useState(false);
   const followupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { isIOS, isStandalone } = useIOSInstall();
+  const { isIOS, isInstalled } = useIOSInstall();
 
   useEffect(() => {
     return () => {
@@ -43,7 +43,7 @@ export function PWAInstallPrompt() {
   };
 
   useEffect(() => {
-    if (isStandalone) return;
+    if (isInstalled) return;
 
     const dismissedAt = Number(localStorage.getItem(DISMISS_KEY) ?? 0);
     if (dismissedAt && Date.now() - dismissedAt < DISMISS_DAYS * 24 * 60 * 60 * 1000) {
@@ -67,7 +67,7 @@ export function PWAInstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, [isIOS, isStandalone]);
+  }, [isIOS, isInstalled]);
 
   const dismiss = () => {
     setVisible(false);
@@ -100,7 +100,7 @@ export function PWAInstallPrompt() {
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             role="dialog"
             aria-label="Install app"
-            className="pwa-install-banner md:hidden"
+            className="pwa-install-banner"
           >
             <div className="pwa-install-icon">
               {isIOS ? <Share size={18} /> : <Download size={18} />}
@@ -141,14 +141,18 @@ export function PWAInstallPrompt() {
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             role="status"
             aria-live="polite"
-            className="pwa-install-banner md:hidden"
+            className="pwa-install-banner"
           >
             <div className="pwa-install-icon">
               <Info size={18} />
             </div>
             <div className="pwa-install-text">
               <span className="pwa-install-title">No worries</span>
-              <span className="pwa-install-subtitle">You can install anytime from the menu</span>
+              <span className="pwa-install-subtitle">
+                {isIOS
+                  ? "You'll find the install instructions in the menu"
+                  : "You can install anytime from the menu"}
+              </span>
             </div>
             <button
               onClick={() => setShowFollowup(false)}

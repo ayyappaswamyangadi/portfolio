@@ -831,7 +831,7 @@ body {
   cursor: default;
 }
 
-/* ─── PWA install banner (mobile) ────────────────────────── */
+/* ─── PWA install banner (bottom sheet on mobile, corner toast on desktop) ── */
 .pwa-install-banner {
   position: fixed;
   left: 0.75rem;
@@ -848,6 +848,15 @@ body {
   background: var(--glass-card-bg);
   border: 1px solid var(--glass-card-border);
   box-shadow: 0 8px 28px var(--glass-shadow), inset 0 1px 0 var(--glass-inset);
+}
+
+@media (min-width: 768px) {
+  .pwa-install-banner {
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: 21rem;
+  }
 }
 
 .pwa-install-icon {

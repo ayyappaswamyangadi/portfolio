@@ -8,7 +8,7 @@ vi.mock("@/lib/gtag", () => ({
   gaEvent: (...args: unknown[]) => gaEventMock(...args),
 }));
 
-const useIOSInstallMock = vi.fn(() => ({ isIOS: false, isStandalone: false }));
+const useIOSInstallMock = vi.fn(() => ({ isIOS: false, isInstalled: false }));
 vi.mock("../hooks/useIOSInstall", () => ({
   useIOSInstall: () => useIOSInstallMock(),
 }));
@@ -33,7 +33,7 @@ describe("PWAInstallButton", () => {
   afterEach(() => {
     gaEventMock.mockClear();
     useIOSInstallMock.mockReset();
-    useIOSInstallMock.mockReturnValue({ isIOS: false, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: false, isInstalled: false });
   });
 
   it("renders nothing when there is no beforeinstallprompt event and the device is not iOS", () => {
@@ -42,8 +42,18 @@ describe("PWAInstallButton", () => {
   });
 
   it("renders nothing on iOS when already running standalone (installed)", () => {
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: true });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: true });
     const { container } = render(<PWAInstallButton />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("stays hidden if beforeinstallprompt fires again after the device already has the app installed", () => {
+    // Regression: Chrome doesn't reliably stop firing beforeinstallprompt on
+    // every later visit (e.g. a plain browser tab after installing via
+    // Chrome's own omnibox icon) — isInstalled must win over a stray event.
+    useIOSInstallMock.mockReturnValue({ isIOS: false, isInstalled: true });
+    const { container } = render(<PWAInstallButton />);
+    dispatchBeforeInstallPrompt();
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -99,7 +109,7 @@ describe("PWAInstallButton", () => {
   });
 
   it("on iOS (not standalone), shows the button and clicking shows install instructions instead of calling prompt()", async () => {
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallButton />);
 
     const button = screen.getByRole("button", { name: /install app/i });
@@ -114,7 +124,7 @@ describe("PWAInstallButton", () => {
   });
 
   it("on iOS, clicking Install again toggles the tooltip closed", async () => {
-    useIOSInstallMock.mockReturnValue({ isIOS: true, isStandalone: false });
+    useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallButton />);
     const button = screen.getByRole("button", { name: /install app/i });
 

@@ -11,8 +11,8 @@ vi.mock("@/lib/gtag", () => ({
 
 // PWAInstallButton renders null in jsdom by default (no beforeinstallprompt
 // event fired, not an iOS UA) — no need to mock it, it contributes nothing
-// to the DOM. Confirmed by inspecting its source: `if (!prompt && !(isIOS
-// && !isStandalone)) return null;`.
+// to the DOM. Confirmed by inspecting its source: `if (!isIOS && !prompt)
+// return null;`.
 
 function renderNavbar() {
   return render(

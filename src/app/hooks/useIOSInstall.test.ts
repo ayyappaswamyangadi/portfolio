@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useIOSInstall } from "./useIOSInstall";
 
@@ -28,11 +28,14 @@ const MAC_UA =
 const IPHONE_UA =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15";
 
+const INSTALLED_KEY = "pwa-installed";
+
 describe("useIOSInstall", () => {
   afterEach(() => {
     setUserAgent(MAC_UA);
     setPlatform("MacIntel");
     setMaxTouchPoints(0);
+    localStorage.removeItem(INSTALLED_KEY);
     // Re-stub matchMedia to the vitest.setup.ts default (matches: false for
     // everything) rather than vi.restoreAllMocks(), which would revert the
     // global setup's vi.fn() to a no-op returning undefined.
@@ -110,5 +113,48 @@ describe("useIOSInstall", () => {
   it("reports isStandalone false when neither signal is present", async () => {
     const { result } = renderHook(() => useIOSInstall());
     await waitFor(() => expect(result.current.isStandalone).toBe(false));
+  });
+
+  it("persists an installed flag when standalone, so a later non-standalone load still reports isInstalled", async () => {
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(display-mode: standalone)",
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    const { result: standaloneResult } = renderHook(() => useIOSInstall());
+    await waitFor(() => expect(standaloneResult.current.isInstalled).toBe(true));
+    expect(localStorage.getItem(INSTALLED_KEY)).toBe("1");
+
+    // A later load in a plain (non-standalone) tab should still see it as installed.
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    const { result: laterResult } = renderHook(() => useIOSInstall());
+    await waitFor(() => expect(laterResult.current.isStandalone).toBe(false));
+    expect(laterResult.current.isInstalled).toBe(true);
+  });
+
+  it("sets isInstalled and persists the flag when the appinstalled event fires", async () => {
+    const { result } = renderHook(() => useIOSInstall());
+    await waitFor(() => expect(result.current.isInstalled).toBe(false));
+
+    act(() => {
+      window.dispatchEvent(new Event("appinstalled"));
+    });
+
+    await waitFor(() => expect(result.current.isInstalled).toBe(true));
+    expect(localStorage.getItem(INSTALLED_KEY)).toBe("1");
   });
 });
