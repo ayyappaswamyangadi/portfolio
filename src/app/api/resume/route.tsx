@@ -68,10 +68,25 @@ export async function GET() {
         "[/api/resume] plain-pdfkit fallback also failed:",
         fallbackError,
       );
+      // TEMPORARY diagnostic: surface both real error messages in the
+      // response body itself. Vercel's dashboard function logs aren't
+      // reachable from here, and blindly guessing at fixes without seeing
+      // the actual crash has already cost multiple failed production
+      // deploys. Remove this once the real cause is identified and fixed.
       return NextResponse.json(
         {
           error:
             "Resume generation is temporarily unavailable. Please try again shortly.",
+          debug: {
+            primary:
+              primaryError instanceof Error
+                ? { message: primaryError.message, stack: primaryError.stack }
+                : String(primaryError),
+            fallback:
+              fallbackError instanceof Error
+                ? { message: fallbackError.message, stack: fallbackError.stack }
+                : String(fallbackError),
+          },
         },
         { status: 500 },
       );
