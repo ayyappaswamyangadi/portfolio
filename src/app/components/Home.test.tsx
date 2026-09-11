@@ -53,10 +53,9 @@ describe("Home", () => {
     });
   });
 
-  it("renders a Download CV link pointing at the resume PDF", () => {
+  it("renders a Download CV button", () => {
     render(<Home />);
-    const dl = screen.getByRole("link", { name: /download cv/i });
-    expect(dl).toHaveAttribute("href", "/api/resume");
+    expect(screen.getByRole("button", { name: /download cv/i })).toBeInTheDocument();
   });
 
   it("renders the quick-stats grid labels", () => {

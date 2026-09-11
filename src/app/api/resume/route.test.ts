@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 describe("GET /api/resume", () => {
   afterEach(() => {
     vi.doUnmock("@react-pdf/renderer");
+    vi.doUnmock("./renderFallbackPdf");
     vi.resetModules();
   });
 
@@ -54,7 +55,45 @@ describe("GET /api/resume", () => {
     expect(buffer.subarray(0, 5).toString("ascii")).toBe("%PDF-");
     expect(buffer.byteLength).toBeGreaterThan(1000);
     expect(errorSpy).toHaveBeenCalledWith(
-      "[/api/resume] renderToBuffer failed, using plain-pdfkit fallback:",
+      "[/api/resume] @react-pdf/renderer failed, using plain-pdfkit fallback:",
+      expect.any(Error),
+    );
+
+    errorSpy.mockRestore();
+  });
+
+  it("returns a real JSON error response (not a broken/empty PDF) when both renderers fail", async () => {
+    vi.doMock("@react-pdf/renderer", async () => {
+      const actual = await vi.importActual<typeof import("@react-pdf/renderer")>(
+        "@react-pdf/renderer",
+      );
+      return {
+        ...actual,
+        renderToBuffer: vi
+          .fn()
+          .mockRejectedValue(new Error("simulated yoga-layout WASM crash")),
+      };
+    });
+    vi.doMock("./renderFallbackPdf", () => ({
+      renderFallbackPdf: vi
+        .fn()
+        .mockRejectedValue(new Error("simulated pdfkit crash")),
+    }));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { GET } = await import("./route");
+    const res = await GET();
+
+    // A client that fired-and-forgot a plain `<a download>` click would
+    // have no way to distinguish this from a real PDF and would still save
+    // it as one — asserting Content-Type here is what actually guards
+    // against a broken/empty file landing in someone's Downloads folder.
+    expect(res.status).toBe(500);
+    expect(res.headers.get("Content-Type")).toContain("application/json");
+    const body = await res.json();
+    expect(body.error).toEqual(expect.any(String));
+    expect(errorSpy).toHaveBeenCalledWith(
+      "[/api/resume] plain-pdfkit fallback also failed:",
       expect.any(Error),
     );
 

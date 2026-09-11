@@ -1,11 +1,9 @@
-import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 import {
   REVISE_START,
   formatDuration,
   getTotalExperienceLabel,
 } from "@/lib/experience";
-import { ResumeDocument } from "./ResumeDocument";
 import { renderFallbackPdf } from "./renderFallbackPdf";
 
 // @react-pdf/renderer uses pdfkit under the hood — pure Node.js, no headless
@@ -25,25 +23,59 @@ export async function GET() {
 
   let buffer: Buffer;
   try {
+    // @react-pdf/renderer (and ResumeDocument, which imports it) must be
+    // imported *inside* this try, not at module top-level. yoga-layout — a
+    // @react-pdf/renderer dependency — runs a top-level `await loadYoga()`
+    // that instantiates a WASM module as soon as the module is evaluated,
+    // and that instantiation has been observed to throw in Vercel's
+    // serverless runtime (see https://github.com/diegomura/react-pdf/issues/2589)
+    // even though an identical build works fine locally under `next start`.
+    // A static top-level import means that throw happens while Next.js is
+    // loading the route module itself — before this function, or its
+    // try/catch, ever runs — which crashes the whole invocation with an
+    // empty response and no way to catch it. A dynamic import here defers
+    // that module evaluation (and any throw it causes) until it's actually
+    // inside this try block.
+    const [{ renderToBuffer }, { ResumeDocument }] = await Promise.all([
+      import("@react-pdf/renderer"),
+      import("./ResumeDocument"),
+    ]);
     buffer = await renderToBuffer(
       <ResumeDocument
         totalExperienceLabel={totalExperienceLabel}
         reviseDurationLabel={reviseDurationLabel}
       />,
     );
-  } catch (error) {
-    // yoga-layout's WASM layout engine (a @react-pdf/renderer dependency)
-    // has been observed to throw in some Vercel serverless invocations
-    // despite an identical build working fine locally under `next start` —
-    // see https://github.com/diegomura/react-pdf/issues/2589. Fall back to
-    // a plain-pdfkit renderer that skips yoga-layout entirely, built from
-    // the same live-computed labels, so the download still reflects the
-    // current month instead of a frozen snapshot.
+  } catch (primaryError) {
+    // Fall back to a plain-pdfkit renderer that never imports
+    // @react-pdf/renderer/yoga-layout at all, built from the same
+    // live-computed labels, so the download still reflects the current
+    // month instead of a frozen snapshot.
     console.error(
-      "[/api/resume] renderToBuffer failed, using plain-pdfkit fallback:",
-      error,
+      "[/api/resume] @react-pdf/renderer failed, using plain-pdfkit fallback:",
+      primaryError,
     );
-    buffer = await renderFallbackPdf({ totalExperienceLabel, reviseDurationLabel });
+    try {
+      buffer = await renderFallbackPdf({ totalExperienceLabel, reviseDurationLabel });
+    } catch (fallbackError) {
+      // Both renderers failed. A client that just fired-and-forgot a
+      // `<a download>` click would have no way to tell this apart from a
+      // real PDF and would save it as one — the exact 0-byte-file-Safari-
+      // can't-open failure mode this whole route has been fighting. Return
+      // a real error response instead; DownloadCvButton.tsx checks
+      // response.ok before ever writing a file to disk.
+      console.error(
+        "[/api/resume] plain-pdfkit fallback also failed:",
+        fallbackError,
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Resume generation is temporarily unavailable. Please try again shortly.",
+        },
+        { status: 500 },
+      );
+    }
   }
 
   // Buffer's TS type isn't structurally assignable to BodyInit in every

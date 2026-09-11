@@ -76,11 +76,9 @@ describe("Footer", () => {
     });
   });
 
-  it("renders a Download CV link pointing at the resume PDF", () => {
+  it("renders a Download CV button", () => {
     render(<Footer />);
-    const cta = screen.getByRole("link", { name: /download cv/i });
-    expect(cta).toHaveAttribute("href", "/api/resume");
-    expect(cta).toHaveAttribute("download");
+    expect(screen.getByRole("button", { name: /download cv/i })).toBeInTheDocument();
   });
 
   it("renders the current year in the copyright line", () => {
