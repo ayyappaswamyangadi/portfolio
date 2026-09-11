@@ -120,10 +120,7 @@ export function ResumeDocument({
   reviseDurationLabel: string;
 }) {
   return (
-    <Document
-      title="Ayyappa Swamy Angadi — Resume"
-      author={RESUME_CONTACT.name}
-    >
+    <Document title="Ayyappa — Resume" author={RESUME_CONTACT.name}>
       <Page size="A4" style={styles.page}>
         {/* ── Header ── */}
         <View style={styles.header}>
