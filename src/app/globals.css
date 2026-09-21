@@ -415,11 +415,15 @@ body {
 
 /* Flip-card back face needs to scroll — .project-card's overflow: hidden
    above is unlayered and beats Tailwind's overflow-y-auto utility, so the
-   scroll behavior has to be declared here instead. */
+   scroll behavior has to be declared here instead.
+   overscroll-behavior stays `auto` on purpose: the card scrolls its own
+   content first, and once it reaches the top/bottom the scroll chains to
+   the page (wheel on desktop, swipe on touch). `contain` would trap the
+   gesture in the card and make the page appear frozen. */
 .project-card-back {
   overflow-y: auto;
   overflow-x: hidden;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }

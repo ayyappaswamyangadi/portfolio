@@ -314,7 +314,6 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
           {/* ── Back: details ── */}
           <div
             className="project-card project-card-back flex flex-col p-6"
-            onWheel={(e) => e.stopPropagation()}
             style={{
               position: "absolute",
               inset: 0,
