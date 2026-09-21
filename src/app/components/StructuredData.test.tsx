@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { projects } from "@/lib/projects";
 import { StructuredData } from "./StructuredData";
 
 describe("StructuredData", () => {
@@ -42,5 +43,24 @@ describe("StructuredData", () => {
       inLanguage: "en-US",
     });
     expect(website.publisher).toEqual({ "@id": person["@id"] });
+  });
+
+  it("describes the web-development service and lists every project, not just the paginated first page", () => {
+    const { container } = render(<StructuredData />);
+    const data = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')!.innerHTML,
+    );
+    const person = data["@graph"].find((n: { "@type": string }) => n["@type"] === "Person");
+    const service = data["@graph"].find((n: { "@type": string }) => n["@type"] === "ProfessionalService");
+    const list = data["@graph"].find((n: { "@type": string }) => n["@type"] === "ItemList");
+
+    expect(service).toMatchObject({
+      name: "Ayyappa - Frontend Web Development Services",
+      provider: { "@id": person["@id"] },
+    });
+    expect(list.itemListElement).toHaveLength(projects.length);
+    expect(list.itemListElement.map((e: { item: { name: string } }) => e.item.name)).toEqual(
+      projects.map((p) => p.title),
+    );
   });
 });

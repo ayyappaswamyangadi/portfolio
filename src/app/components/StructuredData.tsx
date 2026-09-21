@@ -1,6 +1,9 @@
+import { projects } from "@/lib/projects";
+
 const siteUrl = "https://www.ayyappa.dev";
 
-// A JSON-LD @graph combining Person + WebSite — pulled directly from the
+// A JSON-LD @graph combining Person + WebSite + ProfessionalService + a
+// project ItemList — pulled directly from the
 // resume's actual skills/roles/education so search engines' entity
 // understanding of "Ayyappa" matches what recruiters are searching for
 // (React.js, Next.js, TypeScript, frontend/web developer) rather than a
@@ -70,6 +73,51 @@ const structuredData = {
         "Portfolio of Ayyappa Swamy Angadi — Frontend Developer & Web Developer specializing in React.js, Next.js and TypeScript.",
       inLanguage: "en-US",
       publisher: { "@id": `${siteUrl}#person` },
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": `${siteUrl}#service`,
+      name: "Ayyappa - Frontend Web Development Services",
+      url: siteUrl,
+      image: `${siteUrl}/opengraph-image`,
+      description:
+        "Frontend and web application development — React.js, Next.js, TypeScript, HTML, CSS and JavaScript websites and web apps.",
+      serviceType: [
+        "Frontend Development",
+        "Web Application Development",
+        "React.js and Next.js Development",
+        "Responsive Website Development",
+      ],
+      areaServed: "Worldwide",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Bengaluru",
+        addressRegion: "Karnataka",
+        addressCountry: "IN",
+      },
+      founder: { "@id": `${siteUrl}#person` },
+      provider: { "@id": `${siteUrl}#person` },
+    },
+    {
+      // Every project, straight from the same data the (paginated) UI uses —
+      // so structured data lists all of them even though the grid shows two
+      // at a time.
+      "@type": "ItemList",
+      "@id": `${siteUrl}#projects`,
+      name: "Projects by Ayyappa Swamy Angadi",
+      itemListElement: projects.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "SoftwareSourceCode",
+          name: p.title,
+          description: p.description,
+          url: p.liveUrl,
+          ...(p.githubUrl && { codeRepository: p.githubUrl }),
+          keywords: p.tech.join(", "),
+          author: { "@id": `${siteUrl}#person` },
+        },
+      })),
     },
   ],
 };

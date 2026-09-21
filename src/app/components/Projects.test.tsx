@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { projects } from "@/lib/projects";
 import { Projects } from "./Projects";
 
 const gaEventMock = vi.fn();
@@ -289,5 +290,15 @@ describe("Projects", () => {
       category: "social",
       label: "github_profile_projects_cta",
     });
+  });
+
+  it("puts every project in the initial markup (crawlable list), even those on later grid pages", () => {
+    const { container } = render(<Projects />);
+    const list = container.querySelector(".sr-only ul") as HTMLElement;
+    expect(list).not.toBeNull();
+    expect(within(list).getAllByRole("listitem")).toHaveLength(projects.length);
+    for (const p of projects) {
+      expect(within(list).getByRole("link", { name: p.title })).toHaveAttribute("href", p.liveUrl);
+    }
   });
 });

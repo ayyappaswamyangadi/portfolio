@@ -25,6 +25,21 @@ const nextConfig: NextConfig = {
   // than actually protecting anything. These four are standard, essentially
   // never break a site, and cover the common baseline (MIME sniffing,
   // referrer leakage, clickjacking, unwanted device access).
+  // The apex domain currently serves the same page as www with a 200, i.e.
+  // two indexable copies of one site. The canonical tag already points at
+  // www, but a 308 consolidates ranking signals for real. The Search Console
+  // verification file is excluded so the redirect can't break an existing
+  // apex-domain property's ownership check.
+  async redirects() {
+    return [
+      {
+        source: "/:path((?!google1a73ae2602885b7d\\.html$).*)",
+        has: [{ type: "host", value: "ayyappa.dev" }],
+        destination: "https://www.ayyappa.dev/:path",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
