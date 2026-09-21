@@ -599,22 +599,49 @@ body {
 .marquee-track {
   display: flex;
   width: max-content;
+  /* iOS/WebKit (Safari and standalone PWAs — every iOS browser is WebKit
+     under the hood) can leave an unprefixed `animation` on a descendant of
+     a `-webkit-mask-image` parent stuck at frame 0 unless the element also
+     gets its own `-webkit-animation` and is promoted to its own compositing
+     layer. None of this is needed on Blink (Android/desktop Chrome) or
+     Gecko, which is why the marquee only ever froze on iOS. */
+  -webkit-animation: marquee-scroll linear infinite;
   animation: marquee-scroll linear infinite;
+  -webkit-animation-duration: var(--marquee-duration, 32s);
   animation-duration: var(--marquee-duration, 32s);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .marquee-wrapper:hover .marquee-track {
+  -webkit-animation-play-state: paused;
   animation-play-state: paused;
+}
+@-webkit-keyframes marquee-scroll {
+  from {
+    -webkit-transform: translateX(0) translateZ(0);
+    transform: translateX(0) translateZ(0);
+  }
+  to {
+    -webkit-transform: translateX(-50%) translateZ(0);
+    transform: translateX(-50%) translateZ(0);
+  }
 }
 @keyframes marquee-scroll {
   from {
-    transform: translateX(0);
+    -webkit-transform: translateX(0) translateZ(0);
+    transform: translateX(0) translateZ(0);
   }
   to {
-    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%) translateZ(0);
+    transform: translateX(-50%) translateZ(0);
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
+    -webkit-animation: none;
     animation: none;
   }
 }
@@ -631,6 +658,16 @@ body {
 @keyframes cv-icon-nudge {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(3px); }
+}
+/* Reduced-motion-safe variant — same ring, but pulsing via opacity/alpha
+   only, no expanding radius and no icon translate. `prefers-reduced-motion`
+   exists for positional/scaling motion that can trigger vestibular issues,
+   not visual feedback in general, so swapping to a static-size glow keeps
+   this CTA visible to every user (including the many phones that ship with
+   Reduce Motion on by default) instead of going fully static. */
+@keyframes cv-pulse-glow-static {
+  0%, 100% { box-shadow: 0 0 0 4px hsl(var(--primary) / 0.28); }
+  50%       { box-shadow: 0 0 0 4px hsl(var(--primary) / 0.06); }
 }
 
 .btn-cv-pulse {
@@ -660,7 +697,9 @@ body {
   transform: translateY(2px);
 }
 @media (prefers-reduced-motion: reduce) {
-  .btn-cv-pulse,
+  .btn-cv-pulse {
+    animation: cv-pulse-glow-static 2.6s ease-in-out infinite;
+  }
   .btn-cv-pulse .cv-download-icon {
     animation: none;
   }
