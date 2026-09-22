@@ -1,6 +1,7 @@
 // app/layout.tsx
 import "./globals.css";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Outfit } from "next/font/google";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { Navbar } from "@/app/components/Navbar";
@@ -173,6 +174,7 @@ export default function RootLayout({
         <SplashScreen />
         <StructuredData />
         <GoogleAnalytics />
+        <SpeedInsights />
         <WebVitals />
         <SectionViewTracker />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

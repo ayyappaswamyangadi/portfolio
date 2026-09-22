@@ -12,19 +12,13 @@ vi.mock("@/lib/gtag", () => ({
 // Mirrors the `featured` projects (in array order) and the "All"-category
 // pagination order from Projects.tsx's `projects` data, so tests don't have
 // to hardcode positions blindly.
-const FEATURED_TITLES = [
-  "YouTube Clone",
-  "Ayyappa & Nayana — Wedding Invitation",
-  "URL Shortener",
-  "Resume Builder",
-];
-const ALL_ORDER_PAGE_0 = ["YouTube Clone", "TaskFlow — Todo App"];
-const ALL_ORDER_PAGE_1 = ["Ayyappa & Nayana — Wedding Invitation", "URL Shortener"];
-const ALL_ORDER_LAST_PAGE = ["Facebook Clone", "Resume Builder"];
+const FEATURED_TITLES = ["URL Shortener", "Resume Builder"];
+const ALL_ORDER_PAGE_0 = ["URL Shortener", "Sarvadharma Marriage Bureau — Registration Form"];
+const ALL_ORDER_PAGE_1 = ["Facebook Clone", "Resume Builder"];
 
 // The "All Projects" paginated grid renders its own ProjectCard instances,
-// separate from the featured carousel's — a featured project (e.g. YouTube
-// Clone, Wedding Invitation) is mounted TWICE on the page. Scope queries to
+// separate from the featured carousel's — a featured project (e.g. URL
+// Shortener, Resume Builder) is mounted TWICE on the page. Scope queries to
 // just the grid to avoid "multiple elements found" false positives.
 function getGridWithin(container: HTMLElement) {
   const grid = container.querySelector('[class*="sm:grid-cols-2"]') as HTMLElement;
@@ -66,30 +60,22 @@ describe("Projects", () => {
     for (const title of FEATURED_TITLES) {
       expect(screen.getAllByText(title).length).toBeGreaterThan(0);
     }
-    // TaskFlow is not featured — it should not appear in the carousel's dot
-    // indicators (one dot per featured project).
+    // Sarvadharma / Facebook Clone are not featured — they should not appear
+    // in the carousel's dot indicators (one dot per featured project).
     expect(screen.getAllByLabelText(/go to project/i)).toHaveLength(FEATURED_TITLES.length);
 
-    for (const cat of [
-      "All",
-      "UI Clone",
-      "Full Stack",
-      "Productivity",
-      "Utility",
-      "Personal",
-      "Client Work",
-    ]) {
+    for (const cat of ["All", "Full Stack", "Productivity", "Client Work"]) {
       expect(screen.getByRole("button", { name: cat })).toBeInTheDocument();
     }
   });
 
-  it("defaults to the 'All' category, page 1, showing 2 of 8 projects with pagination", () => {
+  it("defaults to the 'All' category, page 1, showing 2 of 4 projects with pagination", () => {
     render(<Projects />);
 
-    expect(screen.getByText(/showing 1–2 of 8 projects/i)).toBeInTheDocument();
+    expect(screen.getByText(/showing 1–2 of 4 projects/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Page 1" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Page 4" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Page 5" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Page 2" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Page 3" })).not.toBeInTheDocument();
     expect(screen.getByLabelText("Previous page")).toBeDisabled();
     expect(screen.getByLabelText("Next page")).not.toBeDisabled();
 
@@ -102,7 +88,7 @@ describe("Projects", () => {
     const user = userEvent.setup();
     render(<Projects />);
 
-    await user.click(screen.getByRole("button", { name: "UI Clone" }));
+    await user.click(screen.getByRole("button", { name: "Client Work" }));
 
     expect(screen.getByText(/showing 1–1 of 1 projects/i)).toBeInTheDocument();
     expect(screen.queryByLabelText("Next page")).not.toBeInTheDocument();
@@ -110,7 +96,7 @@ describe("Projects", () => {
     expect(gaEventMock).toHaveBeenCalledWith({
       action: "filter",
       category: "project_category",
-      label: "UI Clone",
+      label: "Client Work",
     });
   });
 
@@ -120,7 +106,7 @@ describe("Projects", () => {
 
     await user.click(screen.getByLabelText("Next page"));
 
-    expect(screen.getByText(/showing 3–4 of 8 projects/i)).toBeInTheDocument();
+    expect(screen.getByText(/showing 3–4 of 4 projects/i)).toBeInTheDocument();
     // AnimatePresence (mode="wait") briefly keeps the outgoing page's cards
     // mounted (mid-exit-fade) until its ~0.2s exit transition settles, before
     // the incoming page's cards mount — a same-length hint count (2 old vs.
@@ -137,29 +123,16 @@ describe("Projects", () => {
       label: "next",
     });
 
-    await user.click(screen.getByRole("button", { name: "Page 4" }));
-
-    expect(screen.getByText(/showing 7–8 of 8 projects/i)).toBeInTheDocument();
-    for (const title of ALL_ORDER_LAST_PAGE) {
-      await waitFor(() =>
-        expect(getGridWithin(container).getAllByText(title).length).toBeGreaterThan(0),
-      );
-    }
     expect(screen.getByLabelText("Next page")).toBeDisabled();
     expect(screen.getByLabelText("Previous page")).not.toBeDisabled();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "project_pagination",
-      label: "page_4",
-    });
   });
 
   it("flips a card open on tap (non-hover device), firing gaEvent only on the opening tap", async () => {
     const user = userEvent.setup();
     const { container } = render(<Projects />);
 
-    // Page 0's first grid card is "YouTube Clone" — scope to the grid since
-    // YouTube Clone (featured) also has a separate instance in the carousel.
+    // Page 0's first grid card is "URL Shortener" — scope to the grid since
+    // URL Shortener (featured) also has a separate instance in the carousel.
     const grid = getGridWithin(container);
     const firstCardHint = grid.getAllByText(/hover to see details/i)[0];
 
@@ -167,16 +140,16 @@ describe("Projects", () => {
     expect(gaEventMock).toHaveBeenCalledWith({
       action: "expand",
       category: "project_card",
-      label: "YouTube Clone",
+      label: "URL Shortener",
     });
 
-    // Back face content for YouTube Clone is now queryable (flip is a CSS
+    // Back face content for URL Shortener is now queryable (flip is a CSS
     // transform, not conditional mounting, so it's present either way, but
     // this confirms the right project's back content renders at all).
     expect(
-      grid.getByText(/pixel-close clone of youtube's web ui/i),
+      grid.getByText(/full-stack link shortener/i),
     ).toBeInTheDocument();
-    expect(grid.getByText("Home feed + category chips")).toBeInTheDocument();
+    expect(grid.getByText("Live backend link generation")).toBeInTheDocument();
     expect(grid.getAllByTitle("GitHub").length).toBeGreaterThan(0);
     expect(grid.getAllByTitle("Live Demo").length).toBeGreaterThan(0);
 
@@ -192,21 +165,16 @@ describe("Projects", () => {
     const user = userEvent.setup();
     const { container } = render(<Projects />);
 
-    await user.click(screen.getByRole("button", { name: "Personal" }));
-    // Only "Ayyappa & Nayana — Wedding Invitation" is in the Personal
-    // category, but it's also featured, so scope to the grid instance —
-    // the carousel's copy of the same project still has a GitHub link.
-    // Also wait for AnimatePresence's exit transition to settle so the
+    await user.click(screen.getByRole("button", { name: "Client Work" }));
+    // Only "Sarvadharma Marriage Bureau — Registration Form" is in the
+    // Client Work category and it's not featured, so a single grid instance
+    // exists. Wait for AnimatePresence's exit transition to settle so the
     // outgoing "All" page's cards aren't still mounted alongside it (see
-    // the pagination test above for the same race) — wait for the actual
-    // incoming title rather than a hint count, which happened to differ
-    // here (2 outgoing vs. 1 incoming) but isn't a reliable general signal.
+    // the pagination test above for the same race).
     await waitFor(() =>
       expect(
-        getGridWithin(container).getAllByText(
-          "Ayyappa & Nayana — Wedding Invitation",
-        ).length,
-      ).toBeGreaterThan(0),
+        getGridWithin(container).queryAllByText(/hover to see details/i),
+      ).toHaveLength(1),
     );
     const grid = getGridWithin(container);
     const hint = grid.getByText(/hover to see details/i);

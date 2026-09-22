@@ -15,15 +15,7 @@ import { gaEvent } from "@/lib/gtag";
 import { projects } from "@/lib/projects";
 
 // ─── Project data ─────────────────────────────────────────────────────────────
-const categories = [
-  "All",
-  "UI Clone",
-  "Full Stack",
-  "Productivity",
-  "Utility",
-  "Personal",
-  "Client Work",
-];
+const categories = ["All", "Full Stack", "Productivity", "Client Work"];
 const featuredProjects = projects.filter((p) => p.featured);
 const PROJECTS_PER_PAGE = 2;
 
@@ -433,9 +425,9 @@ export function Projects() {
             Featured Projects
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Real, deployed projects — from UI clones and a client&apos;s
-            matrimony intake form to a full-stack URL shortener. Hover any card
-            to flip it and see the details.
+            Real, deployed projects — from a client&apos;s bilingual
+            matrimony intake form to full-stack apps with real backends.
+            Hover any card to flip it and see the details.
           </p>
         </motion.div>
 
