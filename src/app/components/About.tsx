@@ -165,9 +165,10 @@ const experience = [
     type: "Current",
     period: "2022 – Present",
     highlights: [
-      "Building and maintaining complex React applications — including real-time trading platforms and analytical dashboards with advanced data visualisation.",
-      "Developed a Next.js-based AI-driven application enabling users to query and retrieve detailed insights on specific books and IPC (Indian Penal Code) sections through natural language.",
-      "Currently architecting a mobile application that converts a user's local machine into a virtual development environment — enabling complete developer workflows from mobile, including AI-assisted code changes, commit management, and agent-driven task execution via Claude and OpenCode.",
+      "Built 10X Trade, a Telegram Mini App perpetual-futures trading terminal on the dYdX v4 protocol — a live WebSocket engine streams order-book, fill, and price data into real-time PnL and custom Chart.js charts, with non-custodial Cosmos/Ethereum wallet signing for leveraged order execution.",
+      "Built AskFinance, a RAG-based AI chat app for querying financial and SEC documents in natural language — WebSocket-streamed responses with auto-reconnect, and citation chips that deep-link a synchronised PDF viewer to the exact source page.",
+      "Architecting GRASS, a React Native/Expo mobile app that lets developers remotely drive AI coding agents (Claude Code, OpenCode) on a cloud sandbox or their own machine — hand-rolled SSE streaming, QR-code device pairing, and a real-time tool-use permission approval system for safe autonomous agent actions.",
+      "Built the admin dashboard for Convo, an LLM-agent memory/persistence API — magic-link authentication, infinite-scroll conversation-thread browsing, and full API-key lifecycle management with usage tracking.",
       "Delivered multiple Next.js applications with server-side rendering, performance optimisation, and scalable frontend architecture.",
       "Collaborating within a fully remote, cross-functional team to consistently ship production-grade features across several product lines.",
     ],
@@ -175,8 +176,8 @@ const experience = [
       "React",
       "Next.js",
       "TypeScript",
-      "Styled-components",
-      "React Query",
+      "React Native / Expo",
+      "WebSockets",
       "Tailwind CSS",
     ],
     color: "from-purple-500 to-pink-400",
@@ -528,12 +529,12 @@ export function About() {
                     Revise
                   </span>{" "}
                   in May 2022, where I work as a Frontend Engineer — building
-                  complex React applications including dashboards, trading
-                  platforms, and an AI-driven tool for querying book and IPC
-                  section details. I am currently leading development of a
-                  mobile application that turns a user&apos;s own machine into a
-                  virtual development environment, enabling full developer
-                  workflows entirely from mobile via Claude and OpenCode.
+                  products like 10X Trade (a Telegram Mini App trading terminal
+                  on the dYdX protocol), AskFinance (a RAG AI chat app over
+                  financial documents), and the dashboard for Convo, an
+                  LLM-agent memory API. I&apos;m currently architecting GRASS, a
+                  mobile app that lets developers remotely drive AI coding
+                  agents like Claude Code and OpenCode from their phone.
                 </p>
                 <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
                   I care deeply about{" "}
@@ -579,26 +580,34 @@ export function About() {
                     sub: "Chools — WordPress & e-learning",
                   },
                   {
-                    icon: "📊",
-                    label: "Trading & Dashboard Apps",
-                    sub: "Revise — React, real-time data",
+                    icon: "📈",
+                    label: "Crypto Trading Terminal",
+                    sub: "10X Trade — Telegram Mini App on dYdX",
                   },
                   {
-                    icon: "🤖",
-                    label: "AI-powered Applications",
-                    sub: "Books & IPC section insights tool",
+                    icon: "💬",
+                    label: "AI Document Q&A",
+                    sub: "AskFinance — RAG chat over financial docs",
                   },
                   {
                     icon: "📱",
-                    label: "Mobile Remote Dev Tool",
-                    sub: "Claude & OpenCode via mobile",
+                    label: "Remote AI Dev Agent",
+                    sub: "GRASS — Claude Code & OpenCode, on mobile",
+                  },
+                  {
+                    icon: "🔑",
+                    label: "LLM Memory Dashboard",
+                    sub: "Convo — API keys & conversation threads",
+                    full: true,
                   },
                 ].map((item) => (
                   <motion.div
                     key={item.label}
                     whileHover={{ scale: 1.03, y: -2 }}
                     transition={{ type: "spring", stiffness: 350, damping: 20 }}
-                    className="rounded-xl border border-border bg-card/60 p-3 flex items-start gap-2 shimmer-card cursor-default"
+                    className={`rounded-xl border border-border bg-card/60 p-3 flex items-start gap-2 shimmer-card cursor-default ${
+                      item.full ? "col-span-2" : ""
+                    }`}
                   >
                     <span className="text-lg leading-none mt-0.5">
                       {item.icon}

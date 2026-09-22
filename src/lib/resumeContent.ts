@@ -59,10 +59,11 @@ export const RESUME_EXPERIENCE: {
     org: "Revise — Mumbai, India (Remote)",
     dateLabel: "May 2022 – Present",
     bullets: [
-      "Design and develop complex, reusable React components for enterprise-scale applications, including real-time trading platforms and analytical dashboards with advanced data visualization.",
-      "Built a Next.js AI-driven application enabling natural-language queries over books and IPC (Indian Penal Code) section content.",
-      "Lead architecture of a mobile app that turns a local machine into a virtual dev environment — enabling full developer workflows, including AI-assisted code changes and agent-driven task execution, from mobile.",
-      "Drive frontend architecture decisions and REST API integration with backend teams; improved performance via memoization and reduced bundle size. Mentor junior developers and run code reviews — shipped multiple production releases with zero critical defects.",
+      "Built 10X Trade, a Telegram Mini App perp-futures trading terminal on the dYdX v4 protocol — a live WebSocket engine drives real-time PnL and Chart.js price charts, with non-custodial Cosmos/Ethereum wallet signing for leveraged order execution.",
+      "Built AskFinance, a RAG-based AI chat app for querying financial/SEC documents — WebSocket-streamed responses with auto-reconnect, and citation chips that deep-link a synchronized PDF viewer to the exact source page.",
+      "Architecting GRASS, a React Native/Expo app for remotely driving AI coding agents (Claude Code, OpenCode) — hand-rolled SSE streaming, QR-code device pairing, and real-time tool-use permission approvals.",
+      "Built the dashboard for Convo, an LLM-agent memory/persistence API — magic-link authentication, infinite-scroll thread browsing, and full API-key lifecycle management.",
+      "Drive frontend architecture decisions and REST API integration with backend teams; mentor junior developers and run code reviews — shipped multiple production releases with zero critical defects.",
     ],
   },
   {

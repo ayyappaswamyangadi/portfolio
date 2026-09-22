@@ -22,13 +22,13 @@ const ACCENT = "#5b21b6";
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
     paddingHorizontal: 42,
     fontFamily: "Helvetica",
     fontSize: 10.2,
     color: "#1f2937",
-    lineHeight: 1.3,
+    lineHeight: 1.26,
   },
   header: {
     flexDirection: "row",
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   // separately from the general body-spacing pass below.
   contactLine: { marginBottom: 3 },
   link: { color: ACCENT, fontFamily: "Helvetica-Bold", textDecoration: "none" },
-  section: { marginBottom: 7 },
+  section: { marginBottom: 6 },
   h2: {
     fontSize: 10.2,
     fontFamily: "Helvetica-Bold",
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   bold: { fontFamily: "Helvetica-Bold", color: "#1f2937" },
   skillLine: { marginBottom: 3 },
-  entry: { marginBottom: 6 },
+  entry: { marginBottom: 5 },
   entryHead: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 9.4,
     marginBottom: 3,
   },
-  bulletRow: { flexDirection: "row", marginBottom: 2 },
+  bulletRow: { flexDirection: "row", marginBottom: 1.5 },
   bulletDot: { width: 10, color: ACCENT },
   bulletText: { flex: 1 },
   projLine: { marginBottom: 4 },
