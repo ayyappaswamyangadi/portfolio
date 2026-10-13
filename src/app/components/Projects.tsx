@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
@@ -12,6 +12,7 @@ import {
   ImageOff,
 } from "lucide-react";
 import { gaEvent } from "@/lib/gtag";
+import { useCardTouchScroll } from "@/app/hooks/useCardTouchScroll";
 import { projects } from "@/lib/projects";
 
 // ─── Project data ─────────────────────────────────────────────────────────────
@@ -64,6 +65,11 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
     setCanHover(window.matchMedia("(hover: hover)").matches);
   }, []);
 
+  // Touch: the back face scrolls its own content until it's at the end;
+  // the next swipe past that end goes straight to the page (see hook).
+  const backRef = useRef<HTMLDivElement>(null);
+  useCardTouchScroll(backRef, !canHover);
+
   const handleTap = () => {
     if (canHover) return;
     setFlipped((f) => {
@@ -106,6 +112,7 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
               position: "absolute",
               inset: 0,
               backfaceVisibility: "hidden",
+              pointerEvents: flipped ? "none" : "auto",
             }}
           >
             <div className="relative flex-1 w-full overflow-hidden">
@@ -155,7 +162,7 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
                   {project.title}
                 </h3>
                 <p className="text-xs text-white/70 mt-1">
-                  Hover to see details
+                  {canHover ? "Hover" : "Tap"} to see details
                 </p>
               </div>
             </div>
@@ -163,12 +170,18 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
 
           {/* ── Back: details ── */}
           <div
+            ref={backRef}
             className="project-card project-card-back flex flex-col p-6"
             style={{
               position: "absolute",
               inset: 0,
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
+              // WebKit still hit-tests a backface-hidden face. Unflipped, this
+              // scrollable back sits on top of the front in DOM order, so on
+              // iOS it swallowed vertical swipes over the card. Only the
+              // visible face should receive touches.
+              pointerEvents: flipped ? "auto" : "none",
             }}
           >
             <div className="flex items-start justify-between gap-3 mb-3">
@@ -328,7 +341,11 @@ function FeaturedCarousel() {
           <div
             key={project.id}
             className="featured-card carousel-snap-item"
-            style={{ width: "min(340px, calc(92vw - 3rem))" }}
+            // Sized against the carousel itself (100% = its content box), not
+            // the viewport: the arrow padding around it made `92vw - 3rem`
+            // ~20px wider than the visible area on phones, clipping the
+            // card's right edge.
+            style={{ width: "min(340px, 100%)" }}
           >
             <ProjectCard project={project} />
           </div>

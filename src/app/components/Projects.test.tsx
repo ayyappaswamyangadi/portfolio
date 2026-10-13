@@ -134,7 +134,7 @@ describe("Projects", () => {
     // Page 0's first grid card is "URL Shortener" — scope to the grid since
     // URL Shortener (featured) also has a separate instance in the carousel.
     const grid = getGridWithin(container);
-    const firstCardHint = grid.getAllByText(/hover to see details/i)[0];
+    const firstCardHint = grid.getAllByText(/tap to see details/i)[0];
 
     await user.click(firstCardHint);
     expect(gaEventMock).toHaveBeenCalledWith({
@@ -153,8 +153,12 @@ describe("Projects", () => {
     expect(grid.getAllByTitle("GitHub").length).toBeGreaterThan(0);
     expect(grid.getAllByTitle("Live Demo").length).toBeGreaterThan(0);
 
+    // Once flipped, only the back face takes pointer input (WebKit hit-tests
+    // backface-hidden faces, so the hidden one is pointer-events: none) —
+    // the closing tap lands on the visible back, not the front's hint.
+    expect(firstCardHint).toHaveStyle({ pointerEvents: "none" });
     gaEventMock.mockClear();
-    await user.click(firstCardHint);
+    await user.click(grid.getByText(/full-stack link shortener/i));
     // Closing tap should not re-fire the "expand" event.
     expect(gaEventMock).not.toHaveBeenCalledWith(
       expect.objectContaining({ action: "expand" }),
@@ -173,11 +177,11 @@ describe("Projects", () => {
     // the pagination test above for the same race).
     await waitFor(() =>
       expect(
-        getGridWithin(container).queryAllByText(/hover to see details/i),
+        getGridWithin(container).queryAllByText(/tap to see details/i),
       ).toHaveLength(1),
     );
     const grid = getGridWithin(container);
-    const hint = grid.getByText(/hover to see details/i);
+    const hint = grid.getByText(/tap to see details/i);
     await user.click(hint);
 
     expect(grid.queryByTitle("GitHub")).not.toBeInTheDocument();

@@ -216,6 +216,18 @@ describe("About", () => {
     expect(within(choolsCard).queryByText("Current")).not.toBeInTheDocument();
   });
 
+  it("lists work experience newest first, so the current job is the first card", () => {
+    render(<About />);
+
+    const reviseCard = experienceCardByCompany("Revise");
+    const choolsCard = experienceCardByCompany("Chools Consultancy Services");
+    expect(
+      reviseCard.compareDocumentPosition(choolsCard) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(screen.getByText("Previous role")).toBeInTheDocument();
+  });
+
   it("renders all 4 stat cards with their labels, starting at 0 (suffix always shown)", () => {
     render(<About />);
 

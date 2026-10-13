@@ -139,24 +139,8 @@ const techLogos: { name: string; Icon: IconType; hex: string }[] = [
 const totalExperienceLabel = getTotalExperienceLabel();
 
 // ─── Experience timeline ─────────────────────────────────────────────────────
+// Newest first, so the current role is the first thing visitors see.
 const experience = [
-  {
-    company: "Chools Consultancy Services",
-    role: "Software Developer",
-    duration: `Oct 2020 – Jan 2022  ·  ${formatDuration(CHOOLS_PERIOD.start, CHOOLS_PERIOD.end)}`,
-    location: "Bengaluru, India · Onsite",
-    type: "Full-time",
-    period: "2020 – 2022",
-    highlights: [
-      "Developed and maintained Learning Management System (LMS) websites on WordPress, enabling structured course delivery, learner progress tracking, and administrative management.",
-      "Built and customised WordPress themes and plugins to meet client-specific requirements for e-learning platforms.",
-      "Delivered multiple production websites using pure HTML, CSS, and JavaScript — building responsive, cross-browser-compatible interfaces from scratch.",
-      "Collaborated with clients and design teams to translate wireframes and requirements into polished, functional web pages.",
-    ],
-    tech: ["WordPress", "HTML5", "CSS3", "JavaScript"],
-    color: "from-blue-500 to-cyan-400",
-    dotColor: "bg-blue-500",
-  },
   {
     company: "Revise",
     role: "Frontend Engineer",
@@ -182,6 +166,23 @@ const experience = [
     ],
     color: "from-purple-500 to-pink-400",
     dotColor: "bg-purple-500",
+  },
+  {
+    company: "Chools Consultancy Services",
+    role: "Software Developer",
+    duration: `Oct 2020 – Jan 2022  ·  ${formatDuration(CHOOLS_PERIOD.start, CHOOLS_PERIOD.end)}`,
+    location: "Bengaluru, India · Onsite",
+    type: "Full-time",
+    period: "2020 – 2022",
+    highlights: [
+      "Developed and maintained Learning Management System (LMS) websites on WordPress, enabling structured course delivery, learner progress tracking, and administrative management.",
+      "Built and customised WordPress themes and plugins to meet client-specific requirements for e-learning platforms.",
+      "Delivered multiple production websites using pure HTML, CSS, and JavaScript — building responsive, cross-browser-compatible interfaces from scratch.",
+      "Collaborated with clients and design teams to translate wireframes and requirements into polished, functional web pages.",
+    ],
+    tech: ["WordPress", "HTML5", "CSS3", "JavaScript"],
+    color: "from-blue-500 to-cyan-400",
+    dotColor: "bg-blue-500",
   },
 ];
 
@@ -452,14 +453,17 @@ function TechLogoGrid() {
       className="marquee-wrapper"
       style={{ "--marquee-duration": "36s" } as CSSProperties}
     >
-      <div className="marquee-track gap-3 py-2">
+      {/* Spacing is a per-tile margin rather than a flex `gap`: with gap the
+          track is one gap short of two full sets, so the -50% keyframe landed
+          half a gap off and the loop visibly jumped each cycle. */}
+      <div className="marquee-track py-2">
         {marqueeLogos.map(({ name, Icon, hex }, i) => (
           <motion.div
             key={`${name}-${i}`}
             aria-hidden={i >= techLogos.length}
             whileHover={{ scale: 1.08, y: -3 }}
             transition={{ type: "spring", stiffness: 350, damping: 20 }}
-            className="tech-logo-tile flex flex-col items-center gap-1.5 w-[78px] flex-shrink-0 rounded-xl border border-black/5 bg-white/95 dark:bg-white shadow-sm px-2 py-3 cursor-default"
+            className="tech-logo-tile flex flex-col items-center gap-1.5 w-[78px] mr-3 flex-shrink-0 rounded-xl border border-black/5 bg-white/95 dark:bg-white shadow-sm px-2 py-3 cursor-default"
           >
             <Icon size={26} color={`#${hex}`} aria-hidden="true" />
             <span className="text-[9.5px] font-medium text-gray-600 text-center leading-tight">
@@ -657,7 +661,7 @@ export function About() {
           <div className="relative">
             {/* Vertical connecting line — precisely centered on the 40px dot */}
             <div
-              className="absolute w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-transparent"
+              className="absolute w-0.5 bg-gradient-to-b from-purple-500 via-blue-500 to-transparent"
               style={{ left: "19px", top: "40px", bottom: "2.5rem" }}
             />
 
@@ -756,7 +760,7 @@ export function About() {
                         <div className="w-px h-2 bg-border" />
                       </div>
                       <span className="text-xs text-muted-foreground italic">
-                        Next role
+                        Previous role
                       </span>
                     </div>
                   )}

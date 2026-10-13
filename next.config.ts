@@ -64,7 +64,35 @@ export default withPWA({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
+  // "/" is a fully static page, so precache it instead of the default
+  // "dynamic start URL" route. That default serves the launch page
+  // NetworkFirst with no timeout — on iOS, opening the installed app after a
+  // long gap on a slow/half-dead connection left a blank white screen for
+  // minutes while the service worker waited on the network. Precached, the
+  // app shell opens instantly from the SW (and always matches the JS chunks
+  // precached in the same build); a new deploy is picked up in the
+  // background and shown on the next launch.
+  dynamicStartUrl: false,
+  extendDefaultRuntimeCaching: true,
   workboxOptions: {
     disableDevLogs: true,
+    runtimeCaching: [
+      // Same match as next-pwa's default "pages" entry (which this replaces
+      // by cacheName), plus a network timeout so any other page falls back
+      // to its cached copy quickly instead of hanging on a stalled network.
+      {
+        urlPattern: ({ url: { pathname }, sameOrigin }) =>
+          sameOrigin && !pathname.startsWith("/api/"),
+        handler: "NetworkFirst",
+        options: {
+          cacheName: "pages",
+          networkTimeoutSeconds: 3,
+          expiration: {
+            maxEntries: 32,
+            maxAgeSeconds: 7 * 24 * 60 * 60,
+          },
+        },
+      },
+    ],
   },
 })(nextConfig);

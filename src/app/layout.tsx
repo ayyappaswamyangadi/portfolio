@@ -12,6 +12,7 @@ import { FaviconThemeSync } from "@/app/components/FaviconThemeSync";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
 import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
 import { SplashScreen } from "@/app/components/SplashScreen";
+import { ServiceWorkerUpdater } from "@/app/components/ServiceWorkerUpdater";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
 import { WebVitals } from "@/app/components/WebVitals";
 import { SectionViewTracker } from "@/app/components/SectionViewTracker";
@@ -172,6 +173,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: detectPwaLaunchScript }}
         />
         <SplashScreen />
+        <ServiceWorkerUpdater />
         <StructuredData />
         <GoogleAnalytics />
         <SpeedInsights />
