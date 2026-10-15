@@ -1,6 +1,5 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { About } from "./About";
 
 // About.tsx computes experience durations from the current date rather than
@@ -35,60 +34,6 @@ const totalExperienceLabel = monthsToLabel(
     monthsBetween(REVISE_START, NOW_YM),
 );
 
-// Capture every IntersectionObserver instance constructed during a test —
-// framer-motion's own `whileInView` machinery also constructs real
-// IntersectionObservers (About.tsx has several whileInView wrappers), so we
-// can't assume construction order lines up with AnimatedStat instances.
-// Instead each mock instance records the element(s) passed to `.observe()`,
-// and tests look up "the observer watching the element whose text contains
-// this stat's label" — AnimatedStat's own manual observer targets its
-// `.project-card` wrapper directly, with no ancestor whileInView wrapper
-// around the stats bar, so this lookup is unambiguous.
-type IOInstance = { cb: IntersectionObserverCallback; elements: Element[] };
-let ioInstances: IOInstance[] = [];
-const disconnectSpy = vi.fn();
-
-beforeEach(() => {
-  ioInstances = [];
-  disconnectSpy.mockClear();
-  vi.stubGlobal(
-    "IntersectionObserver",
-    class {
-      private instance: IOInstance;
-      constructor(cb: IntersectionObserverCallback) {
-        this.instance = { cb, elements: [] };
-        ioInstances.push(this.instance);
-      }
-      observe = (el: Element) => this.instance.elements.push(el);
-      unobserve = vi.fn();
-      disconnect = disconnectSpy;
-      takeRecords = () => [];
-      root = null;
-      rootMargin = "";
-      thresholds: number[] = [];
-    },
-  );
-});
-
-function fireIntersectingForLabel(label: string) {
-  const instance = ioInstances.find((i) =>
-    i.elements.some(
-      (el) => el.classList.contains("project-card") && el.textContent?.includes(label),
-    ),
-  );
-  if (!instance) throw new Error(`No IntersectionObserver found watching an element with text "${label}"`);
-  act(() => {
-    instance.cb([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
-  });
-}
-
-// The counter's numeric value and suffix render as separate text nodes
-// inside one .gradient-text div (`{display}{suffix}`), so getByText("0")
-// can't find a whole-node match — read the combined textContent instead.
-function counterText(card: HTMLElement) {
-  return card.querySelector(".gradient-text")?.textContent;
-}
-
 // "Revise" and "Chools Consultancy Services" each appear twice — once in the
 // flowing bio paragraph, once as the experience card's company name (which
 // renders as its own gradient <p>, distinguishable by that class).
@@ -104,19 +49,21 @@ describe("About", () => {
     render(<About />);
 
     expect(screen.getByRole("heading", { name: /about me/i })).toBeInTheDocument();
-    expect(screen.getByText("Ayyappa")).toBeInTheDocument();
-    const roleText = screen.getByText("// Frontend Engineer");
+    expect(screen.getByText("Ayyappa Swamy Angadi")).toBeInTheDocument();
+    const roleText = screen.getByText("Senior Frontend Engineer");
     expect(roleText).toBeInTheDocument();
 
     // Scope to the avatar card — "React"/"Next.js" tech badge text also
     // appears (as exact whole-node matches) in the skills carousel and the
     // Revise experience card's tech list, so an unscoped query is ambiguous.
     const avatarCard = roleText.closest(".glass-card") as HTMLElement;
-    for (const badge of ["React", "Next.js", "TS", "Redux"]) {
+    for (const badge of ["React", "Next.js", "TypeScript", "Tailwind"]) {
       expect(within(avatarCard).getByText(badge)).toBeInTheDocument();
     }
-    expect(within(avatarCard).getByText("Yrs Exp.")).toBeInTheDocument();
+    expect(within(avatarCard).getByText("Years")).toBeInTheDocument();
     expect(within(avatarCard).getByText("Projects")).toBeInTheDocument();
+    expect(within(avatarCard).getByText("What I bring")).toBeInTheDocument();
+    expect(within(avatarCard).getByText("On-site, hybrid or remote")).toBeInTheDocument();
   });
 
   it("renders the About-me bio paragraphs with key facts", () => {
@@ -131,59 +78,92 @@ describe("About", () => {
     expect(screen.getAllByText("Revise").length).toBeGreaterThan(0);
   });
 
-  it("renders all 7 skill groups with their skills", () => {
+  it("renders the skill cards strongest first, with testing and backend marked as beginner", () => {
     render(<About />);
 
     const groups: Record<string, string[]> = {
-      "Core Languages": ["JavaScript (ES2022+)", "TypeScript", "HTML5", "CSS3"],
-      "Frameworks & Libraries": [
-        "React.js",
-        "Next.js",
-        "Redux Toolkit",
-        "React Query",
-        "Styled-Components",
-        "Tailwind CSS",
-      ],
-      "State Management": ["Redux", "Context API", "React Hook Form"],
-      "Tools & DevOps": ["Git", "GitHub Actions", "Webpack", "Vite", "Vercel"],
-      Performance: ["Lighthouse audits", "Code splitting", "Lazy loading", "Web Vitals"],
-      "Backend & APIs (Beginner)": ["Node.js", "Express.js", "REST APIs"],
-      "AI-Augmented Development": [
-        "Claude Code",
-        "AI Pair Programming",
-        "Prompt Engineering",
-        "Agentic Dev Workflows",
-        "AI Code Review",
-      ],
+      Frontend: ["React.js", "Next.js", "TypeScript", "JavaScript (ES6+)", "HTML5", "CSS3"],
+      "Styling & UI": ["Tailwind CSS", "Styled-Components", "Framer Motion"],
+      "State & Data": ["Redux Toolkit", "React Query", "WebSockets", "Server-Sent Events"],
+      Performance: ["Code splitting", "Lazy loading", "Core Web Vitals"],
+      "Tooling & Deployment": ["Git & GitHub", "Vite", "Vercel"],
+      "AI-Assisted Development": ["Claude Code", "Agentic Workflows", "AI Code Review"],
+      Testing: ["Vitest", "React Testing Library"],
+      Backend: ["Node.js", "Express.js"],
     };
 
+    const cards = Array.from(document.querySelectorAll(".skill-card"));
+    expect(cards).toHaveLength(Object.keys(groups).length);
+    expect(cards[0]).toHaveTextContent("Frontend");
+
+    expect(screen.queryByText("Material UI")).not.toBeInTheDocument();
+
     for (const [label, skills] of Object.entries(groups)) {
-      const groupLabel = screen.getByText(label);
-      expect(groupLabel).toBeInTheDocument();
-      const card = groupLabel.closest(".skill-carousel-card") as HTMLElement;
+      const card = screen.getByRole("heading", { name: label }).closest(".skill-card") as HTMLElement;
       expect(card).not.toBeNull();
       for (const skill of skills) {
         expect(within(card).getByText(skill)).toBeInTheDocument();
       }
     }
+
+    for (const label of ["Testing", "Backend"]) {
+      const card = screen.getByRole("heading", { name: label }).closest(".skill-card") as HTMLElement;
+      expect(within(card).getByText("Beginner")).toBeInTheDocument();
+    }
   });
 
-  it("hides the prev arrow initially (scrollLeft=0) and shows the next arrow", () => {
+  it("shows the skills as a horizontally scrollable carousel", () => {
     render(<About />);
-
-    expect(screen.queryByRole("button", { name: /previous skills/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /next skills/i })).toBeInTheDocument();
+    const region = screen.getByRole("region", { name: "Technical skills" });
+    expect(region.querySelector(".carousel-scroll")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Previous skills" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next skills" })).not.toBeDisabled();
   });
 
-  it("scrolling the skills carousel via the next arrow does not throw and triggers scroll behavior", async () => {
-    const user = userEvent.setup();
+  it("auto-advances the skills carousel and pauses while hovered", () => {
+    vi.useFakeTimers();
+    try {
+      render(<About />);
+      const region = screen.getByRole("region", { name: "Technical skills" });
+      const prev = screen.getByRole("button", { name: "Previous skills" });
+      expect(prev).toBeDisabled();
+
+      act(() => {
+        fireEvent.mouseEnter(region);
+      });
+      act(() => {
+        vi.advanceTimersByTime(3500);
+      });
+      expect(prev).toBeDisabled();
+
+      act(() => {
+        fireEvent.mouseLeave(region);
+      });
+      act(() => {
+        vi.advanceTimersByTime(3500);
+      });
+      expect(prev).not.toBeDisabled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("aligns the highlighted project cards' icons with their text", () => {
     render(<About />);
+    const card = screen.getByText("Live on the App Store").closest(".rounded-xl") as HTMLElement;
+    expect(card).toHaveClass("items-center");
+  });
 
-    const scrollBySpy = vi.spyOn(Element.prototype, "scrollBy");
-    await user.click(screen.getByRole("button", { name: /next skills/i }));
+  it("no longer shows the separate stats bar (the profile card has the numbers)", () => {
+    render(<About />);
+    for (const label of ["Years Experience", "Projects Delivered", "Companies Worked", "Tech Stack"]) {
+      expect(screen.queryByText(label)).not.toBeInTheDocument();
+    }
+  });
 
-    expect(scrollBySpy).toHaveBeenCalled();
-    scrollBySpy.mockRestore();
+  it("doesn't claim React Native or Playwright anywhere in the section", () => {
+    const { container } = render(<About />);
+    expect(container).not.toHaveTextContent(/react native|expo|playwright/i);
   });
 
   it("renders both work-experience entries with correct duration/location text", () => {
@@ -193,14 +173,14 @@ describe("About", () => {
     // single space, so the source data's double-spaced " · " reads as a
     // single space here even though the raw string in About.tsx has two.
     expect(screen.getByRole("heading", { name: /software developer/i })).toBeInTheDocument();
-    expect(screen.getByText("Oct 2020 – Jan 2022 · 1 yr 3 months")).toBeInTheDocument();
-    expect(screen.getByText("Bengaluru, India · Onsite")).toBeInTheDocument();
+    const chools = experienceCardByCompany("Chools Consultancy Services");
+    expect(chools).toHaveTextContent("Oct 2020 – Jan 2022 · 1 yr 3 months");
+    expect(chools).toHaveTextContent("Bengaluru, India · Onsite");
 
     expect(screen.getByRole("heading", { name: /frontend engineer/i })).toBeInTheDocument();
-    expect(
-      screen.getByText(`May 2022 – Present · ${reviseDurationLabel}`),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Mumbai, India · Remote")).toBeInTheDocument();
+    const revise = experienceCardByCompany("Revise");
+    expect(revise).toHaveTextContent(`May 2022 – Present · ${reviseDurationLabel}`);
+    expect(revise).toHaveTextContent("Mumbai, India · Remote");
   });
 
   it("shows the 'Current' badge only for the Revise (current) job, not Chools", () => {
@@ -228,54 +208,7 @@ describe("About", () => {
     expect(screen.getByText("Previous role")).toBeInTheDocument();
   });
 
-  it("renders all 4 stat cards with their labels, starting at 0 (suffix always shown)", () => {
-    render(<About />);
-
-    // The suffix ("+" or "") is static and renders immediately — only the
-    // numeric part animates from 0, so "Companies Worked" (no suffix) shows
-    // a bare "0" while the others show "0+".
-    const expected: Record<string, string> = {
-      "Years Experience": "0+",
-      "Projects Delivered": "0+",
-      "Companies Worked": "0",
-      "Tech Stack": "0+",
-    };
-    for (const [label, initial] of Object.entries(expected)) {
-      const card = screen.getByText(label).closest(".project-card") as HTMLElement;
-      expect(counterText(card)).toBe(initial);
-    }
-  });
-
-  it("animates a stat counter up to its target value once its card intersects the viewport", async () => {
-    render(<About />);
-
-    const yearsCard = screen.getByText("Years Experience").closest(".project-card") as HTMLElement;
-    expect(counterText(yearsCard)).toBe("0+");
-
-    fireIntersectingForLabel("Years Experience");
-
-    await waitFor(() => {
-      expect(counterText(yearsCard)).toBe("5+");
-    });
-  });
-
-  it("animates the Tech Stack counter (15+) independently of the other stat cards", async () => {
-    render(<About />);
-
-    const techCard = screen.getByText("Tech Stack").closest(".project-card") as HTMLElement;
-
-    fireIntersectingForLabel("Tech Stack");
-
-    await waitFor(() => {
-      expect(counterText(techCard)).toBe("15+");
-    });
-
-    // A stat card that never intersected stays at 0.
-    const companiesCard = screen.getByText("Companies Worked").closest(".project-card") as HTMLElement;
-    expect(counterText(companiesCard)).toBe("0");
-  });
-
-  it("renders the tech stack logo marquee below the stat cards, with a labeled icon per technology", () => {
+  it("renders the tech stack logo marquee, with a labeled icon per technology", () => {
     render(<About />);
 
     const heading = screen.getByText("Tech I Work With");
@@ -284,20 +217,23 @@ describe("About", () => {
     // Several of these names also appear as plain-text skill pills earlier
     // in the page (e.g. "TypeScript", "Next.js"), so scope the search to the
     // logo grid's own container rather than the whole document.
-    const grid = heading.closest(".mt-12") as HTMLElement;
+    const grid = heading.closest(".mt-16") as HTMLElement;
     expect(grid).not.toBeNull();
 
-    // The marquee track renders each logo twice (a duplicated, aria-hidden
-    // copy back-to-back with the real one) so the CSS loop is seamless.
+    // The marquee track renders each logo twice so the CSS loop is
+    // seamless, but only the first copy's label is real text — the second
+    // copy draws it with CSS (data-label) so the tech list isn't duplicated
+    // in the page's extracted text.
     for (const name of [
       "React",
       "Next.js",
-      "Redux",
+      "Tailwind CSS",
       "Node.js",
       "TypeScript",
       "Claude Code",
     ]) {
-      expect(within(grid).getAllByText(name).length).toBe(2);
+      expect(within(grid).getAllByText(name).length).toBe(1);
+      expect(grid.querySelector(`.marquee-dup-label[data-label="${name}"]`)).not.toBeNull();
     }
 
     // Each logo tile renders an actual SVG icon, not just the text label.

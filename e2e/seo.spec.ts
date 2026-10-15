@@ -3,9 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("SEO essentials", () => {
   test("home page has the expected title and meta description", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/Ayyappa.*Frontend Developer/i);
+    await expect(page).toHaveTitle(/Ayyappa.*Senior Frontend Engineer/i);
     const description = page.locator('meta[name="description"]');
-    await expect(description).toHaveAttribute("content", /Frontend Developer/);
+    await expect(description).toHaveAttribute("content", /Senior Frontend Engineer/);
   });
 
   test("has a single canonical link and JSON-LD structured data", async ({ page }) => {

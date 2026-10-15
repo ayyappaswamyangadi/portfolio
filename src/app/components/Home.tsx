@@ -22,23 +22,21 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { gaEvent } from "@/lib/gtag";
 import { getTotalExperienceLabel } from "@/lib/experience";
+import { useCountUp } from "@/app/hooks/useCountUp";
 import { DownloadCvButton } from "./DownloadCvButton";
+import { DotSeparated } from "./DotSeparated";
 
 // WebGL scene needs the browser's canvas/GL context — load client-only.
 const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
 
 const experienceLabel = getTotalExperienceLabel();
 
-// ─── Roles for typing effect ────────────────────────────────────────────────
+// ─── What I build — cycled by the typing effect ─────────────────────────────
 const roles = [
-  "Frontend Engineer",
-  "React & Next.js Developer",
-  "TypeScript Specialist",
-  "UI Performance Optimizer",
-  "Scalable Frontend Architect",
-  "Component-Driven Developer",
-  "State Management Expert",
-  "Web Performance Enthusiast",
+  "real-time web applications",
+  "AI product experiences",
+  "scalable Next.js applications",
+  "fast, responsive user interfaces",
 ];
 
 // ─── Typing effect hook ─────────────────────────────────────────────────────
@@ -89,37 +87,10 @@ function AnimatedCounter({
   target: number;
   suffix?: string;
 }) {
-  const count = useMotionValue(0);
-  const spring = useSpring(count, { stiffness: 60, damping: 18 });
-  const [display, setDisplay] = useState("0");
-  const ref = useRef<HTMLDivElement>(null);
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          setStarted(true);
-          count.set(target);
-        }
-      },
-      { threshold: 0.5 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [count, target, started]);
-
-  useEffect(() => {
-    return spring.on("change", (v) => {
-      setDisplay(Math.round(v).toString());
-    });
-  }, [spring]);
-
+  const display = useCountUp(target);
   return (
-    <div ref={ref} className="text-xl font-bold gradient-text">
-      {display}
+    <div ref={display.ref} className="text-xl font-bold gradient-text">
+      {display.value}
       {suffix}
     </div>
   );
@@ -146,7 +117,7 @@ const floatingTechs = [
     color: "#e2e8f0",
     bg: "rgba(226,232,240,0.09)",
     cls: "float-c",
-    pos: "bottom-[32%] left-[2%]",
+    pos: "top-[40%] left-[2%]",
   },
   {
     name: "CSS",
@@ -167,7 +138,7 @@ const floatingTechs = [
     color: "#68A063",
     bg: "rgba(104,160,99,0.13)",
     cls: "float-f",
-    pos: "top-[68%] left-[5%]",
+    pos: "top-[60%] left-[4%]",
   },
 ];
 
@@ -188,9 +159,19 @@ const bannerLogos: { name: string; Icon: IconType; hex?: string }[] = [
   { name: "Claude Code", Icon: SiClaudecode, hex: "D97757" },
 ];
 
+// ─── Core stack chips under the job title ───────────────────────────────────
+// Claude Code's mark stands in for "AI-Assisted Development" — the practice,
+// not the tool, is what's being listed here.
+const coreStack: { name: string; Icon: IconType; hex?: string }[] = [
+  { name: "React", Icon: SiReact, hex: "61DAFB" },
+  { name: "Next.js", Icon: SiNextdotjs },
+  { name: "TypeScript", Icon: SiTypescript, hex: "3178C6" },
+  { name: "AI-Assisted Development", Icon: SiClaudecode, hex: "D97757" },
+];
+
 function BannerTechIcons() {
   return (
-    <div className="flex flex-wrap justify-center items-center gap-2.5 sm:gap-3 w-full max-w-sm">
+    <div className="flex flex-wrap justify-center lg:justify-start items-center gap-2.5 sm:gap-3 w-full max-w-sm">
       {bannerLogos.map(({ name, Icon, hex }) => (
         <div
           key={name}
@@ -208,6 +189,33 @@ function BannerTechIcons() {
     </div>
   );
 }
+
+// ─── Hero profile card content ──────────────────────────────────────────────
+const profileFields: {
+  key: string;
+  value: string | string[] | boolean;
+  comment?: string;
+}[] = [
+  { key: "name", value: "Ayyappa Swamy Angadi" },
+  { key: "role", value: "Senior Frontend Engineer" },
+  { key: "experience", value: "5+ years", comment: "2 companies" },
+  { key: "location", value: "Bengaluru, India" },
+  { key: "workMode", value: ["On-site", "Hybrid", "Remote"] },
+  { key: "stack", value: ["React", "Next.js", "TypeScript", "Tailwind"] },
+  {
+    key: "strengths",
+    value: ["Real-time UIs", "AI product interfaces", "Frontend architecture"],
+  },
+  {
+    key: "shipped",
+    value: ["App Store app", "2 Product Hunt launches"],
+  },
+  {
+    key: "youGet",
+    value: ["End-to-end feature ownership", "Production-ready, maintainable code"],
+  },
+  { key: "openToWork", value: true },
+];
 
 // ─── Mac Window Card ─────────────────────────────────────────────────────────
 type TabKey = "profile" | "terminal";
@@ -298,7 +306,7 @@ function MacWindow() {
         rotateY: springY,
         transformStyle: "preserve-3d",
       }}
-      className="mac-window w-full sm:w-[28rem] bg-[#0d1117] text-sm select-none shimmer-card"
+      className="mac-window w-full sm:w-[28rem] bg-[#0d1117] text-sm select-none"
     >
       {/* ── Title bar ── */}
       <div className="flex items-center gap-2 px-4 py-3 bg-[#161b22] border-b border-white/[0.08]">
@@ -342,71 +350,56 @@ function MacWindow() {
         ))}
       </div>
 
-      {/* ── Profile tab ── */}
+      {/* ── Profile tab ──
+          Written so a recruiter can stop here: who, how senior, where and
+          how they'll work, the stack, and what they'd own on day one. */}
       {activeTab === "profile" && (
-        <div className="p-5 font-mono text-[13px] leading-[1.75] overflow-x-auto">
-          <div className="mb-1 text-[#8b949e] text-xs">{"// — My Profile"}</div>
-          <div className="mb-2">
-            <span className="text-[#ff7b72]">import </span>
-            <span className="text-[#79c0ff]">type </span>
-            <span className="text-[#ffa657]">{"{ Developer }"}</span>
-            <span className="text-[#ff7b72]"> from </span>
-            <span className="text-[#a5d6ff]">&apos;./types&apos;</span>
-            <span className="text-[#8b949e]">;</span>
-          </div>
+        <div className="p-5 font-mono text-[12.5px] leading-[1.7]">
+          <div className="mb-1 text-[#8b949e] text-xs">{"// at a glance"}</div>
           <div>
             <span className="text-[#ff7b72]">const </span>
-            <span className="text-[#79c0ff]">me</span>
+            <span className="text-[#79c0ff]">ayyappa</span>
             <span className="text-[#ff7b72]">: </span>
-            <span className="text-[#ffa657]">Developer</span>
+            <span className="text-[#ffa657]">Engineer</span>
             <span className="text-[#8b949e]"> = </span>
             <span className="text-[#e6edf3]">{"{"}</span>
           </div>
-          {[
-            ["name", '"Ayyappa"', "str"],
-            ["role", '"Frontend Engineer"', "str"],
-            ["location", '"Bengaluru, Karnataka, India"', "str"],
-            ["experience", '"5+ Years"', "str"],
-            ["stack", '["React", "Next.js", "TypeScript", "Redux"]', "arr"],
-            ["openToWork", "true", "bool"],
-          ].map(([key, val, type]) => (
-            <div key={key} className="ml-5">
+          {profileFields.map(({ key, value, comment }) => (
+            <div key={key} className="ml-4 pl-4 -indent-4">
               <span className="text-[#7ee787]">{key}</span>
               <span className="text-[#8b949e]">: </span>
-              {type === "str" && <span className="text-[#a5d6ff]">{val}</span>}
-              {type === "bool" && <span className="text-[#ffa657]">{val}</span>}
-              {type === "arr" && (
+              {Array.isArray(value) ? (
                 <>
                   <span className="text-[#e6edf3]">[</span>
-                  {["React", "Next.js", "TypeScript", "Redux"].map(
-                    (s, i, arr) => (
-                      <span key={s}>
-                        <span className="text-[#a5d6ff]">&quot;{s}&quot;</span>
-                        {i < arr.length - 1 && (
-                          <span className="text-[#8b949e]">, </span>
-                        )}
-                      </span>
-                    ),
-                  )}
+                  {value.map((v, i) => (
+                    <span key={v}>
+                      <span className="text-[#a5d6ff]">&quot;{v}&quot;</span>
+                      {i < value.length - 1 && (
+                        <span className="text-[#8b949e]">, </span>
+                      )}
+                    </span>
+                  ))}
                   <span className="text-[#e6edf3]">]</span>
                 </>
+              ) : typeof value === "boolean" ? (
+                <span className="text-[#ffa657]">{String(value)}</span>
+              ) : (
+                <span className="text-[#a5d6ff]">&quot;{value}&quot;</span>
               )}
               <span className="text-[#8b949e]">,</span>
+              {comment && (
+                <span className="text-[#8b949e]">{` // ${comment}`}</span>
+              )}
             </div>
           ))}
           <div>
             <span className="text-[#e6edf3]">{"}"}</span>
             <span className="text-[#8b949e]">;</span>
           </div>
-          <div className="mt-3">
-            <span className="text-[#ff7b72]">export default </span>
-            <span className="text-[#79c0ff]">me</span>
-            <span className="text-[#8b949e]">;</span>
-          </div>
-          <div className="mt-4 flex items-center gap-2 text-xs">
+          <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-[#3fb950]/30 bg-[#3fb950]/10 px-3 py-2 text-xs">
             <span className="w-2 h-2 rounded-full bg-[#3fb950] pulse-badge flex-shrink-0" />
-            <span className="text-[#8b949e]">{"// status: "}</span>
-            <span className="text-[#7ee787]">available for work</span>
+            <span className="text-[#7ee787] font-semibold">Available for work</span>
+            <span className="text-[#8b949e]">— on-site, hybrid or remote</span>
           </div>
         </div>
       )}
@@ -527,95 +520,105 @@ export default function Home() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col gap-6 items-center text-center"
+            className="flex flex-col gap-6 items-center text-center lg:items-start lg:text-left"
           >
             {/* Status badge */}
-            <motion.div
-              variants={itemVariants}
-              className="flex items-center gap-2 w-fit"
-            >
-              <span className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400 glow-pulse">
+            <motion.div variants={itemVariants} className="w-fit">
+              <span className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 pulse-badge" />
-                Available for work
+                <DotSeparated text="Available for work · On-site, hybrid or remote" />
               </span>
             </motion.div>
 
-            {/* Greeting + name */}
-            <motion.div variants={itemVariants}>
-              <p className="text-muted-foreground text-lg font-medium flex items-center gap-2 justify-center">
-                Hi there
-                <span className="inline-block animate-[wiggle_1s_ease-in-out_infinite]">
-                  👋
-                </span>
-              </p>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mt-1 leading-[1.05]">
+            {/* Name + positioning headline — static, the first thing read */}
+            <motion.div variants={itemVariants} className="flex flex-col gap-3">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
                 I&apos;m <span className="gradient-text">Ayyappa</span>
                 <span className="sr-only">
-                  {" "}— Frontend Developer, Web Developer &amp; React/Next.js
-                  Engineer
+                  {" "}— Senior Frontend Engineer (React, Next.js, TypeScript)
                 </span>
               </h1>
+              <p className="text-xl sm:text-2xl font-semibold text-foreground">
+                Senior Frontend Engineer
+              </p>
+              <ul
+                aria-label="Core stack"
+                className="flex flex-wrap justify-center lg:justify-start gap-2"
+              >
+                {coreStack.map(({ name, Icon, hex }) => (
+                  <li
+                    key={name}
+                    className="flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm sm:text-base font-bold text-foreground shadow-sm"
+                  >
+                    <Icon
+                      size={16}
+                      className={!hex ? "text-foreground" : undefined}
+                      style={hex ? { color: `#${hex}` } : undefined}
+                      aria-hidden="true"
+                    />
+                    {name}
+                  </li>
+                ))}
+              </ul>
             </motion.div>
 
-            {/* Typing role */}
+            {/* Typing — what I build */}
             <motion.div
               variants={itemVariants}
-              className="text-xl sm:text-2xl font-semibold text-muted-foreground"
+              className="text-lg sm:text-xl font-semibold text-muted-foreground min-h-[1.75rem]"
             >
-              <span className="text-foreground">I am a </span>
+              <span className="text-foreground">I build </span>
               <span className="text-primary" aria-hidden="true">
                 {typedRole}
               </span>
               <span className="cursor-blink text-primary" aria-hidden="true" />
               <span className="sr-only">
-                Frontend Engineer, React &amp; Next.js Developer, TypeScript
-                Specialist, UI Performance Optimizer, Scalable Frontend
-                Architect
+                real-time web applications, AI product experiences, scalable
+                Next.js applications and fast, responsive user interfaces
               </span>
             </motion.div>
 
             {/* Short bio */}
             <motion.p
               variants={itemVariants}
-              className="text-muted-foreground leading-relaxed max-w-md"
+              className="text-muted-foreground leading-relaxed max-w-lg"
             >
-              I&apos;m a{" "}
+              5+ years building production web and mobile products
+              across startups and client work — from{" "}
               <span className="text-foreground font-medium">
-                Frontend Engineer
+                real-time trading and streaming AI interfaces
               </span>{" "}
-              and{" "}
+              to{" "}
               <span className="text-foreground font-medium">
-                Web Developer
+                learning platforms and business websites
+              </span>
+              . I own features end to end, from architecture and API contracts
+              to polished, responsive UI, and ship code that stays{" "}
+              <span className="text-foreground font-medium">
+                fast and maintainable
               </span>{" "}
-              crafting pixel-perfect, performant web experiences with{" "}
-              <span className="text-foreground font-medium">React</span>,{" "}
-              <span className="text-foreground font-medium">Next.js</span>,{" "}
-              <span className="text-foreground font-medium">JavaScript</span>{" "}
-              &amp;{" "}
-              <span className="text-foreground font-medium">TypeScript</span>.
-              5+ years turning ideas into scalable, optimised, delightful UIs
-              with strong problem-solving.
+              as the product grows.
             </motion.p>
 
             {/* Meta info */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground justify-center"
+              className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground justify-center lg:justify-start"
             >
               <span className="icon-mappin flex items-center gap-1.5">
                 <MapPin size={14} className="text-primary" />
-                Bengaluru, Karnataka, India
+                Bengaluru, India
               </span>
-              <span className="icon-briefcase flex items-center gap-2 text-lg sm:text-xl font-bold text-foreground">
-                <Briefcase size={18} className="text-primary" />
-                {experienceLabel} Experience
+              <span className="icon-briefcase flex items-center gap-1.5 font-semibold text-foreground">
+                <Briefcase size={14} className="text-primary" />
+                {experienceLabel} of experience
               </span>
             </motion.div>
 
             {/* CTA buttons */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-3 pt-2 justify-center"
+              className="flex flex-wrap gap-3 justify-center lg:justify-start"
             >
               <Link
                 href="#contact"
@@ -635,7 +638,7 @@ export default function Home() {
             {/* Quick stats */}
             <motion.div
               variants={itemVariants}
-              className="grid grid-cols-3 gap-3 w-full max-w-sm pt-1"
+              className="grid grid-cols-3 gap-3 w-full max-w-sm"
             >
               {[
                 { value: 5, suffix: "+", label: "Years Exp." },
@@ -644,7 +647,7 @@ export default function Home() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-xl border border-border bg-card/60 p-3 text-center shimmer-card"
+                  className="rounded-xl border border-border bg-card/60 p-3 text-center"
                 >
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                   <div className="text-[11px] text-muted-foreground mt-0.5">
@@ -655,7 +658,10 @@ export default function Home() {
             </motion.div>
 
             {/* Tech icon strip (icons only, static, theme-aware) */}
-            <motion.div variants={itemVariants} className="flex justify-center w-full pt-1">
+            <motion.div
+              variants={itemVariants}
+              className="flex justify-center lg:justify-start w-full"
+            >
               <BannerTechIcons />
             </motion.div>
           </motion.div>

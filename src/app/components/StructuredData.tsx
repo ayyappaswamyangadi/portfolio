@@ -1,4 +1,4 @@
-import { projects } from "@/lib/projects";
+import { projects, primaryLink } from "@/lib/projects";
 
 const siteUrl = "https://www.ayyappa.dev";
 
@@ -18,9 +18,9 @@ const structuredData = {
       alternateName: "Ayyappa",
       url: siteUrl,
       image: `${siteUrl}/opengraph-image`,
-      jobTitle: "Frontend Developer",
+      jobTitle: "Senior Frontend Engineer",
       description:
-        "Frontend Developer & Web Developer with 5+ years of experience, including 4+ years building production React.js and Next.js applications. Specialized in scalable, high-performance frontend architecture using React, JavaScript (ES6+) and TypeScript.",
+        "Senior Frontend Engineer with 5+ years of experience shipping production React, Next.js and TypeScript products — including Grass: Code Agent Computer (App Store) and the AI products TaxAI and Convo. Specialized in real-time interfaces, streaming AI UX and complex client state.",
       sameAs: [
         "https://github.com/ayyappaswamyangadi",
         "https://linkedin.com/in/ayyappaswamyangadi",
@@ -49,19 +49,18 @@ const structuredData = {
         // State & forms
         "Redux", "Redux Toolkit", "React Hook Form", "Zod",
         // UI & styling
-        "Tailwind CSS", "Material UI", "Bootstrap", "Styled-Components",
+        "Tailwind CSS", "Bootstrap", "Styled-Components",
         "Framer Motion", "Responsive Web Design", "Cross-Browser Compatibility",
-        // Data & APIs
-        "RESTful APIs", "Axios", "Fetch API",
+        // Data, real-time & APIs
+        "WebSockets", "Server-Sent Events", "RESTful APIs", "React Query",
         // Performance
         "Performance Optimization", "Code Splitting", "Lazy Loading", "Web Vitals",
         // Tooling & workflow
         "Webpack", "Vite", "Babel", "Git", "GitHub",
         "CI/CD Pipelines", "Agile", "Scrum",
         // Domain experience
-        "Web3.js", "Ethers.js", "MetaMask Integration",
-        "Enterprise Dashboards", "Real-Time Trading Platforms",
-        "AI-Powered Applications",
+        "Real-Time Trading Platforms", "dYdX", "Telegram Mini Apps",
+        "Ethers.js", "AI Product Interfaces", "AI-Assisted Development",
       ],
     },
     {
@@ -70,7 +69,7 @@ const structuredData = {
       url: siteUrl,
       name: "Ayyappa Portfolio",
       description:
-        "Portfolio of Ayyappa Swamy Angadi — Frontend Developer & Web Developer specializing in React.js, Next.js and TypeScript.",
+        "Portfolio of Ayyappa Swamy Angadi — Senior Frontend Engineer specializing in React, Next.js and TypeScript.",
       inLanguage: "en-US",
       publisher: { "@id": `${siteUrl}#person` },
     },
@@ -112,7 +111,7 @@ const structuredData = {
           "@type": "SoftwareSourceCode",
           name: p.title,
           description: p.description,
-          url: p.liveUrl,
+          ...(primaryLink(p) && { url: primaryLink(p)!.url }),
           ...(p.githubUrl && { codeRepository: p.githubUrl }),
           keywords: p.tech.join(", "),
           author: { "@id": `${siteUrl}#person` },

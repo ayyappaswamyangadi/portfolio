@@ -5,6 +5,7 @@ import {
   Text,
   Link,
   StyleSheet,
+  Font,
 } from "@react-pdf/renderer";
 import type { ReactNode } from "react";
 import {
@@ -13,12 +14,17 @@ import {
   RESUME_EXPERIENCE,
   RESUME_PROJECTS,
   RESUME_EDUCATION,
+  resumeSummary,
 } from "@/lib/resumeContent";
 
 // Standard PDF base-14 fonts (Helvetica family) — always available without
 // Font.register, and reliably parsed by ATS software since there's no
 // embedded/custom font to fail to extract.
 const ACCENT = "#5b21b6";
+
+// react-pdf hyphenates long words at line ends by default ("PIN-pro-tected"),
+// which splits keywords in ATS text extraction — keep every word whole.
+Font.registerHyphenationCallback((word) => [word]);
 
 const styles = StyleSheet.create({
   page: {
@@ -39,6 +45,7 @@ const styles = StyleSheet.create({
     paddingBottom: 7,
     marginBottom: 9,
   },
+  headerMain: { flex: 1, paddingRight: 16 },
   name: {
     fontSize: 20,
     fontFamily: "Helvetica-Bold",
@@ -52,6 +59,7 @@ const styles = StyleSheet.create({
     color: ACCENT,
   },
   contact: {
+    flexShrink: 0,
     textAlign: "right",
     fontSize: 9,
     color: "#4b5563",
@@ -124,7 +132,7 @@ export function ResumeDocument({
       <Page size="A4" style={styles.page}>
         {/* ── Header ── */}
         <View style={styles.header}>
-          <View>
+          <View style={styles.headerMain}>
             <Text style={styles.name}>{RESUME_CONTACT.name}</Text>
             <Text style={styles.title}>{RESUME_CONTACT.title}</Text>
           </View>
@@ -153,23 +161,16 @@ export function ResumeDocument({
         <View style={styles.section}>
           <Text style={styles.h2}>Professional Summary</Text>
           <Text>
-            Frontend Engineer with{" "}
-            <Text style={styles.bold}>
-              {totalExperienceLabel} of web development experience
-            </Text>
-            , including{" "}
-            <Text style={styles.bold}>
-              {reviseDurationLabel} building production React.js and Next.js
-              applications
-            </Text>{" "}
-            — from real-time trading platforms and enterprise dashboards to
-            AI-driven tools. Since <Text style={styles.bold}>April 2026</Text>,
-            integrates <Text style={styles.bold}>Claude Code</Text> into a daily
-            AI-augmented development workflow, directing agentic
-            pair-programming for scaffolding, refactors, and tests while owning
-            every architecture and code-quality decision. Delivers
-            production-grade features within fully remote, cross-functional
-            Agile teams.
+            {resumeSummary(totalExperienceLabel, reviseDurationLabel).map(
+              (seg, i) =>
+                seg.bold ? (
+                  <Text key={i} style={styles.bold}>
+                    {seg.text}
+                  </Text>
+                ) : (
+                  seg.text
+                ),
+            )}
           </Text>
         </View>
 
@@ -202,7 +203,7 @@ export function ResumeDocument({
 
         {/* ── Projects ── */}
         <View style={styles.section}>
-          <Text style={styles.h2}>Projects</Text>
+          <Text style={styles.h2}>Selected Projects</Text>
           {RESUME_PROJECTS.map((p) => (
             <Text key={p.name} style={styles.projLine}>
               <Text style={styles.projHead}>{p.name}</Text> —{" "}

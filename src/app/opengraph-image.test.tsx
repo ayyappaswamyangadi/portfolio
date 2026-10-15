@@ -6,7 +6,7 @@ describe("opengraph-image constants", () => {
     expect(size).toEqual({ width: 1200, height: 630 });
     expect(contentType).toBe("image/png");
     expect(alt).toMatch(/Ayyappa/);
-    expect(alt).toMatch(/Frontend Developer/);
+    expect(alt).toMatch(/Senior Frontend Engineer/);
   });
 });
 

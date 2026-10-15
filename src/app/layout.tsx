@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { Navbar } from "@/app/components/Navbar";
 import { Footer } from "@/app/components/Footer";
 import { ScrollProgress } from "@/app/components/ScrollProgress";
-import { CursorGlow } from "@/app/components/CursorGlow";
 import { FaviconThemeSync } from "@/app/components/FaviconThemeSync";
+import { CursorGlow } from "@/app/components/CursorGlow";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
 import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
 import { SplashScreen } from "@/app/components/SplashScreen";
@@ -48,11 +48,11 @@ const siteUrl = "https://www.ayyappa.dev";
 // the exact phrases recruiters/search actually use — "Frontend Developer",
 // "React.js", "Next.js", "Web Developer" — up front rather than buried.
 const siteTitle =
-  "Ayyappa | Frontend Developer, React.js & Next.js Web Developer";
+  "Ayyappa | Senior Frontend Engineer — React, Next.js, TypeScript";
 // Description kept under ~160 chars so it doesn't get cut mid-sentence in
 // search results, with the highest-value keywords front-loaded.
 const siteDescription =
-  "Ayyappa Swamy Angadi — Frontend Developer & Web Developer with 5+ years building fast, scalable web apps using React.js, Next.js, TypeScript & JavaScript.";
+  "Ayyappa Swamy Angadi — Senior Frontend Engineer with 5+ years building React, Next.js and TypeScript products, including an App Store app and AI tools.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -67,7 +67,8 @@ export const metadata: Metadata = {
   // actual skill set rather than generic frontend buzzwords.
   keywords: [
     // Roles / titles
-    "Frontend Developer", "Frontend Engineer", "Web Developer",
+    "Senior Frontend Engineer", "Frontend Developer", "Frontend Engineer",
+    "Web Developer",
     "React Developer", "React.js Developer", "Next.js Developer",
     "JavaScript Developer", "TypeScript Developer",
     // Core stack
@@ -76,17 +77,18 @@ export const metadata: Metadata = {
     // State & forms
     "Redux", "Redux Toolkit", "React Hook Form", "Zod",
     // UI & styling
-    "Tailwind CSS", "Material UI", "Bootstrap", "Styled-Components",
+    "Tailwind CSS", "Bootstrap", "Styled-Components",
     "Framer Motion", "Responsive Web Design", "Cross-Browser Compatibility",
-    // Data & APIs
-    "RESTful APIs", "Axios", "Fetch API",
+    // Data, real-time & APIs
+    "WebSockets", "Server-Sent Events", "RESTful APIs", "React Query",
     // Performance
     "Performance Optimization", "Code Splitting", "Lazy Loading", "Web Vitals",
     // Tooling & workflow
     "Webpack", "Vite", "Babel", "Git", "GitHub", "CI/CD", "Agile", "Scrum",
     // Notable project domains
-    "Web3.js", "Ethers.js", "MetaMask Integration",
-    "Enterprise Dashboards", "Real-Time Trading Platforms", "AI-Powered Applications",
+    "Real-Time Trading Platforms", "dYdX", "Telegram Mini Apps", "Ethers.js",
+    "AI Product Interfaces", "Streaming AI UX", "AI-Assisted Development",
+    "Claude Code",
     // Brand / location
     "Scalable Web Applications", "Portfolio", "Ayyappa",
     "Ayyappa Swamy Angadi", "Bengaluru", "Remote Frontend Engineer",

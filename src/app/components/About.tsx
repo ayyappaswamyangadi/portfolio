@@ -1,31 +1,36 @@
 "use client";
 
 import {
-  useRef,
-  useState,
   useCallback,
   useEffect,
+  useRef,
+  useState,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import Image from "next/image";
-import {
-  motion,
-  type Variants,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+import { DotSeparated } from "./DotSeparated";
 import {
   Code2,
   Layers,
-  Terminal,
   GitBranch,
-  Box,
   Zap,
+  Gauge,
   Building2,
   Calendar,
+  Sparkles,
+  Smartphone,
+  Palette,
+  Server,
+  FlaskConical,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
+  Scale,
+  Database,
+  TrendingUp,
+  MapPin,
+  CheckCircle2,
 } from "lucide-react";
 import {
   SiJavascript,
@@ -57,59 +62,54 @@ import {
 } from "@/lib/experience";
 
 // ─── Skills data ─────────────────────────────────────────────────────────────
-const skillGroups = [
+// Strongest first. Testing and backend are listed honestly as beginner skills.
+const skillGroups: {
+  label: string;
+  icon: ReactNode;
+  skills: string[];
+  level?: string;
+}[] = [
   {
-    label: "Core Languages",
-    icon: <Code2 size={16} />,
-    skills: ["JavaScript (ES2022+)", "TypeScript", "HTML5", "CSS3"],
-  },
-  {
-    label: "Frameworks & Libraries",
+    label: "Frontend",
     icon: <Layers size={16} />,
-    skills: [
-      "React.js",
-      "Next.js",
-      "Redux Toolkit",
-      "React Query",
-      "Styled-Components",
-      "Tailwind CSS",
-    ],
+    skills: ["React.js", "Next.js", "TypeScript", "JavaScript (ES6+)", "HTML5", "CSS3"],
   },
   {
-    label: "State Management",
-    icon: <Box size={16} />,
-    skills: ["Redux", "Context API", "React Hook Form"],
+    label: "Styling & UI",
+    icon: <Palette size={16} />,
+    skills: ["Tailwind CSS", "Styled-Components", "Framer Motion", "Responsive Design"],
   },
   {
-    label: "Tools & DevOps",
-    icon: <GitBranch size={16} />,
-    skills: ["Git", "GitHub Actions", "Webpack", "Vite", "Vercel"],
+    label: "State & Data",
+    icon: <Zap size={16} />,
+    skills: ["Redux Toolkit", "React Query", "Context API", "React Hook Form", "Zod", "REST APIs", "WebSockets", "Server-Sent Events"],
   },
   {
     label: "Performance",
-    icon: <Zap size={16} />,
-    skills: [
-      "Lighthouse audits",
-      "Code splitting",
-      "Lazy loading",
-      "Web Vitals",
-    ],
+    icon: <Gauge size={16} />,
+    skills: ["Code splitting", "Lazy loading", "Memoization", "Bundle optimization", "Core Web Vitals"],
   },
   {
-    label: "Backend & APIs (Beginner)",
-    icon: <Terminal size={16} />,
-    skills: ["Node.js", "Express.js", "REST APIs"],
+    label: "Tooling & Deployment",
+    icon: <GitBranch size={16} />,
+    skills: ["Git & GitHub", "Vite", "Webpack", "npm", "Vercel"],
   },
   {
-    label: "AI-Augmented Development",
+    label: "AI-Assisted Development",
     icon: <Sparkles size={16} />,
-    skills: [
-      "Claude Code",
-      "AI Pair Programming",
-      "Prompt Engineering",
-      "Agentic Dev Workflows",
-      "AI Code Review",
-    ],
+    skills: ["Claude Code", "Agentic Workflows", "AI Code Review", "Prompt Engineering"],
+  },
+  {
+    label: "Testing",
+    icon: <FlaskConical size={16} />,
+    skills: ["Vitest", "React Testing Library"],
+    level: "Beginner",
+  },
+  {
+    label: "Backend",
+    icon: <Server size={16} />,
+    skills: ["Node.js", "Express.js"],
+    level: "Beginner",
   },
 ];
 
@@ -149,20 +149,19 @@ const experience = [
     type: "Current",
     period: "2022 – Present",
     highlights: [
-      "Built 10X Trade, a Telegram Mini App perpetual-futures trading terminal on the dYdX v4 protocol — a live WebSocket engine streams order-book, fill, and price data into real-time PnL and custom Chart.js charts, with non-custodial Cosmos/Ethereum wallet signing for leveraged order execution.",
-      "Built AskFinance, a RAG-based AI chat app for querying financial and SEC documents in natural language — WebSocket-streamed responses with auto-reconnect, and citation chips that deep-link a synchronised PDF viewer to the exact source page.",
-      "Architecting GRASS, a React Native/Expo mobile app that lets developers remotely drive AI coding agents (Claude Code, OpenCode) on a cloud sandbox or their own machine — hand-rolled SSE streaming, QR-code device pairing, and a real-time tool-use permission approval system for safe autonomous agent actions.",
-      "Built the admin dashboard for Convo, an LLM-agent memory/persistence API — magic-link authentication, infinite-scroll conversation-thread browsing, and full API-key lifecycle management with usage tracking.",
-      "Delivered multiple Next.js applications with server-side rendering, performance optimisation, and scalable frontend architecture.",
-      "Collaborating within a fully remote, cross-functional team to consistently ship production-grade features across several product lines.",
+      "Grass: Code Agent Computer (live on the App Store) — built the app that lets developers run and steer Claude Code and OpenCode sessions from their phone: resumable streaming chat that survives backgrounding and dropped networks, a queue for approving agent tool calls with push notifications, and one-tap switching between machines. My first project built with AI-assisted development (Claude Code).",
+      "10X Trade — built the trading interface for leveraged crypto futures inside a Telegram Mini App: live WebSocket market data driving real-time profit-and-loss and charts, and orders signed on the user's device.",
+      "TaxAI (launched on Product Hunt) — built the research interface for chartered accountants: answers stream in beside the source Act, and every citation jumps to the exact section or proviso and highlights it, so answers can be verified instead of trusted blindly.",
+      "Convo (launched on Product Hunt) — built the developer dashboard for an LLM-memory SDK: magic-link sign-in, an infinite-scroll thread explorer with expandable messages and metadata, and API key management.",
+      "Own frontend architecture and API contracts with backend engineers, and review code across the team.",
     ],
     tech: [
       "React",
       "Next.js",
       "TypeScript",
-      "React Native / Expo",
-      "WebSockets",
+      "WebSockets / SSE",
       "Tailwind CSS",
+      "Styled-Components",
     ],
     color: "from-purple-500 to-pink-400",
     dotColor: "bg-purple-500",
@@ -175,10 +174,9 @@ const experience = [
     type: "Full-time",
     period: "2020 – 2022",
     highlights: [
-      "Developed and maintained Learning Management System (LMS) websites on WordPress, enabling structured course delivery, learner progress tracking, and administrative management.",
-      "Built and customised WordPress themes and plugins to meet client-specific requirements for e-learning platforms.",
-      "Delivered multiple production websites using pure HTML, CSS, and JavaScript — building responsive, cross-browser-compatible interfaces from scratch.",
-      "Collaborated with clients and design teams to translate wireframes and requirements into polished, functional web pages.",
+      "Built and maintained chools.in, the company's WordPress learning and consulting platform — course catalog, consulting programme pages, learner registration and login, and course checkout.",
+      "Customised WordPress themes and plugins to fit client-specific e-learning requirements.",
+      "Delivered responsive, cross-browser websites in HTML, CSS and JavaScript from client wireframes.",
     ],
     tech: ["WordPress", "HTML5", "CSS3", "JavaScript"],
     color: "from-blue-500 to-cyan-400",
@@ -196,16 +194,6 @@ const fadeUp: Variants = {
   },
 };
 
-const staggerContainer: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const staggerItem: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.35 } },
-};
-
 // ─── Developer Avatar ─────────────────────────────────────────────────────────
 function DeveloperAvatar() {
   return (
@@ -214,7 +202,7 @@ function DeveloperAvatar() {
       whileInView={{ opacity: 1, scale: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
       viewport={{ once: true }}
-      className="relative flex-shrink-0 w-full max-w-xs sm:max-w-sm md:w-56 lg:w-64 mx-auto md:mx-0 self-center md:self-start"
+      className="relative flex-shrink-0 w-full max-w-xs sm:max-w-sm md:w-64 lg:w-72 mx-auto md:mx-0 self-center md:self-start"
     >
       {/* Glow */}
       <div
@@ -235,7 +223,7 @@ function DeveloperAvatar() {
         </div>
 
         {/* Avatar area */}
-        <div className="bg-gradient-to-b from-[#0d1117] to-[#161b22] p-6 flex flex-col items-center gap-4">
+        <div className="bg-gradient-to-b from-[#0d1117] to-[#161b22] p-5 flex flex-col items-center gap-4 text-left">
           {/* Profile photo */}
           <div className="relative">
             <div
@@ -244,7 +232,7 @@ function DeveloperAvatar() {
             >
               <Image
                 src="/assets/images/avatar-headshot.jpg"
-                alt="Ayyappa Swamy, Frontend Engineer"
+                alt="Ayyappa Swamy Angadi, Senior Frontend Engineer"
                 width={200}
                 height={200}
                 className="w-full h-full rounded-full object-cover border-2 border-[#0d1117]"
@@ -257,38 +245,91 @@ function DeveloperAvatar() {
 
           {/* Name + role */}
           <div className="text-center">
-            <p className="font-bold text-sm text-[#e6edf3]">Ayyappa</p>
-            <p className="text-[11px] font-mono text-[#7ee787] mt-0.5">
-              {"// Frontend Engineer"}
+            <p className="font-bold text-base text-[#e6edf3]">
+              Ayyappa Swamy Angadi
+            </p>
+            <p className="text-xs font-semibold text-[#7ee787] mt-0.5">
+              Senior Frontend Engineer
+            </p>
+            <p className="mt-1.5 flex items-center justify-center gap-1 text-[11px] text-[#8b949e]">
+              <MapPin size={11} aria-hidden="true" />
+              Bengaluru, India
             </p>
           </div>
 
-          {/* Tech badges */}
-          <div className="flex flex-wrap gap-1.5 justify-center">
-            {["React", "Next.js", "TS", "Redux"].map((s) => (
-              <span
-                key={s}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-[#79c0ff] border border-primary/25 font-mono"
+          {/* Stats row */}
+          <div className="w-full grid grid-cols-3 gap-2">
+            {[
+              { value: "5+", label: "Years", color: "text-[#ffa657]" },
+              { value: "10+", label: "Projects", color: "text-[#7ee787]" },
+              { value: "2", label: "Companies", color: "text-[#79c0ff]" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-lg bg-white/[0.04] border border-white/[0.06] p-2 text-center"
               >
-                {s}
-              </span>
+                <div className={`text-base font-bold ${stat.color}`}>
+                  {stat.value}
+                </div>
+                <div className="text-[10px] text-[#8b949e] leading-tight">
+                  {stat.label}
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Stats row */}
-          <div className="w-full grid grid-cols-2 gap-2 pt-1">
-            <div className="rounded-lg bg-white/[0.04] border border-white/[0.06] p-2 text-center">
-              <div className="text-base font-bold text-[#ffa657]">5+</div>
-              <div className="text-[9px] text-[#8b949e] leading-tight">
-                Yrs Exp.
-              </div>
+          {/* Core stack */}
+          <div className="w-full">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8b949e]">
+              Core stack
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {["React", "Next.js", "TypeScript", "Tailwind", "Redux"].map((s) => (
+                <span
+                  key={s}
+                  className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-primary/15 text-[#79c0ff] border border-primary/25"
+                >
+                  {s}
+                </span>
+              ))}
             </div>
-            <div className="rounded-lg bg-white/[0.04] border border-white/[0.06] p-2 text-center">
-              <div className="text-base font-bold text-[#7ee787]">10+</div>
-              <div className="text-[9px] text-[#8b949e] leading-tight">
-                Projects
-              </div>
-            </div>
+          </div>
+
+          {/* What a team gets */}
+          <div className="w-full">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#8b949e]">
+              What I bring
+            </p>
+            <ul className="space-y-1.5">
+              {[
+                "End-to-end ownership, from architecture to release",
+                "Real-time, streaming and AI-powered interfaces",
+                "Fast, responsive, maintainable UI code",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-1.5 text-[11.5px] leading-snug text-[#c9d1d9]"
+                >
+                  <CheckCircle2
+                    size={12}
+                    className="mt-[2px] flex-shrink-0 text-[#7ee787]"
+                    aria-hidden="true"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Availability */}
+          <div className="w-full rounded-lg border border-[#3fb950]/30 bg-[#3fb950]/10 px-3 py-2 text-center">
+            <p className="flex items-center justify-center gap-1.5 text-[11.5px] font-semibold text-[#7ee787]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3fb950] pulse-badge" />
+              Available for work
+            </p>
+            <p className="text-[10.5px] text-[#8b949e] mt-0.5">
+              On-site, hybrid or remote
+            </p>
           </div>
         </div>
       </div>
@@ -296,144 +337,153 @@ function DeveloperAvatar() {
   );
 }
 
-// ─── Skills Carousel ─────────────────────────────────────────────────────────
+// ─── Skills carousel ─────────────────────────────────────────────────────────
+// Horizontally scrollable cards that auto-advance one card at a time and loop
+// back to the start. Autoplay pauses while the pointer, keyboard focus or a
+// finger is on the carousel, so it never moves under someone reading it. The
+// dots track real scroll positions (one per reachable position), so the last
+// dot lights up at the end.
+const SKILL_GAP_PX = 20;
+const SKILL_AUTOPLAY_MS = 3000;
+
 function SkillsCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
+  const [perView, setPerView] = useState(1);
+  const [index, setIndex] = useState(0);
+  const positions = Math.max(1, skillGroups.length - perView + 1);
+  const current = Math.min(index, positions - 1);
 
-  const updateArrows = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setAtStart(el.scrollLeft <= 8);
-    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 8);
+  const step = useCallback(() => {
+    const card = scrollRef.current?.querySelector<HTMLElement>(".skill-card");
+    return (card?.offsetWidth ?? 0) + SKILL_GAP_PX;
   }, []);
 
-  const scroll = (dir: number) => {
+  const measure = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const firstCard = el.querySelector<HTMLElement>(".skill-carousel-card");
-    const cardW = (firstCard?.offsetWidth ?? 288) + 20;
-    el.scrollBy({ left: dir * cardW, behavior: "smooth" });
-  };
+    const s = step();
+    if (s <= SKILL_GAP_PX) return;
+    setPerView(Math.max(1, Math.floor((el.clientWidth + SKILL_GAP_PX) / s)));
+    const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 8;
+    setIndex(atEnd ? Number.MAX_SAFE_INTEGER : Math.round(el.scrollLeft / s));
+  }, [step]);
+
+  useEffect(() => {
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [measure]);
+
+  const goTo = useCallback(
+    (i: number) => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const target = Math.min(Math.max(i, 0), positions - 1);
+      el.scrollTo({ left: target * step(), behavior: "smooth" });
+      setIndex(target);
+    },
+    [positions, step],
+  );
+
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    if (paused || positions <= 1) return;
+    const id = setInterval(() => {
+      goTo(current >= positions - 1 ? 0 : current + 1);
+    }, SKILL_AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, [paused, positions, current, goTo]);
 
   return (
-    /* Outer wrapper has extra horizontal padding so arrow buttons
-       stay inside the section's overflow-hidden boundary.       */
-    <div className="relative px-10 -mx-2">
-      {/* Prev arrow */}
-      {!atStart && (
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Technical skills"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          setPaused(false);
+        }
+      }}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setPaused(false)}
+    >
+      {/* Outer padding keeps the arrow buttons inside the section's
+          overflow-hidden boundary. */}
+      <div className="relative -mx-2 px-10">
         <button
-          onClick={() => scroll(-1)}
+          type="button"
+          onClick={() => goTo(current - 1)}
+          disabled={current === 0}
           aria-label="Previous skills"
-          className="btn-click absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-card border border-border shadow-md flex items-center justify-center hover:border-primary/50 hover:bg-accent transition-colors"
+          className="btn-click absolute left-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:border-primary/50 hover:bg-accent disabled:pointer-events-none disabled:opacity-0"
         >
           <ChevronLeft size={18} />
         </button>
-      )}
 
-      {/* Scroll container */}
-      <div
-        ref={scrollRef}
-        onScroll={updateArrows}
-        className="carousel-scroll px-1 py-2"
-      >
-        {skillGroups.map((group) => (
-          <div
-            key={group.label}
-            className="skill-carousel-card carousel-snap-item project-card shimmer-card p-5 group"
-            style={{ width: "min(288px, calc(85vw - 3rem))" }}
-          >
-            <div className="flex items-center gap-2 text-primary mb-3 font-semibold text-sm">
-              {group.icon}
-              {group.label}
-            </div>
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="flex flex-wrap gap-1.5"
+        <div
+          ref={scrollRef}
+          onScroll={measure}
+          className="carousel-scroll !gap-5 px-1 py-2"
+        >
+          {skillGroups.map((group) => (
+            <div
+              key={group.label}
+              className="skill-card carousel-snap-item project-card shimmer-card p-5"
+              style={{ width: "min(288px, calc(85vw - 3rem))" }}
             >
-              {group.skills.map((skill) => (
-                <motion.span
-                  key={skill}
-                  variants={staggerItem}
-                  className="skill-pill text-xs"
-                >
-                  {skill}
-                </motion.span>
-              ))}
-            </motion.div>
-          </div>
-        ))}
-      </div>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-primary">
+                  {group.icon}
+                  {group.label}
+                </h4>
+                {group.level && (
+                  <span className="rounded-full border border-border bg-accent px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    {group.level}
+                  </span>
+                )}
+              </div>
+              <ul className="flex flex-wrap gap-1.5">
+                {group.skills.map((skill) => (
+                  <li key={skill} className="skill-pill text-xs">
+                    {skill}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-      {/* Next arrow */}
-      {!atEnd && (
         <button
-          onClick={() => scroll(1)}
+          type="button"
+          onClick={() => goTo(current + 1)}
+          disabled={current >= positions - 1}
           aria-label="Next skills"
-          className="btn-click absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-card border border-border shadow-md flex items-center justify-center hover:border-primary/50 hover:bg-accent transition-colors"
+          className="btn-click absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card shadow-md transition-colors hover:border-primary/50 hover:bg-accent disabled:pointer-events-none disabled:opacity-0"
         >
           <ChevronRight size={18} />
         </button>
+      </div>
+
+      {positions > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-1.5">
+          {Array.from({ length: positions }, (_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`Go to skills slide ${i + 1} of ${positions}`}
+              aria-current={current === i ? "true" : undefined}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                current === i ? "w-5 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground"
+              }`}
+            />
+          ))}
+        </div>
       )}
-
-      {/* Scroll hint dots */}
-      <div className="flex items-center justify-center gap-1.5 mt-4">
-        {skillGroups.map((g) => (
-          <span key={g.label} className="w-1.5 h-1.5 rounded-full bg-border" />
-        ))}
-      </div>
     </div>
-  );
-}
-
-// ─── Animated stat counter ───────────────────────────────────────────────────
-function AnimatedStat({ label, value }: { label: string; value: string }) {
-  const num = parseInt(value.replace(/\D/g, ""), 10) || 0;
-  const suffix = value.replace(/\d/g, "");
-  const count = useMotionValue(0);
-  const spring = useSpring(count, { stiffness: 55, damping: 16 });
-  const [display, setDisplay] = useState("0");
-  const ref = useRef<HTMLDivElement>(null);
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          setStarted(true);
-          count.set(num);
-        }
-      },
-      { threshold: 0.5 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [count, num, started]);
-
-  useEffect(
-    () => spring.on("change", (v) => setDisplay(Math.round(v).toString())),
-    [spring],
-  );
-
-  return (
-    <motion.div
-      ref={ref}
-      whileHover={{ scale: 1.04, y: -3 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className="project-card p-5 text-center shimmer-card cursor-default"
-    >
-      <div className="text-3xl font-bold gradient-text mb-1">
-        {display}
-        {suffix}
-      </div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-    </motion.div>
   );
 }
 
@@ -466,9 +516,19 @@ function TechLogoGrid() {
             className="tech-logo-tile flex flex-col items-center gap-1.5 w-[78px] mr-3 flex-shrink-0 rounded-xl border border-black/5 bg-white/95 dark:bg-white shadow-sm px-2 py-3 cursor-default"
           >
             <Icon size={26} color={`#${hex}`} aria-hidden="true" />
-            <span className="text-[9.5px] font-medium text-gray-600 text-center leading-tight">
-              {name}
-            </span>
+            {/* The loop's second copy draws its label with CSS content, so the
+                tech list appears once (not twice) in the page's text — what
+                crawlers, link previews and AI page readers extract. */}
+            {i < techLogos.length ? (
+              <span className="text-[9.5px] font-medium text-gray-600 text-center leading-tight">
+                {name}
+              </span>
+            ) : (
+              <span
+                data-label={name}
+                className="marquee-dup-label text-[9.5px] font-medium text-gray-600 text-center leading-tight"
+              />
+            )}
           </motion.div>
         ))}
       </div>
@@ -493,6 +553,7 @@ export function About() {
         >
           {/* Shared title above both columns */}
           <div className="mb-8 text-center">
+            <p className="section-eyebrow">01 · About</p>
             <h2 className="text-3xl sm:text-4xl font-bold section-heading center">
               About Me
             </h2>
@@ -513,125 +574,89 @@ export function About() {
                 </span>
 
                 <p className="mt-0 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
-                  I&apos;m a passionate Frontend Engineer with{" "}
+                  I&apos;m a Senior Frontend Engineer with{" "}
                   <span className="gradient-text font-semibold">
                     {totalExperienceLabel} of professional experience
                   </span>{" "}
-                  building production-grade web applications — from
-                  WordPress-driven LMS platforms and static sites to real-time
-                  trading dashboards and AI-powered tools.
-                </p>
-                <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
-                  I began my career at{" "}
-                  <span className="font-semibold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
-                    Chools Consultancy Services
-                  </span>{" "}
-                  in Bengaluru, where I built and maintained Learning Management
-                  System (LMS) websites on WordPress and delivered static web
-                  projects using pure HTML, CSS, and JavaScript. I then joined{" "}
+                  shipping production web products with React, Next.js and
+                  TypeScript. At{" "}
                   <span className="font-semibold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent">
                     Revise
                   </span>{" "}
-                  in May 2022, where I work as a Frontend Engineer — building
-                  products like 10X Trade (a Telegram Mini App trading terminal
-                  on the dYdX protocol), AskFinance (a RAG AI chat app over
-                  financial documents), and the dashboard for Convo, an
-                  LLM-agent memory API. I&apos;m currently architecting GRASS, a
-                  mobile app that lets developers remotely drive AI coding
-                  agents like Claude Code and OpenCode from their phone.
+                  I&apos;ve built Grass: Code Agent Computer, an App Store app
+                  for steering AI coding agents from your phone; the AI
+                  products TaxAI and Convo; and 10X Trade, leveraged crypto
+                  trading inside Telegram.
                 </p>
                 <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
-                  I care deeply about{" "}
-                  <span className="text-primary font-semibold">
-                    clean, maintainable code
+                  My strength is the hard part of the frontend: real-time
+                  data over WebSockets and Server-Sent Events, streaming AI
+                  interfaces, and keeping complex state fast and predictable.
+                  I started my career at{" "}
+                  <span className="font-semibold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+                    Chools Consultancy Services
                   </span>
-                  ,{" "}
-                  <span className="text-primary font-semibold">
-                    intuitive user experiences
-                  </span>
-                  , and{" "}
-                  <span className="text-primary font-semibold">
-                    performance
-                  </span>
-                  . Whether architecting a feature-rich dashboard or building an
-                  AI-driven interface, I bring the same commitment to quality
-                  and craft to every project.
+                  , where I built their WordPress learning platform.
                 </p>
                 <p className="mt-4 text-muted-foreground dark:text-white leading-relaxed max-md:text-justify">
-                  Since{" "}
+                  I also work with{" "}
                   <span className="text-primary font-semibold">
-                    April 2026
-                  </span>
-                  , I&apos;ve also built AI pair-programming with{" "}
-                  <span className="text-primary font-semibold">
-                    Claude Code
+                    AI-assisted development
                   </span>{" "}
-                  into my daily workflow — using it to move faster on
-                  scaffolding, refactors, tests, and debugging, while I stay
-                  the one making every architecture, design, and
-                  code-quality call. It&apos;s a modern, agentic way of
-                  shipping software, and I&apos;m comfortable directing it on
-                  real production codebases.
+                  tools such as Claude Code to deliver faster, while holding
+                  every change to the same standard: I design the
+                  architecture, review each line and take full ownership of
+                  what ships.
                 </p>
               </div>
 
               {/* Key highlights */}
-              <div className="mt-6 grid grid-cols-2 gap-3 text-left">
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
                 {[
                   {
-                    icon: "🎓",
-                    label: "LMS Platform Development",
-                    sub: "Chools — WordPress & e-learning",
+                    Icon: Smartphone,
+                    label: "Grass: Code Agent Computer",
+                    sub: "Live on the App Store",
                   },
                   {
-                    icon: "📈",
-                    label: "Crypto Trading Terminal",
-                    sub: "10X Trade — Telegram Mini App on dYdX",
+                    Icon: Scale,
+                    label: "TaxAI",
+                    sub: "AI tax research with cited sources",
                   },
                   {
-                    icon: "💬",
-                    label: "AI Document Q&A",
-                    sub: "AskFinance — RAG chat over financial docs",
+                    Icon: Database,
+                    label: "Convo",
+                    sub: "Developer dashboard for LLM memory",
                   },
                   {
-                    icon: "📱",
-                    label: "Remote AI Dev Agent",
-                    sub: "GRASS — Claude Code & OpenCode, on mobile",
+                    Icon: TrendingUp,
+                    label: "10X Trade",
+                    sub: "Crypto futures trading in Telegram",
                   },
-                  {
-                    icon: "🔑",
-                    label: "LLM Memory Dashboard",
-                    sub: "Convo — API keys & conversation threads",
-                    full: true,
-                  },
-                ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    transition={{ type: "spring", stiffness: 350, damping: 20 }}
-                    className={`rounded-xl border border-border bg-card/60 p-3 flex items-start gap-2 shimmer-card cursor-default ${
-                      item.full ? "col-span-2" : ""
-                    }`}
+                ].map(({ Icon, label, sub }) => (
+                  <div
+                    key={label}
+                    className="rounded-xl border border-border bg-card/60 p-3 flex items-center gap-3"
                   >
-                    <span className="text-lg leading-none mt-0.5">
-                      {item.icon}
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon size={16} aria-hidden="true" />
                     </span>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground leading-tight">
-                        {item.label}
+                        {label}
                       </p>
                       <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {item.sub}
+                        {sub}
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* ── Skills carousel ── */}
+        {/* ── Skills ── */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -708,11 +733,11 @@ export function About() {
                       <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mb-4">
                         <span className="flex items-center gap-1">
                           <Calendar size={12} />
-                          {job.duration}
+                          <DotSeparated text={job.duration.replace(/\s+·\s+/g, " · ")} />
                         </span>
                         <span className="flex items-center gap-1">
                           <Building2 size={12} />
-                          {job.location}
+                          <DotSeparated text={job.location} />
                         </span>
                       </div>
 
@@ -770,24 +795,8 @@ export function About() {
           </div>
         </motion.div>
 
-        {/* ── Stats bar — animated counters ── */}
-        <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { label: "Years Experience", value: "5+" },
-            { label: "Projects Delivered", value: "10+" },
-            { label: "Companies Worked", value: "2" },
-            { label: "Tech Stack", value: "15+" },
-          ].map((stat) => (
-            <AnimatedStat
-              key={stat.label}
-              label={stat.label}
-              value={stat.value}
-            />
-          ))}
-        </div>
-
         {/* ── Tech stack logo grid ── */}
-        <div className="mt-12">
+        <div className="mt-16">
           <h3 className="text-xl font-bold mb-6 flex items-center justify-center gap-2">
             <Sparkles size={20} className="text-primary" />
             Tech I Work With

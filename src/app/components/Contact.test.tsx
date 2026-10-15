@@ -203,4 +203,17 @@ describe("Contact", () => {
       label: "Email me",
     });
   });
+
+  it("makes each whole contact card a link with the right action", () => {
+    render(<Contact />);
+    expect(screen.getByRole("link", { name: /send an email/i })).toHaveAttribute(
+      "href",
+      "mailto:ayyappaswamy50@gmail.com",
+    );
+    expect(screen.getByRole("link", { name: /^call/i })).toHaveAttribute("href", "tel:+918792594229");
+    const map = screen.getByRole("link", { name: /open in maps/i });
+    expect(map).toHaveAttribute("href", expect.stringContaining("google.com/maps"));
+    expect(map).toHaveAttribute("target", "_blank");
+    expect(map).toHaveTextContent("Open to on-site, hybrid & remote roles");
+  });
 });

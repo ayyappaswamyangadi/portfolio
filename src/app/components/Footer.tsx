@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { gaEvent } from "@/lib/gtag";
 import { DownloadCvButton } from "./DownloadCvButton";
 
-const socials = [
+export const socials = [
   {
     label: "GitHub",
     href: "https://github.com/ayyappaswamyangadi",

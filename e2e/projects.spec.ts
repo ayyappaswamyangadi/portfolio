@@ -5,80 +5,86 @@ test.describe("Projects section", () => {
     await page.goto("/#projects");
   });
 
-  test("shows the featured carousel and the All Projects grid with pagination", async ({
-    page,
-  }) => {
+  test("shows the professional carousel and the More Projects grid", async ({ page }) => {
     await expect(page.getByRole("heading", { name: "Featured Projects" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "All Projects" })).toBeVisible();
-    await expect(page.getByText(/showing 1–2 of 8 projects/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Professional work at Revise" }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "More Projects" })).toBeAttached();
   });
 
-  test("filtering by a category updates the grid and resets to page 1", async ({ page }) => {
-    const allProjects = page.locator("#projects");
-    await allProjects.getByRole("button", { name: "Utility", exact: true }).click();
-
-    await expect(page.getByText(/showing 1–1 of 1 projects/i)).toBeVisible();
-    // ProjectCard always renders both its front and back face in the DOM
-    // (the flip is a CSS transform, not conditional rendering), so the
-    // title text exists twice per card — assert at least one is visible.
-    await expect(page.getByText("Personal Shopping List").first()).toBeVisible();
-  });
-
-  test("pagination advances to the next page of the All Projects grid", async ({ page }) => {
-    await expect(page.getByRole("button", { name: "Previous page" })).toBeDisabled();
-
-    await page.getByRole("button", { name: "Next page" }).click();
-
-    await expect(page.getByText(/showing 3–4 of 8 projects/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: "Previous page" })).toBeEnabled();
-  });
-
-  test("jumping directly to a page number works", async ({ page }) => {
-    await page.getByRole("button", { name: "Page 3" }).click();
-    await expect(page.getByText(/showing 5–6 of 8 projects/i)).toBeVisible();
-  });
-
-  test("hovering a project card (desktop) flips it to reveal details with a working live-demo link", async ({
+  test("hovering a project card (desktop) flips it to reveal the details and links", async ({
     page,
     isMobile,
   }) => {
-    // ProjectCard only binds mouseenter/mouseleave when matchMedia
-    // (hover: hover) matches — real desktop Chromium reports hover
-    // support, so .hover() drives the flip here; touch-emulated projects
-    // use tap-to-toggle instead (covered in the next test).
     test.skip(isMobile, "hover-driven flip only applies to hover-capable desktop browsers");
-
     const card = page
-      .getByText("YouTube Clone")
-      .first()
+      .getByRole("article", { name: "Grass: Code Agent Computer — show details" })
       .locator("xpath=ancestor::*[contains(@class,'group')][1]");
+    await card.scrollIntoViewIfNeeded();
     await card.hover();
-
-    const liveDemoLink = page.getByRole("link", { name: /view live demo/i }).first();
-    await expect(liveDemoLink).toBeVisible();
-    await expect(liveDemoLink).toHaveAttribute("target", "_blank");
-    await expect(liveDemoLink).toHaveAttribute(
-      "href",
-      "https://youtube-clone-plum-nine.vercel.app/",
-    );
+    const link = card.getByRole("link", { name: "Visit Website", exact: true });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "https://codeongrass.com/");
   });
 
-  test("tapping a project card (touch) flips it to reveal details", async ({ page, isMobile }) => {
+  test("tapping a project card (touch) flips it to reveal the details", async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(!isMobile, "tap-to-flip only applies to touch/non-hover devices");
-
     const card = page
-      .getByText("YouTube Clone")
-      .first()
+      .getByRole("article", { name: "Grass: Code Agent Computer — show details" })
       .locator("xpath=ancestor::*[contains(@class,'group')][1]");
+    await card.scrollIntoViewIfNeeded();
     await card.click();
-
-    await expect(page.getByRole("link", { name: /view live demo/i }).first()).toBeVisible();
+    await expect(card.getByRole("link", { name: "Visit Website", exact: true })).toBeVisible();
   });
 
-  test("GitHub Profile CTA at the bottom of the section is present and correct", async ({
+  test("More Projects stays on one row and paginates", async ({ page }) => {
+    const pages = page.getByRole("navigation", { name: "More projects pages" });
+    await pages.scrollIntoViewIfNeeded();
+    const row = page.locator(".more-projects-row");
+    const tops = await row.locator(":scope > div:visible").evaluateAll((els) =>
+      els.map((e) => Math.round(e.getBoundingClientRect().top)),
+    );
+    expect(new Set(tops).size).toBe(1);
+    await pages.getByRole("button", { name: "Next page" }).click();
+    await expect(page.getByText(/^Showing [2-9]/)).toBeVisible();
+  });
+
+  test("carousel cards are never cut off — every visible card fits fully in view", async ({
     page,
   }) => {
-    const cta = page.getByRole("link", { name: /view github profile/i });
-    await expect(cta).toHaveAttribute("href", "https://github.com/ayyappaswamyangadi");
+    const scroller = page
+      .getByRole("region", { name: "Professional projects" })
+      .locator(".carousel-scroll");
+    await scroller.scrollIntoViewIfNeeded();
+    const box = await scroller.boundingBox();
+    expect(box).not.toBeNull();
+
+    const cards = page.locator(".featured-card");
+    const count = await cards.count();
+    for (let i = 0; i < count; i++) {
+      const c = await cards.nth(i).boundingBox();
+      if (!c) continue;
+      const overlaps = c.x < box!.x + box!.width && c.x + c.width > box!.x;
+      if (overlaps) {
+        // Any card that's on screen must be entirely on screen.
+        expect(c.x).toBeGreaterThanOrEqual(box!.x - 1);
+        expect(c.x + c.width).toBeLessThanOrEqual(box!.x + box!.width + 1);
+      }
+    }
   });
+
+  test("the last carousel dot becomes active at the end", async ({ page }) => {
+    const next = page.getByRole("button", { name: "Next project" });
+    await next.scrollIntoViewIfNeeded();
+    while (await next.isEnabled()) {
+      await next.click();
+    }
+    const dots = page.getByRole("button", { name: /go to slide/i });
+    await expect(dots.last()).toHaveAttribute("aria-current", "true");
+  });
+
 });

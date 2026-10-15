@@ -24,7 +24,7 @@ describe("StructuredData", () => {
     expect(person).toMatchObject({
       name: "Ayyappa Swamy Angadi",
       alternateName: "Ayyappa",
-      jobTitle: "Frontend Developer",
+      jobTitle: "Senior Frontend Engineer",
     });
     expect(person.sameAs).toEqual(
       expect.arrayContaining([

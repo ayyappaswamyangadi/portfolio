@@ -49,7 +49,7 @@ test.describe("Desktop navigation", () => {
     // active) before jumping the scroll position — doing this too early
     // races hydration and produces a scroll the observer never picks up,
     // especially when the dev server is under load from parallel workers.
-    await expect(navLink(page, "home")).toHaveClass(/text-white/);
+    await expect(navLink(page, "home")).toHaveClass(/btn-text/);
     // useActiveSession's IntersectionObserver only flips "active" once a
     // section's top has crossed into the upper 45% of the viewport
     // (rootMargin "-55%" from the bottom), and — because window.scrollTo
@@ -63,8 +63,8 @@ test.describe("Desktop navigation", () => {
     });
     // The active-tab pill measures itself against the [data-section] link
     // matching the currently active section — assert that link is styled
-    // as active (white text class) rather than the inactive-link classes.
-    await expect(navLink(page, "projects")).toHaveClass(/text-white/, { timeout: 10000 });
+    // as active (the --btn-text class) rather than the inactive-link classes.
+    await expect(navLink(page, "projects")).toHaveClass(/btn-text/, { timeout: 10000 });
   });
 
   test("logo links back to home", async ({ page }) => {

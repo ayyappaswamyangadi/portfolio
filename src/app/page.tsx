@@ -3,6 +3,7 @@ import { Contact } from "./components/Contact";
 import Home from "./components/Home";
 import { Projects } from "./components/Projects";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { SocialRail } from "./components/SocialRail";
 
 export default function Landing() {
   return (
@@ -12,6 +13,7 @@ export default function Landing() {
       <Projects />
       <Contact />
       <ScrollToTop />
+      <SocialRail />
     </>
   );
 }

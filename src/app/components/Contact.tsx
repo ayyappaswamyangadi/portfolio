@@ -28,6 +28,32 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 // ─── Contact info ─────────────────────────────────────────────────────────────
+const LOCATION_QUERY = "Bengaluru, Karnataka, India";
+const GOOGLE_MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(LOCATION_QUERY)}`;
+
+// On phones, hand the location to the native maps app: Apple Maps' https
+// links open the Maps app on iOS, and a geo: URI opens the user's chosen
+// maps app on Android. Everywhere else, Google Maps opens in a new tab.
+function mapsUrlForDevice(): { url: string; newTab: boolean } {
+  const ua = navigator.userAgent;
+  const isIOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (isIOS) {
+    return {
+      url: `https://maps.apple.com/?q=${encodeURIComponent(LOCATION_QUERY)}`,
+      newTab: false,
+    };
+  }
+  if (/Android/i.test(ua)) {
+    return {
+      url: `geo:0,0?q=${encodeURIComponent(LOCATION_QUERY)}`,
+      newTab: false,
+    };
+  }
+  return { url: GOOGLE_MAPS_URL, newTab: true };
+}
+
 const contactInfo = [
   {
     icon: <Mail size={20} />,
@@ -35,6 +61,7 @@ const contactInfo = [
     value: "ayyappaswamy50@gmail.com",
     href: "mailto:ayyappaswamy50@gmail.com",
     desc: "I reply within 24 hours",
+    action: "Send an email",
   },
   {
     icon: <Phone size={20} />,
@@ -42,13 +69,16 @@ const contactInfo = [
     value: "+91 87925 94229",
     href: "tel:+918792594229",
     desc: "Mon–Fri, 10am – 7pm IST",
+    action: "Call",
   },
   {
     icon: <MapPin size={20} />,
     label: "Location",
-    value: "Bengaluru, Karnataka, India",
-    href: null,
-    desc: "Open to remote opportunities",
+    value: LOCATION_QUERY,
+    href: GOOGLE_MAPS_URL,
+    desc: "Open to on-site, hybrid & remote roles",
+    action: "Open in maps",
+    isMap: true,
   },
 ];
 
@@ -77,7 +107,11 @@ const contactInfo = [
 // ─── Motion variants ─────────────────────────────────────────────────────────
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
 };
 
 // ─── Contact Section ──────────────────────────────────────────────────────────
@@ -86,6 +120,10 @@ export function Contact() {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [mounted, setMounted] = useState(false);
+  const [mapsLink, setMapsLink] = useState({
+    url: GOOGLE_MAPS_URL,
+    newTab: true,
+  });
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
@@ -99,6 +137,7 @@ export function Contact() {
 
   useEffect(() => {
     setMounted(true);
+    setMapsLink(mapsUrlForDevice());
     return () => {
       if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     };
@@ -112,7 +151,10 @@ export function Contact() {
   const showToast = (state: "success" | "error", autoHideMs: number) => {
     setSubmitState(state);
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    toastTimeoutRef.current = setTimeout(() => setSubmitState("idle"), autoHideMs);
+    toastTimeoutRef.current = setTimeout(
+      () => setSubmitState("idle"),
+      autoHideMs,
+    );
   };
 
   const onSubmit = async (data: ContactFormData) => {
@@ -133,7 +175,11 @@ export function Contact() {
       });
       const result = await response.json();
       if (result.success) {
-        gaEvent({ action: "submit", category: "contact_form", label: "success" });
+        gaEvent({
+          action: "submit",
+          category: "contact_form",
+          label: "success",
+        });
         reset();
         showToast("success", 5000);
       } else {
@@ -214,12 +260,13 @@ export function Contact() {
           viewport={{ once: true }}
           className="mb-10 text-center"
         >
+          <p className="section-eyebrow">03 · Contact</p>
           <h2 className="text-3xl sm:text-4xl font-bold section-heading center mb-4">
             Let&apos;s Connect
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Have a project in mind, want to collaborate, or just say hello? My
-            inbox is always open.
+            Hiring for a frontend role, or have a product to build? Send me a
+            message — I reply within 24 hours.
           </p>
         </motion.div>
 
@@ -231,37 +278,46 @@ export function Contact() {
           viewport={{ once: true }}
           className="grid sm:grid-cols-3 gap-4 mb-10"
         >
-          {contactInfo.map((item) => (
-            <div
-              key={item.label}
-              className="project-card p-5 flex flex-col items-center text-center gap-3 group hover:-translate-y-1 transition-transform duration-200"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors">
-                {item.icon}
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-0.5">
-                  {item.label}
-                </p>
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    onClick={() =>
-                      gaEvent({ action: "click", category: "contact_info", label: item.label })
-                    }
-                    className="text-sm font-semibold hover:text-primary transition-colors break-all"
-                  >
+          {contactInfo.map((item) => {
+            // Server render and first paint use Google Maps in a new tab;
+            // after mount the map card switches to the device's own app.
+            const link = item.isMap
+              ? mapsLink
+              : { url: item.href, newTab: false };
+            return (
+              <a
+                key={item.label}
+                href={link.url}
+                aria-label={`${item.action}: ${item.value}`}
+                {...(link.newTab
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                onClick={() =>
+                  gaEvent({
+                    action: "click",
+                    category: "contact_info",
+                    label: item.label,
+                  })
+                }
+                className="project-card p-5 flex flex-col items-center text-center gap-3 group cursor-pointer hover:-translate-y-1 hover:border-primary/40 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:bg-primary/20 transition-colors">
+                  {item.icon}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-0.5">
+                    {item.label}
+                  </p>
+                  <p className="text-sm font-semibold group-hover:text-primary transition-colors break-all">
                     {item.value}
-                  </a>
-                ) : (
-                  <p className="text-sm font-semibold">{item.value}</p>
-                )}
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {item.desc}
+                  </p>
+                </div>
+              </a>
+            );
+          })}
         </motion.div>
 
         {/* ── Message form card ── */}
@@ -277,8 +333,7 @@ export function Contact() {
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
                 style={{
-                  background:
-                    "var(--btn-gradient)",
+                  background: "var(--btn-gradient)",
                 }}
               >
                 <Send size={18} />

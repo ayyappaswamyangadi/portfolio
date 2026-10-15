@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { projects } from "@/lib/projects";
@@ -9,34 +9,47 @@ vi.mock("@/lib/gtag", () => ({
   gaEvent: (...args: unknown[]) => gaEventMock(...args),
 }));
 
-// Mirrors the `featured` projects (in array order) and the "All"-category
-// pagination order from Projects.tsx's `projects` data, so tests don't have
-// to hardcode positions blindly.
-const FEATURED_TITLES = ["URL Shortener", "Resume Builder"];
-const ALL_ORDER_PAGE_0 = ["URL Shortener", "Sarvadharma Marriage Bureau — Registration Form"];
-const ALL_ORDER_PAGE_1 = ["Facebook Clone", "Resume Builder"];
+const FEATURED_TITLES = [
+  "Grass: Code Agent Computer",
+  "TaxAI — AI Research Assistant for CAs",
+  "Convo — LLM Memory Dashboard",
+  "10X Trade — Futures Trading in Telegram",
+];
 
-// The "All Projects" paginated grid renders its own ProjectCard instances,
-// separate from the featured carousel's — a featured project (e.g. URL
-// Shortener, Resume Builder) is mounted TWICE on the page. Scope queries to
-// just the grid to avoid "multiple elements found" false positives.
-function getGridWithin(container: HTMLElement) {
-  const grid = container.querySelector('[class*="sm:grid-cols-2"]') as HTMLElement;
-  if (!grid) throw new Error("All Projects grid container not found");
-  return within(grid);
+// The whole flip card (front + back faces) for a project, found via the
+// front face's accessible name.
+function cardFor(title: string) {
+  return screen
+    .getByRole("article", { name: `${title} — show details` })
+    .closest(".group") as HTMLElement;
 }
 
-function getScrollByMock() {
-  return Element.prototype.scrollBy as ReturnType<typeof vi.fn>;
+function carousel() {
+  return screen.getByRole("region", { name: "Professional projects" });
 }
+
 function getScrollToMock() {
   return Element.prototype.scrollTo as ReturnType<typeof vi.fn>;
+}
+
+// Make matchMedia report a desktop (≥1024px) viewport so "More Projects"
+// shows three cards per row.
+function mockDesktopWidth() {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: /min-width/.test(query),
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
 }
 
 describe("Projects", () => {
   beforeEach(() => {
     gaEventMock.mockClear();
-    getScrollByMock().mockClear();
     getScrollToMock().mockClear();
   });
 
@@ -53,224 +66,304 @@ describe("Projects", () => {
     }));
   });
 
-  it("renders the featured carousel with only featured projects, and all category filter buttons", () => {
+  it("shows the professional products first in the carousel, in order", () => {
     render(<Projects />);
 
     expect(screen.getByRole("heading", { name: /featured projects/i })).toBeInTheDocument();
-    for (const title of FEATURED_TITLES) {
-      expect(screen.getAllByText(title).length).toBeGreaterThan(0);
-    }
-    // Sarvadharma / Facebook Clone are not featured — they should not appear
-    // in the carousel's dot indicators (one dot per featured project).
-    expect(screen.getAllByLabelText(/go to project/i)).toHaveLength(FEATURED_TITLES.length);
-
-    for (const cat of ["All", "Full Stack", "Productivity", "Client Work"]) {
-      expect(screen.getByRole("button", { name: cat })).toBeInTheDocument();
-    }
+    const names = within(carousel())
+      .getAllByRole("article")
+      .map((a) => a.getAttribute("aria-label")?.replace(" — show details", ""));
+    expect(names).toEqual(FEATURED_TITLES);
   });
 
-  it("defaults to the 'All' category, page 1, showing 2 of 4 projects with pagination", () => {
+  it("front of each card shows the screenshot, type, title and a tap hint; the back holds the details", () => {
     render(<Projects />);
+    const card = cardFor("Grass: Code Agent Computer");
+    const front = within(card).getByRole("article");
 
-    expect(screen.getByText(/showing 1–2 of 4 projects/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Page 1" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Page 2" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Page 3" })).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Previous page")).toBeDisabled();
-    expect(screen.getByLabelText("Next page")).not.toBeDisabled();
+    expect(within(front).getByRole("img")).toHaveAttribute(
+      "alt",
+      "Grass: Code Agent Computer — screenshot",
+    );
+    expect(within(front).getByText("Professional")).toBeInTheDocument();
+    expect(within(front).getByText(/tap to see what i built/i)).toBeInTheDocument();
+    expect(within(front).queryByText("What I built")).not.toBeInTheDocument();
 
-    for (const title of ALL_ORDER_PAGE_0) {
-      expect(screen.getAllByText(title).length).toBeGreaterThan(0);
-    }
+    // Details live on the back face.
+    expect(within(card).getByText("What I built")).toBeInTheDocument();
+    expect(within(card).getByText("React Native")).toBeInTheDocument();
+    expect(within(card).getByText("Claude Code (AI-assisted)")).toBeInTheDocument();
   });
 
-  it("filters by category, resets to page 1, hides pagination for a single-project category, and fires gaEvent", async () => {
+  it("flips a card on tap (touch device), firing gaEvent only on the opening tap", async () => {
     const user = userEvent.setup();
     render(<Projects />);
+    const card = cardFor("TaxAI — AI Research Assistant for CAs");
+    const front = within(card).getByRole("article");
 
-    await user.click(screen.getByRole("button", { name: "Client Work" }));
-
-    expect(screen.getByText(/showing 1–1 of 1 projects/i)).toBeInTheDocument();
-    expect(screen.queryByLabelText("Next page")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Previous page")).not.toBeInTheDocument();
+    await user.click(within(front).getByText(/tap to see what i built/i));
     expect(gaEventMock).toHaveBeenCalledWith({
-      action: "filter",
-      category: "project_category",
-      label: "Client Work",
+      action: "expand",
+      category: "project_card",
+      label: "TaxAI — AI Research Assistant for CAs",
     });
+    // Once flipped, only the back face takes pointer input.
+    expect(front).toHaveStyle({ pointerEvents: "none" });
+
+    gaEventMock.mockClear();
+    await user.click(within(card).getAllByText("TaxAI — AI Research Assistant for CAs")[1]);
+    expect(gaEventMock).not.toHaveBeenCalledWith(
+      expect.objectContaining({ action: "expand" }),
+    );
+    expect(front).toHaveStyle({ pointerEvents: "auto" });
   });
 
-  it("paginates through the 'All' category", async () => {
+  it("links Grass to its website, App Store listing and Product Hunt page", () => {
+    render(<Projects />);
+    const card = cardFor("Grass: Code Agent Computer");
+
+    expect(card).toHaveTextContent("Live on the App Store · Android waitlist");
+    expect(within(card).getByRole("link", { name: "Visit Website" })).toHaveAttribute(
+      "href",
+      "https://codeongrass.com/",
+    );
+    expect(within(card).getByRole("link", { name: /on the app store/i })).toHaveAttribute(
+      "href",
+      "https://apps.apple.com/in/app/grass-code-agent-computer/id6761881356",
+    );
+    expect(within(card).getByRole("link", { name: /on product hunt/i })).toBeInTheDocument();
+  });
+
+  it("links TaxAI and Convo to Product Hunt, with no ranking claim on Convo", () => {
+    render(<Projects />);
+
+    expect(
+      within(cardFor("TaxAI — AI Research Assistant for CAs")).getByRole("link", {
+        name: /view on product hunt/i,
+      }),
+    ).toHaveAttribute("href", "https://www.producthunt.com/products/taxai");
+
+    const convo = cardFor("Convo — LLM Memory Dashboard");
+    expect(within(convo).getByRole("link", { name: /view on product hunt/i })).toBeInTheDocument();
+    expect(convo).not.toHaveTextContent(/product of the day|#8/i);
+  });
+
+  it("shows 10X Trade as a retired product, without any live links", () => {
+    render(<Projects />);
+    const card = cardFor("10X Trade — Futures Trading in Telegram");
+
+    expect(within(card).queryAllByRole("link")).toHaveLength(0);
+    expect(card).toHaveTextContent("Shipped to production · Since retired");
+    expect(within(card).getByText(/has been retired, so no public demo/i)).toBeInTheDocument();
+    expect(card).not.toHaveTextContent(/t\.me/i);
+  });
+
+  it("More Projects shows a single row and pages through the rest (one card per row on phones)", async () => {
     const user = userEvent.setup();
-    const { container } = render(<Projects />);
+    render(<Projects />);
+    const pages = screen.getByRole("navigation", { name: "More projects pages" });
 
-    await user.click(screen.getByLabelText("Next page"));
+    expect(screen.getByText(/showing 1–1 of 5 projects/i)).toBeInTheDocument();
+    expect(within(pages).getAllByRole("button", { name: /^page \d$/i })).toHaveLength(5);
+    expect(
+      screen.getByRole("article", { name: "Chools — Learning & Consulting Platform — show details" }),
+    ).toBeInTheDocument();
 
-    expect(screen.getByText(/showing 3–4 of 4 projects/i)).toBeInTheDocument();
-    // AnimatePresence (mode="wait") briefly keeps the outgoing page's cards
-    // mounted (mid-exit-fade) until its ~0.2s exit transition settles, before
-    // the incoming page's cards mount — a same-length hint count (2 old vs.
-    // 2 new here) isn't a reliable settle signal, so wait for one of the
-    // actual incoming titles to show up in the grid instead.
-    for (const title of ALL_ORDER_PAGE_1) {
-      await waitFor(() =>
-        expect(getGridWithin(container).getAllByText(title).length).toBeGreaterThan(0),
-      );
-    }
+    await user.click(within(pages).getByRole("button", { name: "Next page" }));
+    expect(screen.getByText(/showing 2–2 of 5 projects/i)).toBeInTheDocument();
     expect(gaEventMock).toHaveBeenCalledWith({
       action: "click",
       category: "project_pagination",
       label: "next",
     });
-
-    expect(screen.getByLabelText("Next page")).toBeDisabled();
-    expect(screen.getByLabelText("Previous page")).not.toBeDisabled();
   });
 
-  it("flips a card open on tap (non-hover device), firing gaEvent only on the opening tap", async () => {
+  it("More Projects fits three cards in the row on desktop, with two pages", () => {
+    mockDesktopWidth();
+    render(<Projects />);
+    const pages = screen.getByRole("navigation", { name: "More projects pages" });
+
+    expect(screen.getByText(/showing 1–3 of 5 projects/i)).toBeInTheDocument();
+    expect(within(pages).getAllByRole("button", { name: /^page \d$/i })).toHaveLength(2);
+  });
+
+  it("marks personal and client projects as built end to end, with the free-tier note", () => {
+    mockDesktopWidth();
+    render(<Projects />);
+
+    const resume = cardFor("Resume Builder");
+    expect(resume).toHaveTextContent("Personal project · designed and built end to end");
+    expect(within(resume).getByRole("link", { name: /source code on github/i })).toHaveAttribute(
+      "href",
+      "https://github.com/ayyappaswamyangadi/resume-builder-nextjs",
+    );
+    expect(within(resume).getByText(/hosted on a free tier/i)).toBeInTheDocument();
+
+    const client = cardFor("Sarvadharma Marriage Bureau — Registration Form");
+    expect(client).toHaveTextContent("Client project · designed and built end to end");
+    expect(within(client).queryByRole("link", { name: /github/i })).not.toBeInTheDocument();
+    expect(within(client).getByRole("link", { name: "View Live Demo" })).toHaveAttribute(
+      "href",
+      "https://matrimony-registration-form.vercel.app/",
+    );
+
+    expect(
+      within(cardFor("Grass: Code Agent Computer")).queryByText(/free tier/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it("solo projects lead with end-to-end ownership instead of 'What I built'", () => {
+    mockDesktopWidth();
+    render(<Projects />);
+
+    const resume = cardFor("Resume Builder");
+    expect(within(resume).getByText("Sole developer — built end to end")).toBeInTheDocument();
+    expect(within(resume).getByText("Key features")).toBeInTheDocument();
+    expect(within(resume).queryByText("What I built")).not.toBeInTheDocument();
+
+    const grass = cardFor("Grass: Code Agent Computer");
+    expect(within(grass).getByText("What I built")).toBeInTheDocument();
+    expect(within(grass).queryByText(/sole developer/i)).not.toBeInTheDocument();
+  });
+
+  it("More Projects tabs filter by kind and reset to the first page", async () => {
     const user = userEvent.setup();
-    const { container } = render(<Projects />);
+    mockDesktopWidth();
+    render(<Projects />);
+    const tablist = screen.getByRole("tablist", { name: "Filter projects" });
+    const tabs = within(tablist).getAllByRole("tab");
+    expect(tabs.map((t) => t.textContent)).toEqual([
+      "All Projects5",
+      "Client1",
+      "Professional1",
+      "Personal3",
+    ]);
+    expect(tabs[0]).toHaveAttribute("aria-selected", "true");
 
-    // Page 0's first grid card is "URL Shortener" — scope to the grid since
-    // URL Shortener (featured) also has a separate instance in the carousel.
-    const grid = getGridWithin(container);
-    const firstCardHint = grid.getAllByText(/tap to see details/i)[0];
-
-    await user.click(firstCardHint);
+    await user.click(within(screen.getByRole("navigation", { name: "More projects pages" })).getByRole("button", { name: "Next page" }));
+    await user.click(within(tablist).getByRole("tab", { name: /personal/i }));
+    expect(screen.getByText(/showing 1–3 of 3 projects/i)).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "More projects pages" })).not.toBeInTheDocument();
     expect(gaEventMock).toHaveBeenCalledWith({
-      action: "expand",
-      category: "project_card",
-      label: "URL Shortener",
+      action: "click",
+      category: "project_tab",
+      label: "Personal",
     });
 
-    // Back face content for URL Shortener is now queryable (flip is a CSS
-    // transform, not conditional mounting, so it's present either way, but
-    // this confirms the right project's back content renders at all).
+    await user.click(within(tablist).getByRole("tab", { name: /client/i }));
+    expect(screen.getByText(/showing 1–1 of 1 project$/i)).toBeInTheDocument();
     expect(
-      grid.getByText(/full-stack link shortener/i),
+      screen.getByRole("article", {
+        name: "Sarvadharma Marriage Bureau — Registration Form — show details",
+      }),
     ).toBeInTheDocument();
-    expect(grid.getByText("Live backend link generation")).toBeInTheDocument();
-    expect(grid.getAllByTitle("GitHub").length).toBeGreaterThan(0);
-    expect(grid.getAllByTitle("Live Demo").length).toBeGreaterThan(0);
-
-    // Once flipped, only the back face takes pointer input (WebKit hit-tests
-    // backface-hidden faces, so the hidden one is pointer-events: none) —
-    // the closing tap lands on the visible back, not the front's hint.
-    expect(firstCardHint).toHaveStyle({ pointerEvents: "none" });
-    gaEventMock.mockClear();
-    await user.click(grid.getByText(/full-stack link shortener/i));
-    // Closing tap should not re-fire the "expand" event.
-    expect(gaEventMock).not.toHaveBeenCalledWith(
-      expect.objectContaining({ action: "expand" }),
-    );
   });
 
-  it("hides the GitHub link but keeps Live Demo for a project with no githubUrl", async () => {
+  it("More Projects tabs support arrow-key navigation", async () => {
     const user = userEvent.setup();
-    const { container } = render(<Projects />);
-
-    await user.click(screen.getByRole("button", { name: "Client Work" }));
-    // Only "Sarvadharma Marriage Bureau — Registration Form" is in the
-    // Client Work category and it's not featured, so a single grid instance
-    // exists. Wait for AnimatePresence's exit transition to settle so the
-    // outgoing "All" page's cards aren't still mounted alongside it (see
-    // the pagination test above for the same race).
-    await waitFor(() =>
-      expect(
-        getGridWithin(container).queryAllByText(/tap to see details/i),
-      ).toHaveLength(1),
-    );
-    const grid = getGridWithin(container);
-    const hint = grid.getByText(/tap to see details/i);
-    await user.click(hint);
-
-    expect(grid.queryByTitle("GitHub")).not.toBeInTheDocument();
-    expect(grid.getByTitle("Live Demo")).toBeInTheDocument();
-    expect(grid.getByText(/view live demo/i)).toBeInTheDocument();
+    render(<Projects />);
+    const tabs = within(screen.getByRole("tablist", { name: "Filter projects" })).getAllByRole("tab");
+    tabs[0].focus();
+    await user.keyboard("{ArrowRight}");
+    expect(tabs[1]).toHaveFocus();
+    expect(tabs[1]).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{ArrowLeft}{ArrowLeft}");
+    expect(tabs[3]).toHaveFocus();
   });
 
-  it("featured carousel: next arrow scrolls forward and fires gaEvent; prev arrow appears once scrolled and scrolls backward", async () => {
+  it("carousel arrows step one card at a time and disable at each end", async () => {
     const user = userEvent.setup();
     render(<Projects />);
 
-    expect(screen.queryByLabelText("Previous project")).not.toBeInTheDocument();
-    const nextArrow = screen.getByLabelText("Next project");
+    const prev = screen.getByRole("button", { name: "Previous project" });
+    const next = screen.getByRole("button", { name: "Next project" });
+    expect(prev).toBeDisabled();
 
-    await user.click(nextArrow);
-
-    expect(getScrollByMock()).toHaveBeenCalledWith(
-      expect.objectContaining({ left: expect.any(Number), behavior: "smooth" }),
+    await user.click(next);
+    expect(getScrollToMock()).toHaveBeenCalledWith(
+      expect.objectContaining({ behavior: "smooth" }),
     );
-    const [firstCallArgs] = getScrollByMock().mock.calls[0];
-    expect(firstCallArgs.left).toBeGreaterThan(0);
     expect(gaEventMock).toHaveBeenCalledWith({
       action: "click",
       category: "featured_carousel",
       label: "next",
     });
+    expect(prev).not.toBeDisabled();
 
-    // Simulate the carousel having scrolled away from the start so the
-    // prev arrow becomes visible (its visibility is driven by the
-    // scroll container's onScroll handler, not by clicking next itself).
-    const scrollContainer = nextArrow.parentElement!.querySelector(
-      ".carousel-scroll",
-    ) as HTMLElement;
-    Object.defineProperty(scrollContainer, "scrollLeft", { value: 50, configurable: true });
-    Object.defineProperty(scrollContainer, "scrollWidth", { value: 2000, configurable: true });
-    Object.defineProperty(scrollContainer, "clientWidth", { value: 340, configurable: true });
-    fireEvent.scroll(scrollContainer);
-
-    const prevArrow = await screen.findByLabelText("Previous project");
-    getScrollByMock().mockClear();
-    await user.click(prevArrow);
-
-    const [prevCallArgs] = getScrollByMock().mock.calls[0];
-    expect(prevCallArgs.left).toBeLessThan(0);
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "featured_carousel",
-      label: "prev",
-    });
+    // jsdom has no layout, so the carousel assumes one card per view:
+    // four cards → four positions.
+    await user.click(next);
+    await user.click(next);
+    expect(next).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Go to slide 4 of 4" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
   });
 
-  it("clicking a carousel dot scrolls to that project and fires a labeled gaEvent", async () => {
-    const user = userEvent.setup();
-    render(<Projects />);
+  it("with two cards per view, shows one dot per scroll position and lights the last dot at the end", () => {
+    const { container } = render(<Projects />);
 
-    const dots = screen.getAllByLabelText(/go to project/i);
-    await user.click(dots[1]);
-
-    expect(getScrollToMock()).toHaveBeenCalled();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "featured_carousel",
-      label: `dot_${FEATURED_TITLES[1]}`,
+    // Lay the carousel out as on a desktop: 400px cards, 820px viewport,
+    // 20px gap → two whole cards visible, three reachable positions.
+    const scroller = container.querySelector(".carousel-scroll") as HTMLElement;
+    for (const card of container.querySelectorAll<HTMLElement>(".featured-card")) {
+      Object.defineProperty(card, "offsetWidth", { value: 400, configurable: true });
+    }
+    Object.defineProperty(scroller, "clientWidth", { value: 820, configurable: true });
+    act(() => {
+      window.dispatchEvent(new Event("resize"));
     });
+
+    const dots = screen.getAllByRole("button", { name: /go to slide/i });
+    expect(dots).toHaveLength(3);
+    expect(dots[0]).toHaveAttribute("aria-current", "true");
+
+    Object.defineProperty(scroller, "scrollLeft", { value: 840, configurable: true });
+    fireEvent.scroll(scroller);
+
+    const after = screen.getAllByRole("button", { name: /go to slide/i });
+    expect(after[2]).toHaveAttribute("aria-current", "true");
+    expect(screen.getByRole("button", { name: "Next project" })).toBeDisabled();
   });
 
-  it("renders the GitHub profile CTA with the correct href and fires gaEvent on click", async () => {
-    const user = userEvent.setup();
-    render(<Projects />);
-
-    const cta = screen.getByRole("link", { name: /view github profile/i });
-    expect(cta).toHaveAttribute("href", "https://github.com/ayyappaswamyangadi");
-
-    await user.click(cta);
-
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "social",
-      label: "github_profile_projects_cta",
-    });
-  });
-
-  it("puts every project in the initial markup (crawlable list), even those on later grid pages", () => {
+  it("lists every project in the initial markup for crawlers, even ones on later pages", () => {
     const { container } = render(<Projects />);
     const list = container.querySelector(".sr-only ul") as HTMLElement;
-    expect(list).not.toBeNull();
     expect(within(list).getAllByRole("listitem")).toHaveLength(projects.length);
-    for (const p of projects) {
-      expect(within(list).getByRole("link", { name: p.title })).toHaveAttribute("href", p.liveUrl);
+  });
+
+  it("no longer shows a GitHub profile CTA under the projects", () => {
+    render(<Projects />);
+    expect(screen.queryByRole("link", { name: /view github profile/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/more of my code is on github/i)).not.toBeInTheDocument();
+  });
+
+  it("flips a card on the first tap, even mid-scroll when no click follows", () => {
+    // Touch device: no hover.
+    const mm = window.matchMedia;
+    window.matchMedia = ((q: string) => ({
+      ...mm(q),
+      matches: q === "(hover: hover)" ? false : mm(q).matches,
+    })) as typeof window.matchMedia;
+    try {
+      render(<Projects />);
+      const card = cardFor("Grass: Code Agent Computer");
+      const front = within(card).getByRole("article");
+      fireEvent.touchStart(front, { touches: [{ clientX: 100, clientY: 100 }] });
+      fireEvent.touchEnd(front, { changedTouches: [{ clientX: 102, clientY: 101 }] });
+      expect(front).toHaveStyle({ pointerEvents: "none" });
+
+      // The browser's follow-up click from that same tap must not flip it back.
+      fireEvent.click(front);
+      expect(front).toHaveStyle({ pointerEvents: "none" });
+
+      // A swipe is not a tap.
+      fireEvent.touchStart(front, { touches: [{ clientX: 100, clientY: 100 }] });
+      fireEvent.touchEnd(front, { changedTouches: [{ clientX: 160, clientY: 100 }] });
+      expect(front).toHaveStyle({ pointerEvents: "none" });
+    } finally {
+      window.matchMedia = mm;
     }
   });
 });

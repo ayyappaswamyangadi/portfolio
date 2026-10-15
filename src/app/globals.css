@@ -551,6 +551,19 @@ body {
   transform: scale(0.94);
 }
 
+/* ─── Section eyebrow ──────────────────────────────────
+   Small numbered label above each section heading ("01 · About") — the
+   wayfinding pattern used by well-known developer portfolios. */
+.section-eyebrow {
+  margin-bottom: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: hsl(var(--primary));
+}
+
 /* ─── Carousel ───────────────────────────────────────── */
 .carousel-scroll {
   display: flex;
@@ -597,6 +610,11 @@ body {
     black 94%,
     transparent
   );
+}
+/* Label for the marquee's duplicated (aria-hidden) second set — generated
+   content isn't part of the DOM text, so the tech list isn't repeated. */
+.marquee-dup-label::before {
+  content: attr(data-label);
 }
 .marquee-track {
   display: flex;

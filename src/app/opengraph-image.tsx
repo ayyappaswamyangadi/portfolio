@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Ayyappa — Frontend Developer, React.js & Next.js Web Developer";
+  "Ayyappa — Senior Frontend Engineer: React, Next.js, TypeScript";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -57,7 +57,7 @@ export default async function Image() {
             marginBottom: 24,
           }}
         >
-          Frontend Developer &amp; Web Developer
+          Senior Frontend Engineer
         </div>
         <div
           style={{
@@ -67,7 +67,7 @@ export default async function Image() {
             marginBottom: 40,
           }}
         >
-          React &middot; Next.js &middot; TypeScript &middot; JavaScript &middot; Tailwind CSS
+          React &middot; Next.js &middot; TypeScript &middot; AI-Assisted Development
         </div>
         <div style={{ display: "flex", gap: 12 }}>
           {["React", "Next.js", "TypeScript", "Tailwind CSS"].map((tech) => (

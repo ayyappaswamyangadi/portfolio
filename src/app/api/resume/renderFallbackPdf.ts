@@ -5,6 +5,8 @@ import {
   RESUME_EXPERIENCE,
   RESUME_PROJECTS,
   RESUME_EDUCATION,
+  resumeSummary,
+  type ResumeSegment,
 } from "@/lib/resumeContent";
 
 // Plain-pdfkit fallback for /api/resume's GET handler, used if the primary
@@ -37,9 +39,7 @@ const MARGIN = 42;
 const PAGE_WIDTH = 595.28; // A4, points
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 
-type Segment = { text: string; bold?: boolean };
-
-function paragraph(doc: PDFKit.PDFDocument, segments: Segment[]) {
+function paragraph(doc: PDFKit.PDFDocument, segments: ResumeSegment[]) {
   doc.fontSize(10.2).fillColor(INK);
   segments.forEach((seg, i) => {
     doc.font(seg.bold ? "Helvetica-Bold" : "Helvetica");
@@ -140,24 +140,7 @@ export function renderFallbackPdf({
 
     // ── Professional Summary ──
     heading(doc, "Professional Summary");
-    paragraph(doc, [
-      { text: "Frontend Engineer with " },
-      { text: `${totalExperienceLabel} of web development experience`, bold: true },
-      { text: ", including " },
-      {
-        text: `${reviseDurationLabel} building production React.js and Next.js applications`,
-        bold: true,
-      },
-      {
-        text: " — from real-time trading platforms and enterprise dashboards to AI-driven tools. Since ",
-      },
-      { text: "April 2026", bold: true },
-      { text: ", integrates " },
-      { text: "Claude Code", bold: true },
-      {
-        text: " into a daily AI-augmented development workflow, directing agentic pair-programming for scaffolding, refactors, and tests while owning every architecture and code-quality decision. Delivers production-grade features within fully remote, cross-functional Agile teams.",
-      },
-    ]);
+    paragraph(doc, resumeSummary(totalExperienceLabel, reviseDurationLabel));
 
     // ── Technical Skills ──
     heading(doc, "Technical Skills");
@@ -183,7 +166,7 @@ export function renderFallbackPdf({
     });
 
     // ── Projects ──
-    heading(doc, "Projects");
+    heading(doc, "Selected Projects");
     RESUME_PROJECTS.forEach((p) => {
       doc.fontSize(10.2).font("Helvetica-Bold").fillColor(INK);
       doc.text(`${p.name} — `, { continued: true });

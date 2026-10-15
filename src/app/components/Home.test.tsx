@@ -1,10 +1,6 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-// react-three-fiber WebGL scene doesn't run in jsdom and isn't the concern
-// of this component's own tests — stub it out before importing Home.
-vi.mock("./HeroScene", () => ({ default: () => null }));
 
 const gaEventMock = vi.fn();
 vi.mock("@/lib/gtag", () => ({
@@ -27,14 +23,18 @@ describe("Home", () => {
     render(<Home />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("I'm Ayyappa");
-    // Exact/case-sensitive: the MacWindow profile tab separately renders a
-    // lowercase "available for work" status line, which a case-insensitive
-    // regex query would also match, making the query ambiguous.
-    expect(screen.getByText("Available for work")).toBeInTheDocument();
-    expect(screen.getByText("Bengaluru, Karnataka, India")).toBeInTheDocument();
     expect(
-      screen.getByText(`${getTotalExperienceLabel()} Experience`),
+      screen.getByText((_, el) => el?.tagName === "SPAN" && /^Available for work · On-site, hybrid or remote$/.test(el.textContent ?? "") && el.classList.contains("rounded-full")),
     ).toBeInTheDocument();
+    expect(screen.getByText("Bengaluru, India")).toBeInTheDocument();
+    expect(
+      screen.getByText(`${getTotalExperienceLabel()} of experience`),
+    ).toBeInTheDocument();
+  });
+
+  it("doesn't position me as a React Native developer anywhere in the hero", () => {
+    const { container } = render(<Home />);
+    expect(container).not.toHaveTextContent(/react native/i);
   });
 
   it("renders the 'Let's Connect' CTA linking to #contact and fires gaEvent on click", async () => {
@@ -65,13 +65,37 @@ describe("Home", () => {
     expect(screen.getByText("Companies")).toBeInTheDocument();
   });
 
+  it("renders the quick stats with their real values on first render, never 0+", () => {
+    render(<Home />);
+    const value = (label: string) =>
+      screen.getByText(label).parentElement?.querySelector(".gradient-text")?.textContent;
+    expect(value("Years Exp.")).toBe("5+");
+    expect(value("Projects")).toBe("10+");
+    expect(value("Companies")).toBe("2");
+  });
+
+  it("leads with a static senior positioning headline", () => {
+    render(<Home />);
+    expect(screen.getByText("Senior Frontend Engineer")).toBeInTheDocument();
+    const stack = screen.getByRole("list", { name: "Core stack" });
+    expect(within(stack).getAllByRole("listitem").map((li) => li.textContent)).toEqual([
+      "React",
+      "Next.js",
+      "TypeScript",
+      "AI-Assisted Development",
+    ]);
+  });
+
   it("defaults the Mac window to the profile.ts tab, showing profile fields", () => {
     render(<Home />);
 
     expect(screen.getByText("profile.ts")).toBeInTheDocument();
-    expect(screen.getByText('"Ayyappa"')).toBeInTheDocument();
-    expect(screen.getByText('"Frontend Engineer"')).toBeInTheDocument();
-    expect(screen.getByText('"5+ Years"')).toBeInTheDocument();
+    expect(screen.getByText('"Ayyappa Swamy Angadi"')).toBeInTheDocument();
+    expect(screen.getByText('"Senior Frontend Engineer"')).toBeInTheDocument();
+    expect(screen.getByText('"5+ years"')).toBeInTheDocument();
+    for (const mode of ['"On-site"', '"Hybrid"', '"Remote"']) {
+      expect(screen.getByText(mode)).toBeInTheDocument();
+    }
   });
 
   it("switches to the terminal tab on click and fires gaEvent", async () => {
@@ -126,15 +150,15 @@ describe("Home", () => {
 
     expect(typedRole()?.textContent).toBe("");
 
-    // "Frontend Engineer" is 17 characters, typed at 100ms/char — advance in
-    // small steps so each intermediate setTimeout has a chance to schedule
-    // the next one via the effect it triggers.
-    for (let i = 0; i < 17; i++) {
+    // "real-time web applications" is 26 characters, typed at 100ms/char —
+    // advance in small steps so each intermediate setTimeout has a chance to
+    // schedule the next one via the effect it triggers.
+    for (let i = 0; i < 26; i++) {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(100);
       });
     }
-    expect(typedRole()?.textContent).toBe("Frontend Engineer");
+    expect(typedRole()?.textContent).toBe("real-time web applications");
 
     // After the full word types out: pauses 1800ms, then deletes at
     // 55ms/char before typing the next role. Step in small increments (a
@@ -148,7 +172,7 @@ describe("Home", () => {
         await vi.advanceTimersByTimeAsync(100);
       });
     }
-    expect(typedRole()?.textContent).not.toBe("Frontend Engineer");
+    expect(typedRole()?.textContent).not.toBe("real-time web applications");
   });
 
   it("renders a static, icon-only tech strip with exactly one title-labeled icon per technology", () => {
