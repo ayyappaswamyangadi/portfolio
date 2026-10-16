@@ -95,26 +95,17 @@ describe("Projects", () => {
     expect(within(card).getByText("Claude Code (AI-assisted)")).toBeInTheDocument();
   });
 
-  it("flips a card on tap (touch device), firing gaEvent only on the opening tap", async () => {
+  it("flips a card on tap (touch device) and back on a second tap", async () => {
     const user = userEvent.setup();
     render(<Projects />);
     const card = cardFor("TaxAI — AI Research Assistant for CAs");
     const front = within(card).getByRole("article");
 
     await user.click(within(front).getByText(/tap to see what i built/i));
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "expand",
-      category: "project_card",
-      label: "TaxAI — AI Research Assistant for CAs",
-    });
     // Once flipped, only the back face takes pointer input.
     expect(front).toHaveStyle({ pointerEvents: "none" });
 
-    gaEventMock.mockClear();
     await user.click(within(card).getAllByText("TaxAI — AI Research Assistant for CAs")[1]);
-    expect(gaEventMock).not.toHaveBeenCalledWith(
-      expect.objectContaining({ action: "expand" }),
-    );
     expect(front).toHaveStyle({ pointerEvents: "auto" });
   });
 
@@ -132,6 +123,23 @@ describe("Projects", () => {
       "https://apps.apple.com/in/app/grass-code-agent-computer/id6761881356",
     );
     expect(within(card).getByRole("link", { name: /on product hunt/i })).toBeInTheDocument();
+  });
+
+  it("fires project_link_click with the project and link type", () => {
+    render(<Projects />);
+    const card = cardFor("Grass: Code Agent Computer");
+
+    fireEvent.click(within(card).getByRole("link", { name: "Visit Website" }));
+    expect(gaEventMock).toHaveBeenCalledWith("project_link_click", {
+      project: "Grass: Code Agent Computer",
+      link: "primary",
+    });
+
+    fireEvent.click(within(card).getByRole("link", { name: /on the app store/i }));
+    expect(gaEventMock).toHaveBeenCalledWith("project_link_click", {
+      project: "Grass: Code Agent Computer",
+      link: "app_store",
+    });
   });
 
   it("links TaxAI and Convo to Product Hunt, with no ranking claim on Convo", () => {
@@ -171,11 +179,6 @@ describe("Projects", () => {
 
     await user.click(within(pages).getByRole("button", { name: "Next page" }));
     expect(screen.getByText(/showing 2–2 of 5 projects/i)).toBeInTheDocument();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "project_pagination",
-      label: "next",
-    });
   });
 
   it("More Projects fits three cards in the row on desktop, with two pages", () => {
@@ -244,11 +247,6 @@ describe("Projects", () => {
     await user.click(within(tablist).getByRole("tab", { name: /personal/i }));
     expect(screen.getByText(/showing 1–3 of 3 projects/i)).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "More projects pages" })).not.toBeInTheDocument();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "project_tab",
-      label: "Personal",
-    });
 
     await user.click(within(tablist).getByRole("tab", { name: /client/i }));
     expect(screen.getByText(/showing 1–1 of 1 project$/i)).toBeInTheDocument();
@@ -283,11 +281,6 @@ describe("Projects", () => {
     expect(getScrollToMock()).toHaveBeenCalledWith(
       expect.objectContaining({ behavior: "smooth" }),
     );
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "featured_carousel",
-      label: "next",
-    });
     expect(prev).not.toBeDisabled();
 
     // jsdom has no layout, so the carousel assumes one card per view:

@@ -76,23 +76,6 @@ describe("Contact", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it("fires a gaEvent validation_error on a failed submit attempt", async () => {
-    const user = userEvent.setup();
-    render(<Contact />);
-
-    await user.click(screen.getByRole("button", { name: /send message/i }));
-
-    await waitFor(() =>
-      expect(gaEventMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          action: "submit",
-          category: "contact_form",
-          label: expect.stringContaining("validation_error"),
-        }),
-      ),
-    );
-  });
-
   it("rejects an invalid email but accepts a valid one", async () => {
     const user = userEvent.setup();
     render(<Contact />);
@@ -131,11 +114,7 @@ describe("Contact", () => {
     await waitFor(() =>
       expect(screen.getByLabelText(/your name/i)).toHaveValue(""),
     );
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "submit",
-      category: "contact_form",
-      label: "success",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("message_sent");
   });
 
   it("shows an error message when the API responds with success: false", async () => {
@@ -149,11 +128,7 @@ describe("Contact", () => {
     await user.click(screen.getByRole("button", { name: /send message/i }));
 
     expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "submit",
-      category: "contact_form",
-      label: "error",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("message_failed");
   });
 
   it("shows an error message when the fetch call itself throws", async () => {
@@ -197,11 +172,7 @@ describe("Contact", () => {
 
     await user.click(screen.getByRole("link", { name: /ayyappaswamy50@gmail.com/i }));
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "contact_info",
-      label: "Email me",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("contact_email_click");
   });
 
   it("makes each whole contact card a link with the right action", () => {

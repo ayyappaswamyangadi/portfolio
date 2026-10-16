@@ -50,30 +50,20 @@ describe("PWAInstallPrompt", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows the banner after beforeinstallprompt fires and fires pwa_prompt_shown/android", async () => {
+  it("shows the banner after beforeinstallprompt fires", async () => {
     render(<PWAInstallPrompt />);
     dispatchBeforeInstallPrompt();
 
     expect(await screen.findByRole("dialog", { name: /install app/i })).toBeInTheDocument();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "pwa_prompt_shown",
-      category: "engagement",
-      label: "android",
-    });
   });
 
-  it("shows the banner immediately on iOS with instructional copy, no Install button, and fires pwa_prompt_shown/ios", () => {
+  it("shows the banner immediately on iOS with instructional copy, no Install button", () => {
     useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallPrompt />);
 
     const dialog = screen.getByRole("dialog", { name: /install app/i });
     expect(dialog).toHaveTextContent(/add to home screen/i);
     expect(within(dialog).queryByRole("button", { name: "Install" })).not.toBeInTheDocument();
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "pwa_prompt_shown",
-      category: "engagement",
-      label: "ios",
-    });
   });
 
   it("does not show the prompt again within 14 days of a dismissal", () => {
@@ -92,7 +82,7 @@ describe("PWAInstallPrompt", () => {
     expect(screen.getByRole("dialog", { name: /install app/i })).toBeInTheDocument();
   });
 
-  it("dismiss button hides the banner, records dismissal, and fires pwa_prompt_dismissed", async () => {
+  it("dismiss button hides the banner, records dismissal", async () => {
     useIOSInstallMock.mockReturnValue({ isIOS: true, isInstalled: false });
     render(<PWAInstallPrompt />);
 
@@ -103,11 +93,6 @@ describe("PWAInstallPrompt", () => {
     // exit animation (real timing, driven by rAF) — wait for it to finish
     // unmounting rather than asserting immediately after the click.
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "pwa_prompt_dismissed",
-      category: "engagement",
-      label: "ios",
-    });
     expect(localStorage.getItem(DISMISS_KEY)).not.toBeNull();
   });
 
@@ -132,7 +117,7 @@ describe("PWAInstallPrompt", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(/install anytime from the menu/i);
   });
 
-  it("clicking Install calls prompt(), hides the banner on any outcome, and fires pwa_install", async () => {
+  it("clicking Install calls prompt(), hides the banner on any outcome, and fires app_installed", async () => {
     render(<PWAInstallPrompt />);
     const event = dispatchBeforeInstallPrompt("accepted");
     await screen.findByRole("dialog", { name: /install app/i });
@@ -142,11 +127,7 @@ describe("PWAInstallPrompt", () => {
 
     expect(event.prompt).toHaveBeenCalledTimes(1);
     await waitFor(() =>
-      expect(gaEventMock).toHaveBeenCalledWith({
-        action: "pwa_install",
-        category: "engagement",
-        label: "accepted",
-      }),
+      expect(gaEventMock).toHaveBeenCalledWith("app_installed", { placement: "prompt" }),
     );
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     // Accepted outcome clears the prompt rather than recording a dismissal.

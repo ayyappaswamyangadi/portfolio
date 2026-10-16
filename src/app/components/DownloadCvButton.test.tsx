@@ -36,25 +36,21 @@ describe("DownloadCvButton", () => {
   });
 
   it("renders a button with the given className", () => {
-    render(<DownloadCvButton gaLabel="test_label" className="my-class" />);
+    render(<DownloadCvButton placement="test_label" className="my-class" />);
 
     const button = screen.getByRole("button", { name: /download cv/i });
     expect(button).toHaveClass("my-class");
     expect(button).toHaveAttribute("aria-busy", "false");
   });
 
-  it("fires gaEvent with the exact gaLabel prop on click", async () => {
+  it("fires download_cv with the placement prop on click", async () => {
     vi.mocked(fetch).mockResolvedValue(pdfResponse());
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="hero_download_cv" className="" />);
+    render(<DownloadCvButton placement="hero" className="" />);
 
     await user.click(screen.getByRole("button", { name: /download cv/i }));
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "download_cv",
-      category: "engagement",
-      label: "hero_download_cv",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("download_cv", { placement: "hero" });
   });
 
   it("shows a 'Downloading…' state during the fetch, then reverts on success", async () => {
@@ -65,7 +61,7 @@ describe("DownloadCvButton", () => {
       }),
     );
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="footer_download_cv" className="" />);
+    render(<DownloadCvButton placement="footer_download_cv" className="" />);
 
     const button = screen.getByRole("button", { name: /download cv/i });
     await user.click(button);
@@ -91,7 +87,7 @@ describe("DownloadCvButton", () => {
       .mockImplementation(() => {});
 
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="test" className="" />);
+    render(<DownloadCvButton placement="test" className="" />);
     await user.click(screen.getByRole("button", { name: /download cv/i }));
 
     await waitFor(() => expect(clickSpy).toHaveBeenCalledTimes(1));
@@ -103,7 +99,7 @@ describe("DownloadCvButton", () => {
   it("shows a 'Download failed — retry' state when the server responds with an error status, and never calls createObjectURL", async () => {
     vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 500 }));
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="test" className="" />);
+    render(<DownloadCvButton placement="test" className="" />);
 
     await user.click(screen.getByRole("button", { name: /download cv/i }));
 
@@ -114,7 +110,7 @@ describe("DownloadCvButton", () => {
   it("shows the error state when the server responds 200 with an empty body", async () => {
     vi.mocked(fetch).mockResolvedValue(pdfResponse(0));
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="test" className="" />);
+    render(<DownloadCvButton placement="test" className="" />);
 
     await user.click(screen.getByRole("button", { name: /download cv/i }));
 
@@ -124,7 +120,7 @@ describe("DownloadCvButton", () => {
   it("reverts from the error state back to idle after a delay", async () => {
     vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 500 }));
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="test" className="" />);
+    render(<DownloadCvButton placement="test" className="" />);
 
     await user.click(screen.getByRole("button", { name: /download cv/i }));
     expect(await screen.findByText(/download failed/i)).toBeInTheDocument();
@@ -140,7 +136,7 @@ describe("DownloadCvButton", () => {
   it("still fires gaEvent on every click, including while already downloading", async () => {
     vi.mocked(fetch).mockReturnValue(new Promise(() => {}));
     const user = userEvent.setup();
-    render(<DownloadCvButton gaLabel="repeat_click" className="" />);
+    render(<DownloadCvButton placement="repeat_click" className="" />);
 
     const button = screen.getByRole("button", { name: /download cv/i });
     await user.click(button);

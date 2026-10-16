@@ -53,14 +53,10 @@ describe("Footer", () => {
 
     await user.click(screen.getByRole("link", { name: "GitHub" }));
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "social",
-      label: "github_footer",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("github_click", { placement: "footer" });
   });
 
-  it("renders a 'Let's Connect' CTA linking to #contact and firing its own gaEvent", async () => {
+  it("renders a 'Let's Connect' CTA linking to #contact and firing lets_connect_click", async () => {
     render(<Footer />);
     const user = userEvent.setup();
 
@@ -69,11 +65,7 @@ describe("Footer", () => {
 
     await user.click(cta);
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "hero_cta",
-      label: "lets_connect_footer",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("lets_connect_click", { placement: "footer" });
   });
 
   it("renders a Download CV button", () => {

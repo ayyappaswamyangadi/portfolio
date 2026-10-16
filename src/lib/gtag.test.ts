@@ -15,7 +15,7 @@ describe("gaEvent", () => {
     const gtagSpy = vi.fn();
     window.gtag = gtagSpy;
 
-    gaEvent({ action: "click", category: "test" });
+    gaEvent("download_cv");
 
     expect(gtagSpy).not.toHaveBeenCalled();
   });
@@ -26,36 +26,28 @@ describe("gaEvent", () => {
     // @ts-expect-error simulating gtag.js not having loaded yet
     window.gtag = undefined;
 
-    expect(() => gaEvent({ action: "click", category: "test" })).not.toThrow();
+    expect(() => gaEvent("download_cv")).not.toThrow();
   });
 
-  it("forwards action/category/label/value to window.gtag as an 'event' call", async () => {
+  it("sends the event name with its params", async () => {
     vi.stubEnv("NEXT_PUBLIC_GA_ID", "G-TEST123");
     const { gaEvent } = await import("./gtag");
     const gtagSpy = vi.fn();
     window.gtag = gtagSpy;
 
-    gaEvent({ action: "submit", category: "contact_form", label: "success", value: 1 });
+    gaEvent("lets_connect_click", { placement: "hero" });
 
-    expect(gtagSpy).toHaveBeenCalledWith("event", "submit", {
-      event_category: "contact_form",
-      event_label: "success",
-      value: 1,
-    });
+    expect(gtagSpy).toHaveBeenCalledWith("event", "lets_connect_click", { placement: "hero" });
   });
 
-  it("passes through undefined label/value when not provided", async () => {
+  it("sends an empty params object when none are given", async () => {
     vi.stubEnv("NEXT_PUBLIC_GA_ID", "G-TEST123");
     const { gaEvent } = await import("./gtag");
     const gtagSpy = vi.fn();
     window.gtag = gtagSpy;
 
-    gaEvent({ action: "click", category: "navigation" });
+    gaEvent("message_sent");
 
-    expect(gtagSpy).toHaveBeenCalledWith("event", "click", {
-      event_category: "navigation",
-      event_label: undefined,
-      value: undefined,
-    });
+    expect(gtagSpy).toHaveBeenCalledWith("event", "message_sent", {});
   });
 });

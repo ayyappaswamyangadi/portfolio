@@ -3,11 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ThemeToggleButton from "./ThemeToggleButton";
 
-const gaEventMock = vi.fn();
-vi.mock("@/lib/gtag", () => ({
-  gaEvent: (...args: unknown[]) => gaEventMock(...args),
-}));
-
 const setThemeMock = vi.fn();
 let mockTheme = "dark";
 vi.mock("next-themes", () => ({
@@ -16,7 +11,6 @@ vi.mock("next-themes", () => ({
 
 describe("ThemeToggleButton", () => {
   beforeEach(() => {
-    gaEventMock.mockClear();
     setThemeMock.mockClear();
     mockTheme = "dark";
   });
@@ -40,7 +34,7 @@ describe("ThemeToggleButton", () => {
     expect(button.querySelector("svg")).toHaveClass("lucide-moon");
   });
 
-  it("switches from light to dark on click and fires the toggle_theme gaEvent", async () => {
+  it("switches from light to dark on click", async () => {
     mockTheme = "light";
     render(<ThemeToggleButton />);
     const user = userEvent.setup();
@@ -49,14 +43,9 @@ describe("ThemeToggleButton", () => {
     await user.click(button);
 
     expect(setThemeMock).toHaveBeenCalledWith("dark");
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "toggle_theme",
-      category: "engagement",
-      label: "dark",
-    });
   });
 
-  it("switches from dark to light on click and fires the toggle_theme gaEvent", async () => {
+  it("switches from dark to light on click", async () => {
     mockTheme = "dark";
     render(<ThemeToggleButton />);
     const user = userEvent.setup();
@@ -65,10 +54,5 @@ describe("ThemeToggleButton", () => {
     await user.click(button);
 
     expect(setThemeMock).toHaveBeenCalledWith("light");
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "toggle_theme",
-      category: "engagement",
-      label: "light",
-    });
   });
 });

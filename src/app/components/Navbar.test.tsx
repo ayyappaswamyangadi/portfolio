@@ -64,35 +64,17 @@ describe("Navbar", () => {
     hireLinks.forEach((link) => expect(link).toHaveAttribute("href", "#contact"));
   });
 
-  it("fires a navigation gaEvent with the desktop label when a desktop nav link is clicked", async () => {
-    renderNavbar();
-    const user = userEvent.setup();
-
-    const [desktopAbout] = screen.getAllByRole("link", { name: /^about$/i });
-    await user.click(desktopAbout);
-
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "navigation",
-      label: "about_desktop",
-    });
-  });
-
-  it("fires a hero_cta gaEvent with the navbar label when 'Hire me' is clicked (desktop)", async () => {
+  it("fires hire_me_click when 'Hire me' is clicked (desktop)", async () => {
     renderNavbar();
     const user = userEvent.setup();
 
     const [desktopHire] = screen.getAllByRole("link", { name: /hire me/i });
     await user.click(desktopHire);
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "hero_cta",
-      label: "hire_me_navbar",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("hire_me_click", { placement: "navbar" });
   });
 
-  it("toggles the mobile menu open/closed via the menu button, updating aria-expanded and firing gaEvent", async () => {
+  it("toggles the mobile menu open/closed via the menu button, updating aria-expanded", async () => {
     renderNavbar();
     const user = userEvent.setup();
 
@@ -101,22 +83,12 @@ describe("Navbar", () => {
 
     await user.click(menuButton);
     expect(menuButton).toHaveAttribute("aria-expanded", "true");
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "navigation",
-      label: "menu_open",
-    });
 
     await user.click(menuButton);
     expect(menuButton).toHaveAttribute("aria-expanded", "false");
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "navigation",
-      label: "menu_close",
-    });
   });
 
-  it("closes the mobile menu and fires the mobile nav gaEvent when a mobile nav link is clicked", async () => {
+  it("closes the mobile menu when a mobile nav link is clicked", async () => {
     renderNavbar();
     const user = userEvent.setup();
 
@@ -129,15 +101,10 @@ describe("Navbar", () => {
     const [, mobileContact] = screen.getAllByRole("link", { name: /^contact$/i });
     await user.click(mobileContact);
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "navigation",
-      label: "contact_mobile",
-    });
     expect(menuButton).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("closes the mobile menu and fires hire_me_navbar_mobile when the mobile 'Hire me' CTA is clicked", async () => {
+  it("closes the mobile menu and fires hire_me_click when the mobile 'Hire me' CTA is clicked", async () => {
     renderNavbar();
     const user = userEvent.setup();
 
@@ -147,11 +114,7 @@ describe("Navbar", () => {
     const [, mobileHire] = screen.getAllByRole("link", { name: /hire me/i });
     await user.click(mobileHire);
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "hero_cta",
-      label: "hire_me_navbar_mobile",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("hire_me_click", { placement: "navbar_mobile" });
     expect(menuButton).toHaveAttribute("aria-expanded", "false");
   });
 

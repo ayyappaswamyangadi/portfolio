@@ -2,8 +2,15 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { gaEvent } from "@/lib/gtag";
+import { gaEvent, type AnalyticsEvent } from "@/lib/gtag";
 import { DownloadCvButton } from "./DownloadCvButton";
+
+// GA event for each social icon, keyed by its label.
+export function socialEvent(label: string): AnalyticsEvent {
+  if (label === "GitHub") return "github_click";
+  if (label === "LinkedIn") return "linkedin_click";
+  return "email_icon_click";
+}
 
 export const socials = [
   {
@@ -97,7 +104,7 @@ export function Footer() {
                 aria-label={s.label}
                 title={s.label}
                 onClick={() =>
-                  gaEvent({ action: "click", category: "social", label: `${s.label.toLowerCase()}_footer` })
+                  gaEvent(socialEvent(s.label), { placement: "footer" })
                 }
                 className={`btn-click ${s.cls} w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-accent transition-all duration-200`}
               >
@@ -111,14 +118,14 @@ export function Footer() {
             <a
               href="#contact"
               onClick={() =>
-                gaEvent({ action: "click", category: "hero_cta", label: "lets_connect_footer" })
+                gaEvent("lets_connect_click", { placement: "footer" })
               }
               className="btn-primary btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2"
             >
               Let&apos;s Connect
             </a>
             <DownloadCvButton
-              gaLabel="footer_download_cv"
+              placement="footer"
               className="btn-click inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-md border border-border bg-card/70 hover:border-primary/40 hover:bg-accent/60 transition-colors text-foreground font-semibold"
             />
           </div>

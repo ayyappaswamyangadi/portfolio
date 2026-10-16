@@ -46,11 +46,7 @@ describe("Home", () => {
 
     await user.click(cta);
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "hero_cta",
-      label: "lets_connect",
-    });
+    expect(gaEventMock).toHaveBeenCalledWith("lets_connect_click", { placement: "hero" });
   });
 
   it("renders a Download CV button", () => {
@@ -98,18 +94,13 @@ describe("Home", () => {
     }
   });
 
-  it("switches to the terminal tab on click and fires gaEvent", async () => {
+  it("switches to the terminal tab on click", async () => {
     const user = userEvent.setup();
     render(<Home />);
 
     const terminalTab = screen.getByRole("button", { name: /terminal/i });
     await user.click(terminalTab);
 
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "click",
-      category: "hero_mac_window",
-      label: "terminal_tab",
-    });
     // Profile-only content should no longer be present once switched away.
     expect(screen.queryByText('"Ayyappa"')).not.toBeInTheDocument();
   });

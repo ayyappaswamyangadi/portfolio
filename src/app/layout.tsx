@@ -17,8 +17,6 @@ import {
   UPDATE_VIEW_KEY,
 } from "@/app/components/ServiceWorkerUpdater";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
-import { WebVitals } from "@/app/components/WebVitals";
-import { SectionViewTracker } from "@/app/components/SectionViewTracker";
 import { StructuredData } from "@/app/components/StructuredData";
 import type { Metadata, Viewport } from "next";
 
@@ -183,8 +181,6 @@ export default function RootLayout({
         <StructuredData />
         <GoogleAnalytics />
         <SpeedInsights />
-        <WebVitals />
-        <SectionViewTracker />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <FaviconThemeSync />
           <CursorGlow />

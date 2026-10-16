@@ -22,11 +22,11 @@ type Status = "idle" | "downloading" | "error";
 
 export function DownloadCvButton({
   className,
-  gaLabel,
+  placement,
   iconSize = 14,
 }: {
   className: string;
-  gaLabel: string;
+  placement: string;
   iconSize?: number;
 }) {
   const [status, setStatus] = useState<Status>("idle");
@@ -39,7 +39,7 @@ export function DownloadCvButton({
   }, []);
 
   const handleClick = async () => {
-    gaEvent({ action: "download_cv", category: "engagement", label: gaLabel });
+    gaEvent("download_cv", { placement });
     if (status === "downloading") return;
     setStatus("downloading");
 

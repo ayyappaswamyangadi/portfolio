@@ -58,12 +58,14 @@ function GithubIcon({ size = 14 }: { size?: number }) {
 function IconLink({
   href,
   label,
-  gaLabel,
+  project,
+  link,
   children,
 }: {
   href: string;
   label: string;
-  gaLabel: string;
+  project: string;
+  link: string;
   children: React.ReactNode;
 }) {
   return (
@@ -75,7 +77,7 @@ function IconLink({
       aria-label={label}
       onClick={(e) => {
         e.stopPropagation();
-        gaEvent({ action: "click", category: "project_link", label: gaLabel });
+        gaEvent("project_link_click", { project, link });
       }}
       className="btn-click inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary/50 hover:bg-accent hover:text-foreground"
     >
@@ -126,12 +128,7 @@ function ProjectCard({ project }: { project: Project }) {
   const lastTouchFlip = useRef(0);
 
   const toggle = () => {
-    setFlipped((f) => {
-      if (!f) {
-        gaEvent({ action: "expand", category: "project_card", label: project.title });
-      }
-      return !f;
-    });
+    setFlipped((f) => !f);
   };
 
   const handleTap = () => {
@@ -293,7 +290,8 @@ function ProjectCard({ project }: { project: Project }) {
                   <IconLink
                     href={project.appStoreUrl}
                     label={`${project.title} on the App Store`}
-                    gaLabel={`app_store_${project.title}`}
+                    project={project.title}
+                    link="app_store"
                   >
                     <SiAppstore size={14} aria-hidden="true" />
                   </IconLink>
@@ -302,7 +300,8 @@ function ProjectCard({ project }: { project: Project }) {
                   <IconLink
                     href={project.productHuntUrl}
                     label={`${project.title} on Product Hunt`}
-                    gaLabel={`product_hunt_${project.title}`}
+                    project={project.title}
+                    link="product_hunt"
                   >
                     <SiProducthunt size={14} aria-hidden="true" />
                   </IconLink>
@@ -311,7 +310,8 @@ function ProjectCard({ project }: { project: Project }) {
                   <IconLink
                     href={project.githubUrl}
                     label={`${project.title} source code on GitHub`}
-                    gaLabel={`github_${project.title}`}
+                    project={project.title}
+                    link="github"
                   >
                     <GithubIcon size={14} />
                   </IconLink>
@@ -378,11 +378,7 @@ function ProjectCard({ project }: { project: Project }) {
                   rel="noopener noreferrer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    gaEvent({
-                      action: "click",
-                      category: "project_link",
-                      label: `primary_${project.title}`,
-                    });
+                    gaEvent("project_link_click", { project: project.title, link: "primary" });
                   }}
                   className="btn-click inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white"
                   style={{ background: "var(--btn-gradient)" }}
@@ -449,7 +445,7 @@ function FeaturedCarousel() {
     return () => window.removeEventListener("resize", measure);
   }, [measure]);
 
-  const goTo = (i: number, label: string) => {
+  const goTo = (i: number) => {
     const el = scrollRef.current;
     if (!el) return;
     const target = Math.min(Math.max(i, 0), positions - 1);
@@ -458,7 +454,6 @@ function FeaturedCarousel() {
     pendingTarget.current = s > CAROUSEL_GAP_PX ? target : null;
     el.scrollTo({ left: target * s, behavior: "smooth" });
     setIndex(target);
-    gaEvent({ action: "click", category: "featured_carousel", label });
   };
 
   const current = Math.min(index, positions - 1);
@@ -477,7 +472,7 @@ function FeaturedCarousel() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => goTo(current - 1, "prev")}
+              onClick={() => goTo(current - 1)}
               disabled={current === 0}
               aria-label="Previous project"
               className="btn-click flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary/50 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
@@ -486,7 +481,7 @@ function FeaturedCarousel() {
             </button>
             <button
               type="button"
-              onClick={() => goTo(current + 1, "next")}
+              onClick={() => goTo(current + 1)}
               disabled={current >= positions - 1}
               aria-label="Next project"
               className="btn-click flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary/50 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
@@ -522,7 +517,7 @@ function FeaturedCarousel() {
             <button
               key={i}
               type="button"
-              onClick={() => goTo(i, `dot_${i + 1}`)}
+              onClick={() => goTo(i)}
               aria-label={`Go to slide ${i + 1} of ${positions}`}
               aria-current={current === i ? "true" : undefined}
               className={`h-2 rounded-full transition-all duration-300 ${
@@ -592,7 +587,6 @@ function MoreProjects() {
   const selectTab = (i: number) => {
     setTab(i);
     setPage(0);
-    gaEvent({ action: "click", category: "project_tab", label: projectTabs[i].label });
   };
 
   // Arrow keys move between tabs, per the WAI-ARIA tabs pattern.
@@ -606,9 +600,8 @@ function MoreProjects() {
     tabRefs.current[next]?.focus();
   };
 
-  const go = (p: number, label: string) => {
+  const go = (p: number) => {
     setPage(Math.min(Math.max(p, 0), totalPages - 1));
-    gaEvent({ action: "click", category: "project_pagination", label });
   };
 
   return (
@@ -691,7 +684,7 @@ function MoreProjects() {
         >
           <button
             type="button"
-            onClick={() => go(current - 1, "prev")}
+            onClick={() => go(current - 1)}
             disabled={current === 0}
             aria-label="Previous page"
             className="btn-click flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary/50 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
@@ -702,7 +695,7 @@ function MoreProjects() {
             <button
               key={i}
               type="button"
-              onClick={() => go(i, `page_${i + 1}`)}
+              onClick={() => go(i)}
               aria-label={`Page ${i + 1}`}
               aria-current={current === i ? "page" : undefined}
               className="btn-click h-8 w-8 rounded-full text-xs font-semibold transition-all"
@@ -724,7 +717,7 @@ function MoreProjects() {
           ))}
           <button
             type="button"
-            onClick={() => go(current + 1, "next")}
+            onClick={() => go(current + 1)}
             disabled={current >= totalPages - 1}
             aria-label="Next page"
             className="btn-click flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary/50 hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"

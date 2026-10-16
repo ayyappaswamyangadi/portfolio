@@ -63,7 +63,7 @@ describe("PWAInstallButton", () => {
     expect(screen.getByRole("button", { name: /install app/i })).toBeInTheDocument();
   });
 
-  it("clicking Install calls prompt(), awaits userChoice, and fires a gaEvent with the outcome", async () => {
+  it("clicking Install calls prompt(), awaits userChoice, and fires app_installed when accepted", async () => {
     const promptFn = vi.fn().mockResolvedValue(undefined);
     render(<PWAInstallButton />);
     dispatchBeforeInstallPrompt({ prompt: promptFn, userChoice: Promise.resolve({ outcome: "accepted" }) });
@@ -73,11 +73,7 @@ describe("PWAInstallButton", () => {
 
     expect(promptFn).toHaveBeenCalledTimes(1);
     await waitFor(() =>
-      expect(gaEventMock).toHaveBeenCalledWith({
-        action: "pwa_install",
-        category: "engagement",
-        label: "accepted",
-      }),
+      expect(gaEventMock).toHaveBeenCalledWith("app_installed", { placement: "button" }),
     );
   });
 
@@ -95,16 +91,18 @@ describe("PWAInstallButton", () => {
 
   it("keeps the button available after a dismissed outcome (prompt not cleared)", async () => {
     render(<PWAInstallButton />);
-    dispatchBeforeInstallPrompt({ userChoice: Promise.resolve({ outcome: "dismissed" }) });
+    const promptMock = vi.fn().mockResolvedValue(undefined);
+    dispatchBeforeInstallPrompt({
+      prompt: promptMock,
+      userChoice: Promise.resolve({ outcome: "dismissed" }),
+    });
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /install app/i }));
 
-    await waitFor(() =>
-      expect(gaEventMock).toHaveBeenCalledWith(
-        expect.objectContaining({ label: "dismissed" }),
-      ),
-    );
+    await waitFor(() => expect(promptMock).toHaveBeenCalled());
+    // Only a completed install is tracked — a dismissal sends nothing.
+    expect(gaEventMock).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: /install app/i })).toBeInTheDocument();
   });
 

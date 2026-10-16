@@ -91,7 +91,7 @@ export function PWAInstallButton({ revealAfterPromptDismiss = false }: PWAInstal
     if (!prompt) return;
     await prompt.prompt();
     const { outcome } = await prompt.userChoice;
-    gaEvent({ action: "pwa_install", category: "engagement", label: outcome });
+    if (outcome === "accepted") gaEvent("app_installed", { placement: "button" });
     if (outcome === "accepted") setPrompt(null);
   };
 

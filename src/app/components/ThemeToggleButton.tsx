@@ -2,7 +2,6 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
-import { gaEvent } from "@/lib/gtag";
 
 const ThemeToggleButton = () => {
   const { theme, setTheme } = useTheme();
@@ -17,7 +16,6 @@ const ThemeToggleButton = () => {
   const handleToggle = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
-    gaEvent({ action: "toggle_theme", category: "engagement", label: next });
   };
 
   return (

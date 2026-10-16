@@ -3,14 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ErrorPage from "./error";
 
-const gaEventMock = vi.fn();
-vi.mock("@/lib/gtag", () => ({
-  gaEvent: (...args: unknown[]) => gaEventMock(...args),
-}));
-
 describe("Error (route-level error boundary)", () => {
   beforeEach(() => {
-    gaEventMock.mockClear();
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
@@ -32,15 +26,10 @@ describe("Error (route-level error boundary)", () => {
     expect(reset).toHaveBeenCalledTimes(1);
   });
 
-  it("logs the error and fires a gaEvent exception on mount", () => {
+  it("logs the error on mount", () => {
     const error = new Error("network dropped");
     render(<ErrorPage error={error} reset={vi.fn()} />);
 
     expect(console.error).toHaveBeenCalledWith(error);
-    expect(gaEventMock).toHaveBeenCalledWith({
-      action: "exception",
-      category: "error",
-      label: "network dropped",
-    });
   });
 });

@@ -15,7 +15,7 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
-import { gaEvent } from "@/lib/gtag";
+import { gaEvent, type AnalyticsEvent } from "@/lib/gtag";
 
 // ─── Form schema ─────────────────────────────────────────────────────────────
 const contactSchema = z.object({
@@ -54,7 +54,16 @@ function mapsUrlForDevice(): { url: string; newTab: boolean } {
   return { url: GOOGLE_MAPS_URL, newTab: true };
 }
 
-const contactInfo = [
+const contactInfo: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href: string;
+  desc: string;
+  action: string;
+  gaEvent: AnalyticsEvent;
+  isMap?: boolean;
+}[] = [
   {
     icon: <Mail size={20} />,
     label: "Email me",
@@ -62,6 +71,7 @@ const contactInfo = [
     href: "mailto:ayyappaswamy50@gmail.com",
     desc: "I reply within 24 hours",
     action: "Send an email",
+    gaEvent: "contact_email_click",
   },
   {
     icon: <Phone size={20} />,
@@ -70,6 +80,7 @@ const contactInfo = [
     href: "tel:+918792594229",
     desc: "Mon–Fri, 10am – 7pm IST",
     action: "Call",
+    gaEvent: "contact_call_click",
   },
   {
     icon: <MapPin size={20} />,
@@ -78,6 +89,7 @@ const contactInfo = [
     href: GOOGLE_MAPS_URL,
     desc: "Open to on-site, hybrid & remote roles",
     action: "Open in maps",
+    gaEvent: "contact_location_click",
     isMap: true,
   },
 ];
@@ -175,19 +187,15 @@ export function Contact() {
       });
       const result = await response.json();
       if (result.success) {
-        gaEvent({
-          action: "submit",
-          category: "contact_form",
-          label: "success",
-        });
+        gaEvent("message_sent");
         reset();
         showToast("success", 5000);
       } else {
-        gaEvent({ action: "submit", category: "contact_form", label: "error" });
+        gaEvent("message_failed");
         showToast("error", 4000);
       }
     } catch {
-      gaEvent({ action: "submit", category: "contact_form", label: "error" });
+      gaEvent("message_failed");
       showToast("error", 4000);
     }
   };
@@ -293,11 +301,7 @@ export function Contact() {
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
                 onClick={() =>
-                  gaEvent({
-                    action: "click",
-                    category: "contact_info",
-                    label: item.label,
-                  })
+                  gaEvent(item.gaEvent)
                 }
                 className="project-card p-5 flex flex-col items-center text-center gap-3 group cursor-pointer hover:-translate-y-1 hover:border-primary/40 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-primary"
               >
@@ -349,13 +353,7 @@ export function Contact() {
             </div>
 
             <form
-              onSubmit={handleSubmit(onSubmit, (formErrors) =>
-                gaEvent({
-                  action: "submit",
-                  category: "contact_form",
-                  label: `validation_error_${Object.keys(formErrors).join("_")}`,
-                }),
-              )}
+              onSubmit={handleSubmit(onSubmit)}
               className="space-y-5"
               noValidate
             >

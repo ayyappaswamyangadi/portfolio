@@ -54,7 +54,6 @@ export function PWAInstallPrompt() {
     // install trigger there, so just show the instructional copy directly.
     if (isIOS) {
       setVisible(true);
-      gaEvent({ action: "pwa_prompt_shown", category: "engagement", label: "ios" });
       return;
     }
 
@@ -62,7 +61,6 @@ export function PWAInstallPrompt() {
       e.preventDefault();
       setPrompt(e as BeforeInstallPromptEvent);
       setVisible(true);
-      gaEvent({ action: "pwa_prompt_shown", category: "engagement", label: "android" });
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -72,14 +70,13 @@ export function PWAInstallPrompt() {
   const dismiss = () => {
     setVisible(false);
     markDismissed();
-    gaEvent({ action: "pwa_prompt_dismissed", category: "engagement", label: isIOS ? "ios" : "android" });
   };
 
   const handleInstall = async () => {
     if (!prompt) return;
     await prompt.prompt();
     const { outcome } = await prompt.userChoice;
-    gaEvent({ action: "pwa_install", category: "engagement", label: outcome });
+    if (outcome === "accepted") gaEvent("app_installed", { placement: "prompt" });
     setVisible(false);
     if (outcome !== "accepted") {
       markDismissed();
