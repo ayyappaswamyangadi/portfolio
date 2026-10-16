@@ -124,13 +124,11 @@ export const metadata: Metadata = {
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
-    // iOS Safari does not render SVG apple-touch-icons — it silently falls
-    // back to a screenshot of the page — so the PNG must be listed (and
-    // listed first; Safari uses the first entry it recognizes).
-    apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
-      { url: "/apple-icon.svg", type: "image/svg+xml" },
-    ],
+    // PNG only. iOS can't use an SVG home-screen icon, and when several
+    // apple-touch-icons are listed it doesn't reliably pick the PNG — a
+    // size-less SVG entry can win, and iOS then draws a plain letter tile
+    // ("A" from the app title) instead of the icon.
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
     shortcut: "/icon.svg",
   },
   appleWebApp: {
