@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/resume": ["./node_modules/pdfkit/js/standard-fonts/**"],
   },
+  // Deliberately no apex -> www redirect: the app is installed from both
+  // ayyappa.dev and www.ayyappa.dev, and each install's service worker lives
+  // on its own origin. Browsers refuse a redirected worker script, so a
+  // redirect freezes apex installs on whatever build they last cached. Both
+  // hosts serve the full site; the canonical tag (layout.tsx) and sitemap
+  // point at www, so search engines still index one copy.
+  //
   // Baseline security headers. Deliberately not shipping a CSP here — this
   // page loads Google Analytics' inline script + remote JS, Google Fonts,
   // and a WebGL scene, and a strict policy tuned blind (no way to test it
@@ -25,40 +32,6 @@ const nextConfig: NextConfig = {
   // than actually protecting anything. These four are standard, essentially
   // never break a site, and cover the common baseline (MIME sniffing,
   // referrer leakage, clickjacking, unwanted device access).
-  // The apex domain currently serves the same page as www with a 200, i.e.
-  // two indexable copies of one site. The canonical tag already points at
-  // www, but a 308 consolidates ranking signals for real. The Search Console
-  // verification file is excluded so the redirect can't break an existing
-  // apex-domain property's ownership check.
-  //
-  // /sw.js is excluded too: a PWA installed from the apex before this
-  // redirect existed has its own service worker on that origin, and browsers
-  // refuse a redirected worker script — so that worker could never update and
-  // kept serving its stale build forever. On the apex, /sw.js is instead
-  // rewritten (below) to a worker that clears it out and hands over to www.
-  async redirects() {
-    return [
-      {
-        source: "/:path((?!google1a73ae2602885b7d\\.html$|sw\\.js$).*)",
-        has: [{ type: "host", value: "ayyappa.dev" }],
-        destination: "https://www.ayyappa.dev/:path",
-        permanent: true,
-      },
-    ];
-  },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: "/sw.js",
-          has: [{ type: "host", value: "ayyappa.dev" }],
-          destination: "/apex-sw.js",
-        },
-      ],
-      afterFiles: [],
-      fallback: [],
-    };
-  },
   async headers() {
     return [
       {
@@ -86,8 +59,6 @@ export default withPWA({
   // waking up (network flapping off/on) threw the reader back to the top
   // mid-read. NetworkStatus already announces reconnection.
   reloadOnOnline: false,
-  // Only ever served on the apex domain, as its /sw.js — never precache it.
-  publicExcludes: ["!noprecache/**/*", "!apex-sw.js"],
   // "/" is a fully static page, so precache it instead of the default
   // "dynamic start URL" route. That default serves the launch page
   // NetworkFirst with no timeout — on iOS, opening the installed app after a
