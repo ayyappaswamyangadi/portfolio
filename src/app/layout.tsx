@@ -12,7 +12,10 @@ import { CursorGlow } from "@/app/components/CursorGlow";
 import { NetworkStatus } from "@/app/components/NetworkStatus";
 import { PWAInstallPrompt } from "@/app/components/PWAInstallPrompt";
 import { SplashScreen } from "@/app/components/SplashScreen";
-import { ServiceWorkerUpdater } from "@/app/components/ServiceWorkerUpdater";
+import {
+  ServiceWorkerUpdater,
+  UPDATE_VIEW_KEY,
+} from "@/app/components/ServiceWorkerUpdater";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
 import { WebVitals } from "@/app/components/WebVitals";
 import { SectionViewTracker } from "@/app/components/SectionViewTracker";
@@ -23,13 +26,16 @@ import type { Metadata, Viewport } from "next";
 // the `pwa-splash` class on <html> before the browser paints anything — a
 // regular browser tab visit never touches this, so it never sees a splash
 // flash. SplashScreen.tsx removes the class once it's done fading itself out.
+// Also skipped when this load is ServiceWorkerUpdater swapping in a new build
+// mid-session — that reload should look like nothing happened.
 const detectPwaLaunchScript = `
 (function () {
   try {
     var isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
-    if (isStandalone) {
+    var isUpdateSwap = !!sessionStorage.getItem("${UPDATE_VIEW_KEY}");
+    if (isStandalone && !isUpdateSwap) {
       document.documentElement.classList.add("pwa-splash");
     }
   } catch (e) {}

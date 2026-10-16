@@ -200,6 +200,7 @@ function ProjectCard({ project }: { project: Project }) {
       <div className="relative h-full w-full" style={{ perspective: "1400px" }}>
         <motion.div
           className="relative h-full w-full"
+          data-flipped={flipped}
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           style={{ transformStyle: "preserve-3d" }}
@@ -499,6 +500,7 @@ function FeaturedCarousel() {
       <div
         ref={scrollRef}
         onScroll={measure}
+        data-scroll-key="featured-projects"
         className="carousel-scroll !gap-5 py-3"
       >
         {featuredProjects.map((project, i) => (

@@ -30,15 +30,34 @@ const nextConfig: NextConfig = {
   // www, but a 308 consolidates ranking signals for real. The Search Console
   // verification file is excluded so the redirect can't break an existing
   // apex-domain property's ownership check.
+  //
+  // /sw.js is excluded too: a PWA installed from the apex before this
+  // redirect existed has its own service worker on that origin, and browsers
+  // refuse a redirected worker script — so that worker could never update and
+  // kept serving its stale build forever. On the apex, /sw.js is instead
+  // rewritten (below) to a worker that clears it out and hands over to www.
   async redirects() {
     return [
       {
-        source: "/:path((?!google1a73ae2602885b7d\\.html$).*)",
+        source: "/:path((?!google1a73ae2602885b7d\\.html$|sw\\.js$).*)",
         has: [{ type: "host", value: "ayyappa.dev" }],
         destination: "https://www.ayyappa.dev/:path",
         permanent: true,
       },
     ];
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/sw.js",
+          has: [{ type: "host", value: "ayyappa.dev" }],
+          destination: "/apex-sw.js",
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
   async headers() {
     return [
@@ -63,7 +82,12 @@ export default withPWA({
   disable: process.env.NODE_ENV === "development",
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
+  // Off: it hard-reloads the page on every `online` event, which on a phone
+  // waking up (network flapping off/on) threw the reader back to the top
+  // mid-read. NetworkStatus already announces reconnection.
+  reloadOnOnline: false,
+  // Only ever served on the apex domain, as its /sw.js — never precache it.
+  publicExcludes: ["!noprecache/**/*", "!apex-sw.js"],
   // "/" is a fully static page, so precache it instead of the default
   // "dynamic start URL" route. That default serves the launch page
   // NetworkFirst with no timeout — on iOS, opening the installed app after a
@@ -77,12 +101,19 @@ export default withPWA({
   workboxOptions: {
     disableDevLogs: true,
     runtimeCaching: [
-      // Same match as next-pwa's default "pages" entry (which this replaces
-      // by cacheName), plus a network timeout so any other page falls back
+      // Replaces next-pwa's default "pages" entry (by cacheName) with a
+      // network timeout, so any page other than the precached "/" falls back
       // to its cached copy quickly instead of hanging on a stalled network.
+      // Limited to page navigations: custom entries are registered *ahead*
+      // of the defaults, so the default's broad "any same-origin URL" match
+      // here would swallow every image/font/script request too, making each
+      // one wait up to the timeout on a bad connection instead of being
+      // served straight from its stale-while-revalidate/cache-first cache.
       {
-        urlPattern: ({ url: { pathname }, sameOrigin }) =>
-          sameOrigin && !pathname.startsWith("/api/"),
+        urlPattern: ({ request, url: { pathname }, sameOrigin }) =>
+          request.mode === "navigate" &&
+          sameOrigin &&
+          !pathname.startsWith("/api/"),
         handler: "NetworkFirst",
         options: {
           cacheName: "pages",

@@ -426,6 +426,7 @@ function SkillsCarousel() {
         <div
           ref={scrollRef}
           onScroll={measure}
+          data-scroll-key="skills"
           className="carousel-scroll !gap-5 px-1 py-2"
         >
           {skillGroups.map((group) => (
