@@ -27,27 +27,31 @@ class MockResizeObserver {
 }
 vi.stubGlobal("ResizeObserver", MockResizeObserver);
 
-// jsdom doesn't implement matchMedia — used by next-themes, useIOSInstall,
-// and the hover-capability check in ProjectCard.
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  configurable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+// Server-side tests (route handlers, auth) opt into
+// `@vitest-environment node`, where there's no DOM to patch.
+if (typeof window !== "undefined") {
+  // jsdom doesn't implement matchMedia — used by next-themes, useIOSInstall,
+  // and the hover-capability check in ProjectCard.
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
 
-// jsdom doesn't implement scrollTo/scrollBy.
-window.scrollTo = vi.fn();
-Element.prototype.scrollTo = vi.fn();
-Element.prototype.scrollBy = vi.fn();
+  // jsdom doesn't implement scrollTo/scrollBy.
+  window.scrollTo = vi.fn();
+  Element.prototype.scrollTo = vi.fn();
+  Element.prototype.scrollBy = vi.fn();
+}
 
 // next/image renders a plain <img> in tests via next.config's default loader;
 // silence the "fill" prop needing a positioned parent warning noise isn't

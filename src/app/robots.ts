@@ -5,9 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // /api/resume renders a PDF in a serverless function on every hit, and
-      // /~offline is the PWA's offline fallback — neither belongs in search.
-      disallow: ["/api/", "/~offline"],
+      // /api/resume renders a PDF in a serverless function on every hit,
+      // /~offline is the PWA's offline fallback, and /admin is private —
+      // none belong in search.
+      disallow: ["/api/", "/~offline", "/admin"],
     },
     sitemap: "https://www.ayyappa.dev/sitemap.xml",
   };

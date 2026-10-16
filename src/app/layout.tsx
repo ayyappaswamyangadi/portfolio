@@ -17,6 +17,7 @@ import {
   UPDATE_VIEW_KEY,
 } from "@/app/components/ServiceWorkerUpdater";
 import { GoogleAnalytics } from "@/app/components/GoogleAnalytics";
+import { HideOnAdmin } from "@/app/components/HideOnAdmin";
 import { StructuredData } from "@/app/components/StructuredData";
 import type { Metadata, Viewport } from "next";
 
@@ -179,19 +180,25 @@ export default function RootLayout({
         <SplashScreen />
         <ServiceWorkerUpdater />
         <StructuredData />
-        <GoogleAnalytics />
+        <HideOnAdmin>
+          <GoogleAnalytics />
+        </HideOnAdmin>
         <SpeedInsights />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <FaviconThemeSync />
-          <CursorGlow />
           <NetworkStatus />
-          <header className="sticky top-0 z-50">
-            <Navbar />
-            <ScrollProgress />
-          </header>
+          <HideOnAdmin>
+            <CursorGlow />
+            <header className="sticky top-0 z-50">
+              <Navbar />
+              <ScrollProgress />
+            </header>
+          </HideOnAdmin>
           <main className="flex-1">{children}</main>
-          <Footer />
-          <PWAInstallPrompt />
+          <HideOnAdmin>
+            <Footer />
+            <PWAInstallPrompt />
+          </HideOnAdmin>
         </ThemeProvider>
       </body>
     </html>

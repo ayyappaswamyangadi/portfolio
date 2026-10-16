@@ -46,6 +46,13 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
     ];
   },
 };
@@ -72,6 +79,14 @@ export default withPWA({
   workboxOptions: {
     disableDevLogs: true,
     runtimeCaching: [
+      // The private /admin dashboard (and its login/logout endpoints) always
+      // goes to the network and is never written to any cache. Registered
+      // first, so it wins over the page/RSC/api caches below.
+      {
+        urlPattern: ({ url: { pathname }, sameOrigin }) =>
+          sameOrigin && (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")),
+        handler: "NetworkOnly",
+      },
       // Replaces next-pwa's default "pages" entry (by cacheName) with a
       // network timeout, so any page other than the precached "/" falls back
       // to its cached copy quickly instead of hanging on a stalled network.

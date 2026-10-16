@@ -1,0 +1,46 @@
+import { NextResponse, type NextRequest } from "next/server";
+import {
+  ADMIN_COOKIE,
+  SESSION_MAX_AGE_S,
+  checkPassword,
+  clearFailures,
+  createSessionToken,
+  isAdminConfigured,
+  isLockedOut,
+  recordFailure,
+} from "@/lib/adminAuth";
+
+// A plain form POST + 303 redirect (rather than a server action) so login is a
+// full page navigation: the PWA's front-end-nav cache only hooks client-side
+// router navigations, and the dashboard must never land in it.
+function redirectTo(req: NextRequest, path: string) {
+  return NextResponse.redirect(new URL(path, req.url), 303);
+}
+
+export async function POST(req: NextRequest) {
+  if (!isAdminConfigured()) return redirectTo(req, "/admin/login?error=setup");
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (isLockedOut(ip)) return redirectTo(req, "/admin/login?error=locked");
+
+  const form = await req.formData();
+  const password = String(form.get("password") ?? "");
+
+  if (!checkPassword(password)) {
+    recordFailure(ip);
+    // Slow every wrong guess down a little.
+    await new Promise((r) => setTimeout(r, 800));
+    return redirectTo(req, "/admin/login?error=wrong");
+  }
+
+  clearFailures(ip);
+  const res = redirectTo(req, "/admin");
+  res.cookies.set(ADMIN_COOKIE, createSessionToken(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: SESSION_MAX_AGE_S,
+  });
+  return res;
+}
