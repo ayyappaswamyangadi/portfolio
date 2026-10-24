@@ -7,6 +7,16 @@
 // copy) and src/app/components/About.tsx when either changes — they should
 // all tell the same story about skills and experience.
 
+import { projects } from "./projects";
+
+// Live links come from projects.ts so the resume and the site's project cards
+// can't point at different URLs. Throws at import if a project loses its link.
+function liveUrl(titlePrefix: string): string {
+  const url = projects.find((p) => p.title.startsWith(titlePrefix))?.liveUrl;
+  if (!url) throw new Error(`projects.ts has no liveUrl for "${titlePrefix}"`);
+  return url;
+}
+
 export const RESUME_CONTACT = {
   name: "AYYAPPA SWAMY ANGADI",
   title: "Senior Frontend Engineer — React · Next.js · TypeScript · AI-Assisted Development",
@@ -83,23 +93,29 @@ export const RESUME_SKILLS: { label: string; items: string }[] = [
   },
 ];
 
+// A bullet's optional link renders first, as the clickable product name.
+export type ResumeBullet = { link?: { label: string; url: string }; text: string };
+
 // Each bullet: product + proof point, what I built, the hard part.
 export const RESUME_EXPERIENCE: {
   role: string;
   org: string;
   dateLabel: string;
-  bullets: string[];
+  bullets: ResumeBullet[];
 }[] = [
   {
     role: "Frontend Engineer",
     org: "Revise — Mumbai, India (Remote)",
     dateLabel: "May 2022 – Present",
     bullets: [
-      "Grass: Code Agent Computer (live on the App Store) — Built the app for running and steering Claude Code and OpenCode sessions from a phone: resumable streaming chat that survives backgrounding and dropped networks, a tool-approval queue with push notifications, and one-tap switching between machines. First project built with AI-assisted development (Claude Code).",
-      "10X Trade — Built the trading interface for leveraged crypto futures in a Telegram Mini App: live WebSocket market data driving real-time profit-and-loss and charts, with orders signed on the user's device.",
-      "TaxAI (launched on Product Hunt) — Built the research interface for chartered accountants: answers stream in beside the source Act, and each citation jumps to and highlights the exact section or proviso.",
-      "Convo (launched on Product Hunt) — Built the developer dashboard for an LLM-memory SDK: magic-link sign-in, an infinite-scroll thread explorer and API key management.",
-      "Own frontend architecture and API contracts with backend engineers, and review code across the team.",
+      {
+        link: { label: "Grass: Code Agent Computer", url: liveUrl("Grass") },
+        text: " (live on the App Store) — Built the app for running and steering Claude Code and OpenCode sessions from a phone: resumable streaming chat that survives backgrounding and dropped networks, a tool-approval queue with push notifications, and one-tap switching between machines. First project built with AI-assisted development (Claude Code).",
+      },
+      { text: "10X Trade — Built the trading interface for leveraged crypto futures in a Telegram Mini App: live WebSocket market data driving real-time profit-and-loss and charts, with orders signed on the user's device." },
+      { text: "TaxAI (launched on Product Hunt) — Built the research interface for chartered accountants: answers stream in beside the source Act, and each citation jumps to and highlights the exact section or proviso." },
+      { text: "Convo (launched on Product Hunt) — Built the developer dashboard for an LLM-memory SDK: magic-link sign-in, an infinite-scroll thread explorer and API key management." },
+      { text: "Own frontend architecture and API contracts with backend engineers, and review code across the team." },
     ],
   },
   {
@@ -107,28 +123,34 @@ export const RESUME_EXPERIENCE: {
     org: "Chools Consultancy Services — Bengaluru, India (Onsite)",
     dateLabel: "Oct 2020 – Jan 2022",
     bullets: [
-      "Built and maintained chools.in, the company's WordPress learning and consulting platform — course catalog, programme pages, learner accounts and course checkout.",
-      "Customised WordPress themes and plugins for client-specific e-learning requirements.",
-      "Delivered responsive, cross-browser websites in HTML, CSS and JavaScript from client wireframes.",
+      {
+        link: { label: "chools.in", url: liveUrl("Chools") },
+        text: " — Built and maintained the company's WordPress learning and consulting platform: course catalog, programme pages, learner accounts and course checkout.",
+      },
+      { text: "Customised WordPress themes and plugins for client-specific e-learning requirements." },
+      { text: "Delivered responsive, cross-browser websites in HTML, CSS and JavaScript from client wireframes." },
     ],
   },
 ];
 
 // Personal and client projects only — professional products live under
 // Experience above, so nothing here repeats them.
-export const RESUME_PROJECTS: { name: string; tech: string; desc: string }[] = [
+export const RESUME_PROJECTS: { name: string; url: string; tech: string; desc: string }[] = [
   {
     name: "Resume Builder",
+    url: liveUrl("Resume Builder"),
     tech: "Next.js, React, Tailwind CSS, Firebase, Zustand.",
     desc: "Built solo, end to end: 50+ ATS-friendly templates, live preview, AI writing help, PDF export and autosave.",
   },
   {
     name: "URL Shortener",
+    url: liveUrl("URL Shortener"),
     tech: "React, Node.js, Express, REST API.",
     desc: "Built solo, end to end: React frontend, Node.js/Express API and database, with searchable link history.",
   },
   {
     name: "Bilingual Registration Form (client)",
+    url: liveUrl("Sarvadharma Marriage Bureau"),
     tech: "React, Google Drive API, jsPDF.",
     desc: "Built solo for a client, requirements to launch: English/Kannada intake form with PDF/image export and Google Drive saving.",
   },

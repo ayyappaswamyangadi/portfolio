@@ -69,6 +69,8 @@ const styles = StyleSheet.create({
   // separately from the general body-spacing pass below.
   contactLine: { marginBottom: 3 },
   link: { color: ACCENT, fontFamily: "Helvetica-Bold", textDecoration: "none" },
+  // Underlined so a reader can tell a project name opens the live app.
+  liveLink: { color: ACCENT, fontFamily: "Helvetica-Bold", textDecoration: "underline" },
   section: { marginBottom: 6 },
   h2: {
     fontSize: 10.2,
@@ -195,7 +197,14 @@ export function ResumeDocument({
               </View>
               <Text style={styles.org}>{job.org}</Text>
               {job.bullets.map((b) => (
-                <Bullet key={b}>{b}</Bullet>
+                <Bullet key={b.text}>
+                  {b.link && (
+                    <Link src={b.link.url} style={styles.liveLink}>
+                      {b.link.label}
+                    </Link>
+                  )}
+                  {b.text}
+                </Bullet>
               ))}
             </View>
           ))}
@@ -206,7 +215,10 @@ export function ResumeDocument({
           <Text style={styles.h2}>Selected Projects</Text>
           {RESUME_PROJECTS.map((p) => (
             <Text key={p.name} style={styles.projLine}>
-              <Text style={styles.projHead}>{p.name}</Text> —{" "}
+              <Link src={p.url} style={styles.liveLink}>
+                {p.name}
+              </Link>{" "}
+              —{" "}
               <Text style={styles.projTech}>{p.tech}</Text> {p.desc}
             </Text>
           ))}

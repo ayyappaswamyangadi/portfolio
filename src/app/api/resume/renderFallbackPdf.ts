@@ -6,6 +6,7 @@ import {
   RESUME_PROJECTS,
   RESUME_EDUCATION,
   resumeSummary,
+  type ResumeBullet,
   type ResumeSegment,
 } from "@/lib/resumeContent";
 
@@ -62,15 +63,27 @@ function heading(doc: PDFKit.PDFDocument, label: string) {
   doc.fillColor(INK);
 }
 
-function bullet(doc: PDFKit.PDFDocument, text: string) {
+function bullet(doc: PDFKit.PDFDocument, { link, text }: ResumeBullet) {
   const x = MARGIN + 10;
   const width = CONTENT_WIDTH - 10;
   // Bullet glyph is part of the same text() call as the body so wrapped
   // lines share its x/width — that's what keeps them hanging-indented
   // under the first line instead of back at the page margin.
   doc.fontSize(10.2).font("Helvetica").fillColor(INK);
-  doc.text(`•  ${text}`, x, doc.y, { width });
+  if (link) {
+    doc.text("•  ", x, doc.y, { width, continued: true });
+    doc
+      .font("Helvetica-Bold")
+      .fillColor(ACCENT)
+      .text(link.label, { continued: true, link: link.url, underline: true });
+    doc.font("Helvetica").fillColor(INK).text(text, { link: null, underline: false });
+  } else {
+    doc.text(`•  ${text}`, x, doc.y, { width });
+  }
   doc.moveDown(0.15);
+  // text(x, y) moves pdfkit's cursor x too — put it back at the margin so the
+  // next heading isn't indented like a bullet.
+  doc.x = MARGIN;
 }
 
 export function renderFallbackPdf({
@@ -168,8 +181,9 @@ export function renderFallbackPdf({
     // ── Projects ──
     heading(doc, "Selected Projects");
     RESUME_PROJECTS.forEach((p) => {
-      doc.fontSize(10.2).font("Helvetica-Bold").fillColor(INK);
-      doc.text(`${p.name} — `, { continued: true });
+      doc.fontSize(10.2).font("Helvetica-Bold").fillColor(ACCENT);
+      doc.text(p.name, { continued: true, link: p.url, underline: true });
+      doc.fillColor(INK).text(" — ", { continued: true, link: null, underline: false });
       doc.font("Helvetica-Oblique").fillColor("#6b7280").fontSize(9.1);
       doc.text(`${p.tech} `, { continued: true });
       doc.font("Helvetica").fillColor(INK).fontSize(10.2);
