@@ -2,13 +2,23 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-function loginRequest(password: string, ip = "10.0.0.1") {
-  const body = new URLSearchParams({ password });
+import { totpCode } from "@/lib/adminAuth";
+
+const TOTP_SECRET = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP";
+const code = (offsetS = 0) => totpCode(TOTP_SECRET, Date.now() + offsetS * 1000);
+
+function loginRequest(password: string, ip = "10.0.0.1", otp = code()) {
+  const body = new URLSearchParams({ password, code: otp });
   return new NextRequest("https://www.ayyappa.dev/api/admin/login", {
     method: "POST",
     body,
     headers: { "content-type": "application/x-www-form-urlencoded", "x-forwarded-for": ip },
   });
+}
+
+async function usePassword(password: string) {
+  const { hashPassword } = await import("@/lib/adminAuth");
+  vi.stubEnv("ADMIN_PASSWORD_HASH", password ? await hashPassword(password, 14) : "");
 }
 
 async function load() {
@@ -17,10 +27,11 @@ async function load() {
 }
 
 describe("POST /api/admin/login", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.useFakeTimers({ toFake: ["setTimeout"] });
-    vi.stubEnv("ADMIN_PASSWORD", "right-password");
+    await usePassword("right-password");
     vi.stubEnv("ADMIN_SESSION_SECRET", "secret");
+    vi.stubEnv("ADMIN_TOTP_SECRET", TOTP_SECRET);
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -28,8 +39,14 @@ describe("POST /api/admin/login", () => {
   });
 
   async function post(POST: (r: NextRequest) => Promise<Response>, req: NextRequest) {
-    const pending = POST(req);
-    await vi.runAllTimersAsync();
+    // scrypt runs on the thread pool, so keep ticking the fake clock until the
+    // request settles instead of flushing timers once.
+    let done = false;
+    const pending = POST(req).finally(() => (done = true));
+    while (!done) {
+      await vi.advanceTimersByTimeAsync(1000);
+      await new Promise((r) => setImmediate(r));
+    }
     return pending;
   }
 
@@ -51,16 +68,60 @@ describe("POST /api/admin/login", () => {
     expect(res.headers.get("set-cookie")).toBeNull();
   });
 
-  it("locks out after 5 wrong attempts, even if the 6th is right", async () => {
+  it("locks out after 3 wrong attempts from anywhere, even if the 4th is right", async () => {
     const { POST } = await load();
-    for (let i = 0; i < 5; i++) await post(POST, loginRequest("nope", "7.7.7.7"));
-    const res = await post(POST, loginRequest("right-password", "7.7.7.7"));
+    for (const ip of ["1.1.1.1", "2.2.2.2", "3.3.3.3"]) {
+      const res = await post(POST, loginRequest("nope", ip));
+      expect(res.headers.get("location")).toContain("error=wrong");
+    }
+    const res = await post(POST, loginRequest("right-password", "4.4.4.4"));
     expect(res.headers.get("location")).toContain("error=locked");
     expect(res.headers.get("set-cookie")).toBeNull();
   });
 
+  it("unlocks only once the owner sets a new password; the old one stays dead", async () => {
+    const { POST } = await load();
+    for (let i = 0; i < 3; i++) await post(POST, loginRequest("nope"));
+    await usePassword("brand-new-password");
+    const old = await post(POST, loginRequest("right-password"));
+    expect(old.headers.get("location")).toContain("error=wrong");
+    const res = await post(POST, loginRequest("brand-new-password"));
+    expect(res.headers.get("location")).toBe("https://www.ayyappa.dev/admin");
+  });
+
+  it("needs the authenticator code too: the right password alone fails", async () => {
+    const { POST } = await load();
+    const wrongCode = String((Number(code()) + 1) % 1_000_000).padStart(6, "0");
+    for (const otp of ["", "abcdef", wrongCode]) {
+      const res = await post(POST, loginRequest("right-password", "10.0.0.1", otp));
+      expect(res.headers.get("location")).toContain("error=wrong");
+      expect(res.headers.get("set-cookie")).toBeNull();
+    }
+    // ...and those count toward the lockout.
+    const res = await post(POST, loginRequest("right-password"));
+    expect(res.headers.get("location")).toContain("error=locked");
+  });
+
+  it("accepts each code only once", async () => {
+    const { POST } = await load();
+    const otp = code();
+    const first = await post(POST, loginRequest("right-password", "10.0.0.1", otp));
+    expect(first.headers.get("location")).toBe("https://www.ayyappa.dev/admin");
+    const replay = await post(POST, loginRequest("right-password", "10.0.0.1", otp));
+    expect(replay.headers.get("location")).toContain("error=wrong");
+  });
+
+  it("resets the count after a successful login", async () => {
+    const { POST } = await load();
+    for (let i = 0; i < 2; i++) await post(POST, loginRequest("nope"));
+    await post(POST, loginRequest("right-password", "10.0.0.1", code(-30)));
+    for (let i = 0; i < 2; i++) await post(POST, loginRequest("nope"));
+    const res = await post(POST, loginRequest("right-password", "10.0.0.1", code(0)));
+    expect(res.headers.get("location")).toBe("https://www.ayyappa.dev/admin");
+  });
+
   it("refuses logins when admin isn't configured", async () => {
-    vi.stubEnv("ADMIN_PASSWORD", "");
+    await usePassword("");
     const { POST } = await load();
     const res = await post(POST, loginRequest(""));
     expect(res.headers.get("location")).toContain("error=setup");

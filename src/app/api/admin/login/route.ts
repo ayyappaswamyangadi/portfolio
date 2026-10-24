@@ -3,11 +3,13 @@ import {
   ADMIN_COOKIE,
   SESSION_MAX_AGE_S,
   checkPassword,
-  clearFailures,
+  claimTotpStep,
   createSessionToken,
   isAdminConfigured,
-  isLockedOut,
-  recordFailure,
+  isLockoutStoreConfigured,
+  matchTotp,
+  reserveAttempt,
+  resetAttempts,
 } from "@/lib/adminAuth";
 
 // A plain form POST + 303 redirect (rather than a server action) so login is a
@@ -18,22 +20,39 @@ function redirectTo(req: NextRequest, path: string) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!isAdminConfigured()) return redirectTo(req, "/admin/login?error=setup");
+  if (!isAdminConfigured() || !isLockoutStoreConfigured()) {
+    return redirectTo(req, "/admin/login?error=setup");
+  }
 
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (isLockedOut(ip)) return redirectTo(req, "/admin/login?error=locked");
+  let allowed: boolean;
+  try {
+    allowed = await reserveAttempt();
+  } catch {
+    return redirectTo(req, "/admin/login?error=unavailable");
+  }
+  if (!allowed) return redirectTo(req, "/admin/login?error=locked");
 
   const form = await req.formData();
   const password = String(form.get("password") ?? "");
+  const code = String(form.get("code") ?? "");
 
-  if (!checkPassword(password)) {
-    recordFailure(ip);
-    // Slow every wrong guess down a little.
+  const passwordOk = await checkPassword(password);
+  const step = matchTotp(code);
+  let ok = passwordOk && step !== null;
+  if (ok) {
+    try {
+      ok = await claimTotpStep(step!);
+    } catch {
+      return redirectTo(req, "/admin/login?error=unavailable");
+    }
+  }
+
+  if (!ok) {
     await new Promise((r) => setTimeout(r, 800));
     return redirectTo(req, "/admin/login?error=wrong");
   }
 
-  clearFailures(ip);
+  await resetAttempts().catch(() => {});
   const res = redirectTo(req, "/admin");
   res.cookies.set(ADMIN_COOKIE, createSessionToken(), {
     httpOnly: true,
